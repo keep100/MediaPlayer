@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
+//import ""
 
 Window {
     id:mainWindow
@@ -131,7 +132,7 @@ Window {
         color: setColor(25, 25, 25,0.6)
     }
 
-    TitleBar{}
+//    TitleBar{}
 
     Rectangle{
         id:footer
