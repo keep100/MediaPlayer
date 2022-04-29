@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>TitleBar.qml</file>
         <file>images/bg.jpg</file>
         <file>images/logo.png</file>
         <file>images/pause.png</file>
@@ -16,7 +15,6 @@
         <file>images/上一首.png</file>
         <file>images/视频.png</file>
         <file>images/停止.png</file>
-        <file>images/微信图片_20220417154210.png</file>
         <file>images/无内容.png</file>
         <file>images/下一首.png</file>
         <file>images/音乐.png</file>
@@ -26,5 +24,10 @@
         <file>images/正常化.png</file>
         <file>images/最大化.png</file>
         <file>images/最小化.png</file>
+        <file>components/TitleBar.qml</file>
+        <file>images/退出全屏.png</file>
+        <file>images/取消搜索词.png</file>
+        <file>images/搜索.png</file>
+        <file>components/ListData.qml</file>
     </qresource>
 </RCC>
