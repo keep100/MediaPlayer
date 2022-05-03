@@ -152,7 +152,7 @@ Window {
         easing.type: Easing.InOutExpo //渐变滑出效果
     }
 
-    //进度条
+    //播放进度条
     Slider {
         id: mySlider
         value: 0.2

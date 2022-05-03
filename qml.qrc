@@ -48,5 +48,6 @@
         <file>components/MusicView.qml</file>
         <file>components/CoverPage.qml</file>
         <file>components/PlayQueue.qml</file>
+        <file>images/删除.png</file>
     </qresource>
 </RCC>
