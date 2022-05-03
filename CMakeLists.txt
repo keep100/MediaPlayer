@@ -14,10 +14,34 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
 
+#提供位置定位.cmake文件
+set(Qt6_DIR C:/Qt/Qt6/6.3.0/msvc2019_64/lib/cmake/Qt6)
+
+find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS OpenGL)
+
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS MultimediaWidgets)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/include)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/lib)
+link_libraries(avcodec avformat avutil swscale swresample)
+
 set(PROJECT_SOURCES
         main.cpp
         qml.qrc
+        XDemux.h XDemux.cpp
+        XDecode.h XDecode.cpp
+        XVideoWidget.h XVideoWidget.cpp
+        XResample.h XResample.cpp
+        XAudioPlay.h XAudioPlay.cpp
+        XAudioThread.h XAudioThread.cpp
+        XVideoThread.h XVideoThread.cpp
+        IVideoCall.h
+        xdemuxthread.h xdemuxthread.cpp
 )
+
+
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(MediaPlayer
@@ -46,6 +70,13 @@ target_compile_definitions(MediaPlayer
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(MediaPlayer
   PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick)
+
+target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGLWidgets)
+target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGL)
+
+
+target_link_libraries(MediaPlayer PRIVATE Qt6::Multimedia)
+target_link_libraries(MediaPlayer PRIVATE Qt6::MultimediaWidgets)
 
 set_target_properties(MediaPlayer PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
