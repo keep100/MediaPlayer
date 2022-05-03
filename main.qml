@@ -12,9 +12,13 @@ Window {
     visible: true
     flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint //除去窗口原生标题栏
 
-    property int windowWidth: Screen.desktopAvailableWidth*0.65 //窗口宽度，跟随电脑屏幕变化
-    property int windowHeight: Screen.desktopAvailableHeight*0.8 ////窗口高度，跟随电脑屏幕变化
-    //    property int curIdx: 0
+    property int windowWidth: Screen.desktopAvailableWidth*0.65  //窗口宽度，跟随电脑屏幕变化
+    property int windowHeight: Screen.desktopAvailableHeight*0.8  //窗口高度，跟随电脑屏幕变化
+    property bool isFullSreen: false  //是否已经全屏
+    property bool isAudioPlay: false  //是否有音频播放
+    property bool isPlaying: false    //音视频是否正在播放
+    property bool isCoverShow: false  //音频封面页是否已经展示
+    property int curIdx: 0  //当前页面，0代表视频页面，1代表音频页面
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -39,6 +43,15 @@ Window {
         windowHeight=Screen.height;
     }
 
+    //监听是否有音视频在播放
+    onIsAudioPlayChanged: {
+        if(!isAudioPlay){
+            musicList.currentIndex=-1;
+            queue.currentIndex=-1;
+        }
+    }
+
+    //窗口背景
     Image {
         id: bg
         source: "./images/bg.jpg"
@@ -47,89 +60,10 @@ Window {
         smooth: true
     }
 
-    Rectangle{
-        id:leftMenu
-        width: parent.width/5
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        color: setColor(20, 20, 20,0.8)
+    //左侧导航栏
+    LeftMenu{id:leftMenu}
 
-        Column{
-            Rectangle{
-                width: leftMenu.width
-                height: leftMenu.height*0.2
-                color: "transparent"
-                Image {
-                    id: logo
-                    anchors.centerIn: parent
-                    source: "./images/logo.png"
-                }
-            }
-            Rectangle{
-                width: leftMenu.width
-                height: 1
-                color: setColor(183, 184, 184)
-            }
-            Label{
-                text:'媒体库'
-                width: leftMenu.width
-                height: 50
-                font.pixelSize: 22
-                leftPadding: 10
-                color: setColor(126, 134, 144)
-                verticalAlignment: Text.AlignVCenter
-            }
-            Rectangle{
-                id:line
-                width: leftMenu.width
-                height: 1
-                color: setColor(183, 184, 184)
-            }
-            ListView{
-                id:listView
-                width: leftMenu.width
-                height: 30*model.length
-                model:[
-                    {
-                        text:'视频',
-                        icon:'./images/视频.png'
-                    },
-                    {
-                        text:'音乐',
-                        icon:'./images/音乐.png'
-                    },
-                ]
-
-                delegate: ItemDelegate{
-                    width: parent.width
-                    height: 30
-
-                    Text{
-                        text:modelData.text
-                        font.pixelSize: 14
-                        leftPadding:30
-                        color: "white"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    background: Rectangle{
-                        Image {
-                            x:5
-                            width: 18
-                            height: 18
-                            anchors.verticalCenter: parent.verticalCenter
-                            fillMode: Image.PreserveAspectFit
-                            source: modelData.icon
-                        }
-                        color: listView.currentIndex===index?setColor(70, 117, 156,0.8):"transparent"
-                    }
-                    onClicked: listView.currentIndex=index
-                }
-            }
-        }
-    }
-
+    //内容展示区
     Rectangle{
         id:contentView
         anchors.top: titleBar.top
@@ -145,74 +79,23 @@ Window {
             topPadding: 50
             width: parent.width
 
+            //当前页面标题
             Label{
-                text: listView.currentIndex===0?'视频':'音乐'
+                text: curIdx===0?'视频':'音乐'
                 font.pixelSize: 24
                 color: "white"
             }
 
-            Rectangle{
-                id:searchBox
-                x:parent.width-width-40
-                width: 240
-                height: 30
-                color: setColor(54, 56, 61)
-                radius: 20
-
-                Image {
-                    id:searchIcon
-                    width: 22
-                    height: 22
-                    source: "./images/搜索.png"
-                    x:12
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                TextField{
-                    id:searchInput
-                    placeholderText: qsTr("搜索")
-                    placeholderTextColor:setColor(136, 138, 146)
-                    color: "white"
-                    font.pixelSize: 14
-                    x:searchIcon.x+searchIcon.width+8
-                    anchors.verticalCenter: parent.verticalCenter
-                    selectByMouse:true
-
-                    background: Rectangle {
-                        implicitWidth: 170
-                        color: "transparent"
-                    }
-
-                    onAccepted: {
-                        console.log(text)
-                        focus=false;
-                    }
-                }
-
-                Image {
-                    id:cancelBtn
-                    width: 18
-                    height: 18
-                    source: "./images/取消搜索词.png"
-                    x:parent.width-width-8
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    MouseArea{
-                        anchors.fill: parent
-
-                        onClicked: searchInput.clear()
-                    }
-                }
-            }
-
-
+            //搜索框
+            SearchBox{id:searchBox}
         }
 
+        //上传文件按钮
         Button{
             id: uploadBtn
             x: titleRow.x+30
             y:titleRow.y+titleRow.height+8
-            text: listView.currentIndex===0?"导入视频":"导入音频"
+            text: curIdx===0?"导入视频":"导入音频"
             hoverEnabled:false
 
             contentItem: Text {
@@ -232,172 +115,79 @@ Window {
             }
         }
 
-        ListData {id:videoList }
+        //视频数据列表
+        //        VideoListData {id:videoData }
 
-        Rectangle {
-            y:uploadBtn.y+uploadBtn.height+20
-            width: parent.width
-            height: parent.height-y
-            color: "transparent"
+        //视频展示区
+        VideoView{id:videoView}
 
-            Component {
-                id: videoDelegate
-                Item {
-                    width: grid.cellWidth
-                    height: grid.cellHeight
-                    Column {
-                        anchors.fill: parent
-                        anchors.leftMargin: titleBar.isMaximized||footer.isFullSreen?50:30
-                        anchors.bottomMargin: titleBar.isMaximized||footer.isFullSreen?25:15
-                        Image {
-                            width: parent.width
-                            height: parent.height*0.8
-                            source: src
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text {
-                            text: videoName
-                            font.pixelSize:titleBar.isMaximized||footer.isFullSreen?16:14
-                            topPadding: 8
-                            color: "white"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                }
-            }
-
-            GridView {
-                id: grid
-                anchors.fill: parent
-                cellWidth:  titleBar.isMaximized||footer.isFullSreen?240:180
-                cellHeight: cellWidth*0.7
-                clip: true
-
-                model:videoList
-                delegate: videoDelegate
-            }
-        }
+        //音频展示区
+        MusicView{id:musicView}
     }
 
     //标题栏
     TitleBar{id:titleBar}
 
-    Rectangle{
-        id:footer
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 40
-        color: setColor(0,0,0,0.8)
+    //音乐封面页面
+    CoverPage{id:coverPage}
 
-        property bool isFullSreen: false
+    //音频封面滑动动画
+    PropertyAnimation{
+        id:coverAnimation
+        target: coverPage
+        properties: "y"
+        duration: 300
+        easing.type: Easing.InQuad
+    }
 
-        Row{
-            width: parent.width
-            height: parent.height
-            Image {
-                id: exitBtn
-                source: "./images/停止.png"
-                width: 20
-                height: 20
-                x:leftMenu.width+windowWidth*0.1
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Image {
-                id: prevBtn
-                source: "./images/上一首.png"
-                width: 26
-                height: 26
-                x:exitBtn.x+windowWidth*0.08
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Image {
-                id: playBtn
-                source: "./images/播放.png"
-                width: 15
-                height: 15
-                x:prevBtn.x+windowWidth*0.07
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Image {
-                id: nextBtn
-                source: "./images/下一首.png"
-                width: 26
-                height: 26
-                x:playBtn.x+windowWidth*0.06
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Image {
-                id: soundIcon
-                source: "./images/音量.png"
-                width: 16
-                height: 16
-                x:nextBtn.x+windowWidth*0.08
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Slider {
-                id: soundSlider
-                value: 0.5
-                x:soundIcon.x+windowWidth*0.02
-                anchors.verticalCenter: parent.verticalCenter
+    //播放队列
+    PlayQueue{id:playQueue}
 
-                background: Rectangle {
-                    y: soundSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 100
-                    implicitHeight: 4
-                    width: soundSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "white"
+    //播放队列滑动动画
+    PropertyAnimation{
+        id: queueAnimation
+        target: playQueue
+        properties: "x"
+        duration: 800
+        easing.type: Easing.InOutExpo //渐变滑出效果
+    }
 
-                    Rectangle {
-                        width: soundSlider.visualPosition * parent.width
-                        height: parent.height
-                        color: setColor(22, 132, 252)
-                        radius: 2
-                    }
-                }
+    //进度条
+    Slider {
+        id: mySlider
+        value: 0.2
+        y:footer.y-mySlider.availableHeight / 2
+        z:1
+        visible: isAudioPlay
 
-                handle: Rectangle {
-                    x:  soundSlider.visualPosition * (soundSlider.availableWidth - width)
-                    y:  soundSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 13
-                    implicitHeight: 13
-                    radius: 100
-                    color: soundSlider.pressed ? "#f0f0f0" : "#f6f6f6"
-                    border.color: "#bdbebf"
-                }
-            }
-            Image {
-                id: fullBtn
-                source: footer.isFullSreen?"./images/退出全屏.png":"./images/全屏.png"
-                width: 18
-                height: 18
-                x:soundSlider.x+windowWidth*0.3
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        footer.isFullSreen=!footer.isFullSreen;
-                        footer.isFullSreen?showFull():showInitial();
-                    }
-                }
-            }
-            Image {
-                id: listBtn
-                source: "./images/列表.png"
-                width: 18
-                height: 18
-                x:fullBtn.x+windowWidth*0.04
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
+        background: Rectangle {
+            y: mySlider.availableHeight / 2 - height / 2
+            implicitWidth: windowWidth
+            implicitHeight: 4
+            width: mySlider.availableWidth
+            height: implicitHeight
+            radius: 2
+            color: "white"
+
+            Rectangle {
+                width: mySlider.visualPosition * parent.width
+                height: parent.height
+                color: setColor(22, 132, 252)
+                radius: 2
             }
         }
+
+        handle: Rectangle {
+            x:  mySlider.visualPosition * (mySlider.availableWidth - width)
+            y:  mySlider.availableHeight / 2 - height / 2
+            implicitWidth: 10
+            implicitHeight: 10
+            radius: 100
+            color: mySlider.pressed ? "#f0f0f0" : "#f6f6f6"
+            border.color: "#bdbebf"
+        }
     }
+
+    //底部控制栏
+    Footer{id:footer}
 }
