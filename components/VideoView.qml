@@ -38,7 +38,6 @@ Rectangle {
                         height: parent.height-2
                         anchors.centerIn: parent
                         Image {//删除图标
-                            id:delIcon
                             source: "../images/删除.png"
                             anchors.right: parent.right
                             anchors.top: parent.top

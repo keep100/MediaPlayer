@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
+import Qt.labs.platform 1.1
 import "./components/"
 
 Window {
@@ -113,6 +114,8 @@ Window {
                 color: uploadBtn.down?setColor(97, 173, 253):setColor(77, 153, 252)
                 radius: 20
             }
+
+            onClicked: fileDialog.open()
         }
 
         //视频数据列表
@@ -123,6 +126,16 @@ Window {
 
         //音频展示区
         MusicView{id:musicView}
+    }
+
+    //本地文件选择框
+    FileDialog {
+        id: fileDialog
+//        currentFile: document.source
+        fileMode:FileDialog.OpenFiles  //支持文件多选
+        folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]  //打开默认文件夹
+        nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
+                               :["audio files (*.mp3 *.flac *.wav *rm)"]
     }
 
     //标题栏
