@@ -11,6 +11,10 @@ Rectangle{
     color: "transparent"
     visible: curIdx===1
 
+    function reset(){
+        musicList.currentIndex=-1;
+    }
+
     //有音频的状态展示区
     Column{
         leftPadding: uploadBtn.x

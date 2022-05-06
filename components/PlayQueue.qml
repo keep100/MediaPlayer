@@ -11,6 +11,10 @@ Rectangle{
     x:footer.isShowQueue?windowWidth-width:windowWidth
     color: setColor(0,0,0,0.7)
 
+    function reset(){
+        queue.currentIndex=-1;
+    }
+
     Column{
         anchors.fill: parent
 

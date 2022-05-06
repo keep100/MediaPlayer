@@ -47,8 +47,8 @@ Window {
     //监听是否有音视频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
-            musicList.currentIndex=-1;
-            queue.currentIndex=-1;
+            musicView.reset();
+            playQueue.reset();
         }
     }
 
