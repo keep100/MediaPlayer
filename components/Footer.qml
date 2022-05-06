@@ -26,7 +26,7 @@ Rectangle{
             //音频略缩图
             Image {
                 id: smallCover
-                source: "../images/small-cover.png"
+                source: "qrc:/images/small-cover.png"
                 width: parent.height*0.8
                 height: width
                 fillMode: Image.PreserveAspectFit
@@ -39,7 +39,7 @@ Rectangle{
                     height: 18
                     opacity: 0
                     anchors.centerIn: parent
-                    source: "../images/向上.png"
+                    source: "qrc:/images/向上.png"
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -79,7 +79,7 @@ Rectangle{
         //退出播放音视频的按钮
         Image {
             id: exitBtn
-            source: isAudioPlay?"../images/停止.png":"../images/停止-禁用.png"
+            source: isAudioPlay?"qrc:/images/停止.png":"qrc:/images/停止-禁用.png"
             width: 20
             height: 20
             x:leftMenu.width+windowWidth*0.1
@@ -99,7 +99,7 @@ Rectangle{
         //上一首按钮
         Image {
             id: prevBtn
-            source: isAudioPlay?"../images/上一首.png":"../images/上一首-禁用.png"
+            source: isAudioPlay?"qrc:/images/上一首.png":"qrc:/images/上一首-禁用.png"
             width: 26
             height: 26
             x:exitBtn.x+windowWidth*0.08
@@ -110,8 +110,8 @@ Rectangle{
         //播放与暂停按钮
         Image {
             id: playBtn
-            source: isAudioPlay?(isPlaying?"../images/pause.png":"../images/播放.png")
-                               :"../images/播放-禁用.png"
+            source: isAudioPlay?(isPlaying?"qrc:/images/pause.png":"qrc:/images/播放.png")
+                               :"qrc:/images/播放-禁用.png"
             width: 15
             height: 15
             x:prevBtn.x+windowWidth*0.07
@@ -130,7 +130,7 @@ Rectangle{
         //下一首按钮
         Image {
             id: nextBtn
-            source: isAudioPlay?"../images/下一首.png":"../images/下一首-禁用.png"
+            source: isAudioPlay?"qrc:/images/下一首.png":"qrc:/images/下一首-禁用.png"
             width: 26
             height: 26
             x:playBtn.x+windowWidth*0.06
@@ -141,7 +141,7 @@ Rectangle{
         //音量图标
         Image {
             id: soundIcon
-            source: "../images/音量.png"
+            source: "qrc:/images/音量.png"
             width: 16
             height: 16
             x:nextBtn.x+windowWidth*0.08
@@ -187,7 +187,7 @@ Rectangle{
         //当前播放模式图标
         Image {
             id: playMode
-            source: "../images/"+playModeList.model[playModeList.currentIndex]+".png"
+            source: "qrc:/images/"+playModeList.model[playModeList.currentIndex]+".png"
             width: 18
             height: 18
             x:soundSlider.x+windowWidth*0.26
@@ -228,7 +228,7 @@ Rectangle{
                             Image {
                                 width: 16
                                 height: 16
-                                source: playModeList.currentIndex===index?"../images/打钩.png":""
+                                source: playModeList.currentIndex===index?"qrc:/images/打钩.png":""
                                 x:10
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -251,7 +251,7 @@ Rectangle{
         //全屏按钮
         Image {
             id: fullBtn
-            source: isFullSreen?"../images/退出全屏.png":"../images/全屏.png"
+            source: isFullSreen?"qrc:/images/退出全屏.png":"qrc:/images/全屏.png"
             width: 18
             height: 18
             x:soundSlider.x+windowWidth*0.3
@@ -269,7 +269,7 @@ Rectangle{
         //播放队列按钮
         Image {
             id: listBtn
-            source: "../images/列表.png"
+            source: "qrc:/images/列表.png"
             width: 18
             height: 18
             x:fullBtn.x+windowWidth*0.04

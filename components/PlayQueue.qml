@@ -111,7 +111,7 @@ Rectangle{
             Image {
                 width: 120
                 height: 120
-                source: "../images/无内容.png"
+                source: "qrc:/images/无内容.png"
             }
             Text {
                 text: qsTr("播放队列为空")

@@ -5,14 +5,14 @@ import QtQuick.Controls 2.5
 //音乐封面页面
 Image {
     id: coverPage
-    source: "../images/cover.png"
+    source: "qrc:/images/cover.png"
     width: windowWidth
     y:windowHeight
     height: windowHeight-footer.height
 
     //下滑箭头
     Image {
-        source: "../images/下箭头.png"
+        source: "qrc:/images/下箭头.png"
         width: 30
         height: 30
         x:20

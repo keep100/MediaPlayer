@@ -22,7 +22,7 @@ Rectangle{
             Image {//软件logo
                 id: logo
                 anchors.centerIn: parent
-                source: "../images/logo.png"
+                source: "qrc:/images/logo.png"
             }
         }
 
@@ -60,11 +60,11 @@ Rectangle{
             model:[
                 {
                     text:'视频',
-                    icon:'../images/视频.png'
+                    icon:'qrc:/images/视频.png'
                 },
                 {
                     text:'音乐',
-                    icon:'../images/音乐.png'
+                    icon:'qrc:/images/音乐.png'
                 },
             ]
             delegate: ItemDelegate{//列表项

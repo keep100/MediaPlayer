@@ -39,7 +39,7 @@ Rectangle{
                 width: parent.width*0.5
                 height: parent.height*0.5
                 anchors.centerIn: parent
-                source: "../images/关闭.png"
+                source: "qrc:/images/关闭.png"
             }
         }
         onClicked: {
@@ -64,8 +64,8 @@ Rectangle{
                 height: parent.height * 0.4
                 anchors.centerIn: parent
                 source: isMaximized?
-                            "../images/正常化.png":
-                            "../images/最大化.png"
+                            "qrc:/images/正常化.png":
+                            "qrc:/images/最大化.png"
             }
         }
         onClicked:{

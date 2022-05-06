@@ -14,7 +14,7 @@ Window {
     flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint //除去窗口原生标题栏
 
     property int windowWidth: Screen.desktopAvailableWidth*0.65  //窗口宽度，跟随电脑屏幕变化
-    property int windowHeight: Screen.desktopAvailableHeight*0.8  //窗口高度，跟随电脑屏幕变化
+    property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
     property bool isFullSreen: false  //是否已经全屏
     property bool isAudioPlay: false  //是否有音频播放
     property bool isPlaying: false    //音视频是否正在播放
@@ -55,7 +55,7 @@ Window {
     //窗口背景
     Image {
         id: bg
-        source: "./images/bg.jpg"
+        source: "qrc:/images/bg.jpg"
         width: windowWidth
         height: windowHeight
         smooth: true

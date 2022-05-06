@@ -30,6 +30,7 @@ link_libraries(avcodec avformat avutil swscale swresample)
 set(PROJECT_SOURCES
         main.cpp
         qml.qrc
+        image.qrc
         XDemux.h XDemux.cpp
         XDecode.h XDecode.cpp
         XVideoWidget.h XVideoWidget.cpp
