@@ -13,6 +13,7 @@ Window {
     property bool isShowQueue: false  //是否展示了视频播放列表
     property point clickPos: "0,0"    //鼠标点击标题栏时的坐标
 
+    //定时器，时间到隐藏顶部和底部栏
     Timer {
         id:timer
         interval: 3000
@@ -23,6 +24,7 @@ Window {
         }
     }
 
+    //控制底部栏动画启用的定时器
     Timer {
         id:timer1
         interval: 10
@@ -30,15 +32,29 @@ Window {
         onTriggered: isEnabled=true;
     }
 
+    //视频流展示区域
     Image {
-        source: "qrc:/images/bg.jpg"
+        id:img
         anchors.fill: parent
+        cache: false
+        mipmap: true
+        smooth: true
+//        fillMode: Image.PreserveAspectFit
+    }
+
+    Connections{
+        target: MyImage
+        function onCallQmlRefeshImg(){
+            img.source = "";
+            img.source = "image://Imgs";
+        }
     }
 
     MouseArea{
         anchors.fill: parent
         hoverEnabled: true
 
+        //监听鼠标移动
         onPositionChanged: {
             topBar.y=0;
             footer.y=windowHeight-footer.height
@@ -47,6 +63,7 @@ Window {
             timer.start();
         }
 
+        //顶部栏
         Rectangle{
             id:topBar
             width: parent.width
@@ -62,7 +79,6 @@ Window {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    id:playerName
                     text: qsTr("播放器名字")
                     leftPadding: 8
                     color: "white"
@@ -104,11 +120,13 @@ Window {
             }
         }
 
+        //视频播放队列
         PlayQueue{
             id:videoQueue
             x:isShowQueue?windowWidth-videoQueue.width:windowWidth
         }
 
+        //底部控制栏
         Footer{
             id:footer
             y:windowHeight-footer.height

@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
         xdemuxthread.h xdemuxthread.cpp
+        imageprovider.h imageprovider.cpp
 )
 
 
