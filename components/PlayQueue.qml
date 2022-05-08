@@ -6,9 +6,9 @@ import QtQuick.Controls 2.5
 Rectangle{
     id:playQueue
     anchors.top: parent.top
-    anchors.bottom: footer.top
-    width: windowWidth*0.22
-    x:footer.isShowQueue?windowWidth-width:windowWidth
+    height: parent.height-footer.height
+    width: parent.width*0.22
+//    x:footer.isShowQueue?windowWidth-width:windowWidth
     color: setColor(0,0,0,0.7)
 
     function reset(){

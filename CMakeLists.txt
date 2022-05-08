@@ -75,7 +75,6 @@ target_link_libraries(MediaPlayer
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGLWidgets)
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGL)
 
-
 target_link_libraries(MediaPlayer PRIVATE Qt6::Multimedia)
 target_link_libraries(MediaPlayer PRIVATE Qt6::MultimediaWidgets)
 

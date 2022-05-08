@@ -4,14 +4,11 @@ import QtQuick.Controls 2.5
 
 //底部控制栏
 Rectangle{
-    id:footer
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    id:myFooter
+    y:parent.height-height
+    width: parent.width
     height: 40
-    color: setColor(43, 45, 47,0.95)
-
-    property bool isShowQueue: false  //是否展示了播放列表
+    color: videoPage.visible?setColor(0,0,0,0.6):setColor(43, 45, 47,0.95)
 
     Row{
         width: parent.width
@@ -82,7 +79,7 @@ Rectangle{
             source: isAudioPlay?"qrc:/images/停止.png":"qrc:/images/停止-禁用.png"
             width: 20
             height: 20
-            x:leftMenu.width+windowWidth*0.1
+            x:parent.width*0.3
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
@@ -91,6 +88,11 @@ Rectangle{
                     if(isAudioPlay){
                         isAudioPlay=false;
                         isPlaying=false;
+                    }
+                    if(videoPage.visible){
+                        mainWindow.visible=true;
+                        videoPage.isShowQueue=false;
+                        videoPage.close();
                     }
                 }
             }
@@ -187,7 +189,7 @@ Rectangle{
         //当前播放模式图标
         Image {
             id: playMode
-            source: "qrc:/images/"+playModeList.model[playModeList.currentIndex]+".png"
+            source: "qrc:/images/"+playModeList.model[mainWindow.playMode]+".png"
             width: 18
             height: 18
             x:soundSlider.x+windowWidth*0.26
@@ -197,7 +199,7 @@ Rectangle{
             property bool isClicked: false
 
             Rectangle{//可选播放模式区域
-                parent: footer
+                parent: myFooter
                 anchors.bottom: parent.top
                 x:playMode.x+playMode.width/2-width/2
                 width: 110
@@ -228,14 +230,14 @@ Rectangle{
                             Image {
                                 width: 16
                                 height: 16
-                                source: playModeList.currentIndex===index?"qrc:/images/打钩.png":""
+                                source: mainWindow.playMode===index?"qrc:/images/打钩.png":""
                                 x:10
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             color:modeItem.hovered?"gray": setColor(43, 45, 47,0.95)
                         }
                         onClicked: {
-                            playModeList.currentIndex=index;
+                            mainWindow.playMode=index;
                             playMode.isClicked=false;
                         }
                     }
@@ -279,14 +281,26 @@ Rectangle{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    isShowQueue=!isShowQueue;
-                    if(isShowQueue){
-                        queueAnimation.from = windowWidth;
-                        queueAnimation.to = windowWidth-playQueue.width;
+                    if(!videoPage.visible){
+                        mainWindow.isShowQueue=!mainWindow.isShowQueue;
+                        if(mainWindow.isShowQueue){
+                            queueAnimation.from = windowWidth;
+                            queueAnimation.to = windowWidth-playQueue.width;
+                        }else{
+                            queueAnimation.from = windowWidth-playQueue.width;
+                            queueAnimation.to = windowWidth;
+                        }
                     }else{
-                        queueAnimation.from = windowWidth-playQueue.width;
-                        queueAnimation.to = windowWidth;
+                        videoPage.isShowQueue=!videoPage.isShowQueue;
+                        if(videoPage.isShowQueue){
+                            queueAnimation.from = windowWidth;
+                            queueAnimation.to = windowWidth-playQueue.width;
+                        }else{
+                            queueAnimation.from = windowWidth-playQueue.width;
+                            queueAnimation.to = windowWidth;
+                        }
                     }
+                    queueAnimation.target=mainWindow.visible?playQueue:videoQueue;
                     queueAnimation.running = true;
                 }
             }

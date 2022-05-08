@@ -8,7 +8,7 @@ Rectangle{
     anchors.right: parent.right
     height: 35
     color: "transparent"
-    visible: footer.isFullSreen?false:true
+    visible: !isFullSreen
 
     property bool isDoubleClicked: false //判断标题栏是否被双击，当isDoubleClicked为true时最大化窗口，反之正常化窗口
     property bool isMaximized: false //判断当前是否最大化

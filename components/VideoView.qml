@@ -80,6 +80,10 @@ Rectangle {
 
                         onEntered: videoCell.isEnter=true
                         onExited: videoCell.isEnter=false
+                        onClicked: {
+                            videoPage.visible=true;
+                            mainWindow.visible=false;
+                        }
                     }
                 }
 

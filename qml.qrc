@@ -11,5 +11,6 @@
         <file>components/MusicView.qml</file>
         <file>components/CoverPage.qml</file>
         <file>components/PlayQueue.qml</file>
+        <file>components/VideoPage.qml</file>
     </qresource>
 </RCC>
