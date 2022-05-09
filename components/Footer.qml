@@ -9,6 +9,80 @@ Rectangle{
     width: parent.width
     height: 40
     color: videoPage.visible?setColor(0,0,0,0.6):setColor(43, 45, 47,0.95)
+    focus: true  //得获取焦点，才能监听键盘事件
+
+    property variant pressedKeys: new Set()
+
+    Keys.onPressed:function(e) {
+        //将键值加入set
+        if(!e.isAutoRepeat){
+            pressedKeys.add(e.key);
+        }
+        if(!timer.running){
+            timer.start();
+        }
+    }
+    Keys.onReleased: function(e){
+        if(!e.isAutoRepeat){
+            pressedKeys.delete(e.key);
+        }
+        if(pressedKeys.size<=0){
+            timer.stop();
+        }
+    }
+
+    //用于控制遍历按键set的时机
+    Timer{
+        id:timer
+        repeat: true
+        interval: 50
+        onTriggered: {
+            //如果没有按键按下，停止定时器
+            if(pressedKeys.size<=0){
+                timer.stop();
+                return;
+            }
+
+            //遍历已经按下的按键，处理多个按键
+            for(let key of pressedKeys){
+                switch(key){
+                case Qt.Key_Space:     //处理空格键，暂停或播放音视频
+                    console.log('sapce');
+                    break;
+                case Qt.Key_F:         //处理Ctrl+F，全屏或小屏
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl F');
+                    }
+                    break;
+                case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl I');
+                    }
+                    break;
+                case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl left');
+                    }
+                    break;
+                case Qt.Key_Right:      //处理Ctrl+ → ，下一首
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl right');
+                    }
+                    break;
+                case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl up');
+                    }
+                    break;
+                case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
+                    if(pressedKeys.has(Qt.Key_Control)){
+                        console.log('ctrl down');
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
     Row{
         width: parent.width
