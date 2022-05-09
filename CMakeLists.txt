@@ -41,6 +41,7 @@ set(PROJECT_SOURCES
         IVideoCall.h
         xdemuxthread.h xdemuxthread.cpp
         imageprovider.h imageprovider.cpp
+        cursorposprovider.h
 )
 
 

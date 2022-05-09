@@ -11,7 +11,7 @@ Window {
     minimumWidth: 800
     minimumHeight: 500
     visible: true
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint //除去窗口原生标题栏
+    flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
     property int windowWidth: Screen.desktopAvailableWidth*0.65  //窗口宽度，跟随电脑屏幕变化
     property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
