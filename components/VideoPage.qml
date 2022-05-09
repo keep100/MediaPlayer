@@ -7,11 +7,10 @@ Window {
     width: windowWidth
     height: windowHeight
     visible: false
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint //除去窗口原生标题栏
+    flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
     property bool isEnabled: false    //是否启用底部栏动画
     property bool isShowQueue: false  //是否展示了视频播放列表
-    property point clickPos: "0,0"    //鼠标点击标题栏时的坐标
 
     //定时器，时间到隐藏顶部和底部栏
     Timer {
@@ -42,13 +41,14 @@ Window {
 //        fillMode: Image.PreserveAspectFit
     }
 
-    Connections{
-        target: MyImage
-        function onCallQmlRefeshImg(){
-            img.source = "";
-            img.source = "image://Imgs";
-        }
-    }
+    //与ShowImage类实例建立连接，接收刷新界面的信号
+//    Connections{
+//        target: MyImage
+//        function onCallQmlRefeshImg(){
+//            img.source = "";
+//            img.source = "image://Imgs";
+//        }
+//    }
 
     MouseArea{
         anchors.fill: parent
@@ -98,6 +98,7 @@ Window {
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton //只处理鼠标左键
+                property point clickPos: "0,0"    //鼠标点击标题栏时的坐标
 
                 //鼠标按下的回调函数
                 onPressed: function(mouse) {
@@ -108,9 +109,8 @@ Window {
                 onPositionChanged:function (mouse) {
                     //判断当前窗口是否在正常化状态，是就直接移动窗口位置
                     if(pressed && !titleBar.isMaximized&&!isFullSreen) {
-                        var delta = Qt.point(mouse.x-clickPos.x, mouse.y-clickPos.y)
-                        videoPage.x += delta.x
-                        videoPage.y += delta.y
+                        videoPage.setX(mousePosition.cursorPos().x-clickPos.x);
+                        videoPage.setY(mousePosition.cursorPos().y-clickPos.y);
                     }
                 }
             }
