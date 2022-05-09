@@ -18,14 +18,17 @@ Rectangle{
         if(!e.isAutoRepeat){
             pressedKeys.add(e.key);
         }
+        //启动定时器
         if(!timer.running){
             timer.start();
         }
     }
     Keys.onReleased: function(e){
+        //将按键值弹出
         if(!e.isAutoRepeat){
             pressedKeys.delete(e.key);
         }
+        //停止定时器
         if(pressedKeys.size<=0){
             timer.stop();
         }
@@ -48,15 +51,30 @@ Rectangle{
                 switch(key){
                 case Qt.Key_Space:     //处理空格键，暂停或播放音视频
                     console.log('sapce');
+                    if(isAudioPlay){
+                        isPlaying=!isPlaying;
+                    }
+                    break;
+                case Qt.Key_Escape:     //处理空格键，暂停或播放音视频
+                    console.log('esc');
+                    if(isFullSreen){
+                        isFullSreen=false;
+                        showInitial();
+                    }
                     break;
                 case Qt.Key_F:         //处理Ctrl+F，全屏或小屏
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl F');
+                        isFullSreen=!isFullSreen;
+                        isFullSreen?showFull():showInitial();
                     }
                     break;
                 case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl I');
+                        if(!fileDialog.visible){
+                            fileDialog.open();
+                        }
                     }
                     break;
                 case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
