@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
         XAudioThread.h XAudioThread.cpp
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
-        xdemuxthread.h xdemuxthread.cpp
+        XDemuxThread.h XDemuxThread.cpp
         imageprovider.h imageprovider.cpp
         cursorposprovider.h
         XDecodeThread.h XDecodeThread.cpp
