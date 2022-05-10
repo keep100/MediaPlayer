@@ -16,11 +16,21 @@ public:
 
     //启动所有线程
     virtual void Start();
+    //关闭线程清理资源
+    virtual void Close();
+    virtual void Clear();
+    //跳转
+    virtual void Seek(double);
 
     void run();
     XDemuxThread();
     virtual ~XDemuxThread();
     bool isExit = false;
+    long long pts = 0;
+    long long totalMs = 0;
+    void SetPause(bool isPause);
+    bool isPause = false;
+    bool isFirst = false;
 protected:
     std::mutex mux;
     XDemux *demux = 0;

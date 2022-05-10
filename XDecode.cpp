@@ -5,6 +5,18 @@ extern "C"
 }
 #include <iostream>
 using namespace std;
+void XFreePacket(AVPacket **pkt)
+{
+    if (!pkt || !(*pkt))
+        return;
+    av_packet_free(pkt);
+}
+void XFreeFrame(AVFrame **frame)
+{
+    if (!frame || !(*frame))
+        return;
+    av_frame_free(frame);
+}
 void XDecode::Close()
 {
     mtx.lock();
@@ -13,6 +25,7 @@ void XDecode::Close()
         avcodec_close(codec);
         avcodec_free_context(&codec);
     }
+    pts = 0;
     mtx.unlock();
 }
 
@@ -102,6 +115,7 @@ AVFrame* XDecode::Recv()
         av_frame_free(&frame);
         return NULL;
     }
+    pts = frame->pts;
     //cout << "["<<frame->linesize[0] << "] " << flush;
     return frame;
 }
