@@ -42,6 +42,9 @@ set(PROJECT_SOURCES
         xdemuxthread.h xdemuxthread.cpp
         imageprovider.h imageprovider.cpp
         cursorposprovider.h
+        XDecodeThread.h XDecodeThread.cpp
+        OverloadSlider.h OverloadSlider.cpp
+        widget.h widget.cpp widget.ui
 )
 
 
