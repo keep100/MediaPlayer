@@ -11,15 +11,17 @@ Window {
     minimumWidth: 800
     minimumHeight: 500
     visible: true
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint //除去窗口原生标题栏
+    flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
     property int windowWidth: Screen.desktopAvailableWidth*0.65  //窗口宽度，跟随电脑屏幕变化
-    property int windowHeight: Screen.desktopAvailableHeight*0.8  //窗口高度，跟随电脑屏幕变化
+    property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
     property bool isFullSreen: false  //是否已经全屏
     property bool isAudioPlay: false  //是否有音频播放
     property bool isPlaying: false    //音视频是否正在播放
     property bool isCoverShow: false  //音频封面页是否已经展示
-    property int curIdx: 0  //当前页面，0代表视频页面，1代表音频页面
+    property bool isShowQueue: false  //是否展示了播放列表
+    property int playMode: 0          //播放模式
+    property int curIdx: 0            //当前页面，0代表视频页面，1代表音频页面
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -36,26 +38,40 @@ Window {
         showNormal();
         windowWidth=Screen.desktopAvailableWidth*0.65;
         windowHeight=Screen.desktopAvailableHeight*0.8;
+        if(videoPage.visible){
+            mainWindow.visible=false;
+            videoPage.x=Screen.width*0.5-videoPage.width*0.5;
+            videoPage.y=Screen.height*0.5-videoPage.height*0.5;
+            videoPage.isEnabled=false;
+        }
     }
     //实现窗口全屏
     function showFull(){
         showFullScreen();
         windowWidth=Screen.width;
         windowHeight=Screen.height;
+        if(videoPage.visible){
+            mainWindow.visible=false;
+            videoPage.x=0;
+            videoPage.y=0;
+        }
     }
 
     //监听是否有音视频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
-            musicList.currentIndex=-1;
-            queue.currentIndex=-1;
+            musicView.reset();
+            playQueue.reset();
         }
     }
+
+    //视频播放界面
+    VideoPage{id:videoPage}
 
     //窗口背景
     Image {
         id: bg
-        source: "./images/bg.jpg"
+        source: "qrc:/images/bg.jpg"
         width: windowWidth
         height: windowHeight
         smooth: true
@@ -118,9 +134,6 @@ Window {
             onClicked: fileDialog.open()
         }
 
-        //视频数据列表
-        //        VideoListData {id:videoData }
-
         //视频展示区
         VideoView{id:videoView}
 
@@ -131,7 +144,7 @@ Window {
     //本地文件选择框
     FileDialog {
         id: fileDialog
-//        currentFile: document.source
+        //        currentFile: document.source
         fileMode:FileDialog.OpenFiles  //支持文件多选
         folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]  //打开默认文件夹
         nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
@@ -154,14 +167,16 @@ Window {
     }
 
     //播放队列
-    PlayQueue{id:playQueue}
+    PlayQueue{
+        id:playQueue
+        x:isShowQueue?windowWidth-playQueue.width:windowWidth
+    }
 
     //播放队列滑动动画
     PropertyAnimation{
         id: queueAnimation
-        target: playQueue
         properties: "x"
-        duration: 800
+        duration: 500
         easing.type: Easing.InOutExpo //渐变滑出效果
     }
 

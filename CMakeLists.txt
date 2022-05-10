@@ -30,6 +30,7 @@ link_libraries(avcodec avformat avutil swscale swresample)
 set(PROJECT_SOURCES
         main.cpp
         qml.qrc
+        image.qrc
         XDemux.h XDemux.cpp
         XDecode.h XDecode.cpp
         XVideoWidget.h XVideoWidget.cpp
@@ -39,6 +40,8 @@ set(PROJECT_SOURCES
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
         xdemuxthread.h xdemuxthread.cpp
+        imageprovider.h imageprovider.cpp
+        cursorposprovider.h
 )
 
 
@@ -73,7 +76,6 @@ target_link_libraries(MediaPlayer
 
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGLWidgets)
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGL)
-
 
 target_link_libraries(MediaPlayer PRIVATE Qt6::Multimedia)
 target_link_libraries(MediaPlayer PRIVATE Qt6::MultimediaWidgets)

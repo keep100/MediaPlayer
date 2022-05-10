@@ -38,7 +38,7 @@ Rectangle {
                         height: parent.height-2
                         anchors.centerIn: parent
                         Image {//删除图标
-                            source: "../images/删除.png"
+                            source: "qrc:/images/删除.png"
                             anchors.right: parent.right
                             anchors.top: parent.top
                             width: 24
@@ -61,7 +61,7 @@ Rectangle {
                             border.color: "white"
                             visible: videoCell.isEnter
                             Image {
-                                source: "../images/more.png"
+                                source: "qrc:/images/more.png"
                                 width: 18
                                 height: 18
                                 anchors.centerIn: parent
@@ -80,6 +80,10 @@ Rectangle {
 
                         onEntered: videoCell.isEnter=true
                         onExited: videoCell.isEnter=false
+                        onClicked: {
+                            videoPage.visible=true;
+                            mainWindow.visible=false;
+                        }
                     }
                 }
 
@@ -117,7 +121,7 @@ Rectangle {
         Image {
             width: 110
             height: 110
-            source: "../images/暂无视频.png"
+            source: "qrc:/images/暂无视频.png"
         }
         Text {
             text: qsTr("暂无视频")

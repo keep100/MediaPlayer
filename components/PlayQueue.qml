@@ -6,10 +6,14 @@ import QtQuick.Controls 2.5
 Rectangle{
     id:playQueue
     anchors.top: parent.top
-    anchors.bottom: footer.top
-    width: windowWidth*0.22
-    x:footer.isShowQueue?windowWidth-width:windowWidth
+    height: parent.height-footer.height
+    width: parent.width*0.22
+//    x:footer.isShowQueue?windowWidth-width:windowWidth
     color: setColor(0,0,0,0.7)
+
+    function reset(){
+        queue.currentIndex=-1;
+    }
 
     Column{
         anchors.fill: parent
@@ -107,7 +111,7 @@ Rectangle{
             Image {
                 width: 120
                 height: 120
-                source: "../images/无内容.png"
+                source: "qrc:/images/无内容.png"
             }
             Text {
                 text: qsTr("播放队列为空")

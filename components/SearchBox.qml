@@ -16,7 +16,7 @@ Rectangle{
         id:searchIcon
         width: 22
         height: 22
-        source: "../images/搜索.png"
+        source: "qrc:/images/搜索.png"
         x:12
         anchors.verticalCenter: parent.verticalCenter
     }
@@ -48,7 +48,7 @@ Rectangle{
         id:cancelBtn
         width: 18
         height: 18
-        source: "../images/取消搜索词.png"
+        source: "qrc:/images/取消搜索词.png"
         x:parent.width-width-8
         anchors.verticalCenter: parent.verticalCenter
 

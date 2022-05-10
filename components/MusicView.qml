@@ -11,6 +11,10 @@ Rectangle{
     color: "transparent"
     visible: curIdx===1
 
+    function reset(){
+        musicList.currentIndex=-1;
+    }
+
     //有音频的状态展示区
     Column{
         leftPadding: uploadBtn.x
@@ -18,7 +22,7 @@ Rectangle{
         Image {
             width: 100
             height: 100
-            source: "../images/音乐封面.png"
+            source: "qrc:/images/音乐封面.png"
         }
         Row{
             topPadding: 10
@@ -89,7 +93,7 @@ Rectangle{
                             x:parent.width*0.04
                             width: 18
                             height: 18
-                            source: musicList.currentIndex===index?"../images/音量.png":""
+                            source: musicList.currentIndex===index?"qrc:/images/音量.png":""
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
@@ -103,7 +107,7 @@ Rectangle{
                             x: parent.width*0.45
                             width: 14
                             height: 14
-                            source: "../images/播放.png"
+                            source: "qrc:/images/播放.png"
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
                             MouseArea{
@@ -119,7 +123,7 @@ Rectangle{
                             x: parent.width*0.53
                             width: 16
                             height: 16
-                            source: "../images/more.png"
+                            source: "qrc:/images/more.png"
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -172,7 +176,7 @@ Rectangle{
         Image {
             width: 100
             height: 100
-            source: "../images/无音乐.png"
+            source: "qrc:/images/无音乐.png"
         }
         Text {
             topPadding: 10
