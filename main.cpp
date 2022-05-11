@@ -3,7 +3,7 @@
 #include <QQmlContext>
 #include "imageprovider.h"
 #include "XVideoThread.h"
-#include "xdemuxthread.h"
+#include "XDemuxThread.h"
 #include "cursorposprovider.h"
 
 int main(int argc, char *argv[])
