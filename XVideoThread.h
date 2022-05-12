@@ -7,11 +7,13 @@ class XDecode;
 #include <QThread>
 #include "IVideoCall.h"
 #include "XDecodeThread.h"
-class XVideoThread:public XDecodeThread
+#include "imageprovider.h"
+
+class XVideoThread: public XDecodeThread
 {
 public:
     //打开，不管成功与否都清理
-    virtual bool Open(AVCodecParameters *para, IVideoCall *call,int width,int height);
+    virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height);
     void run();
     XVideoThread();
     virtual ~XVideoThread();
@@ -21,11 +23,13 @@ public:
     void SetPause(bool isPause);
     bool isPause = false;
     virtual bool RepaintPts(long long seekPts, AVPacket *pkt);
+    ShowImage *showImage;
+    QImage frameToImage(AVFrame *frame);
 
 protected:
     std::mutex vmux;
     IVideoCall *call = 0;
-
+    AVCodecParameters *codecParam;
 
 
 };

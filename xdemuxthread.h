@@ -5,10 +5,11 @@
 #include <QThread>
 #include "IVideoCall.h"
 #include <mutex>
+
 class XDemux;
 class XVideoThread;
 class XAudioThread;
-class XDemuxThread:public QThread
+class XDemuxThread: public QThread
 {
 public:
     //创建对象并打开
@@ -31,10 +32,11 @@ public:
     void SetPause(bool isPause);
     bool isPause = false;
     bool isFirst = false;
+    XVideoThread *vt = 0;
+
 protected:
     std::mutex mux;
     XDemux *demux = 0;
-    XVideoThread *vt = 0;
     XAudioThread *at = 0;
 };
 

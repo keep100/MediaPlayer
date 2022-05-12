@@ -1,22 +1,35 @@
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
+#include "libavdevice/avdevice.h"
+#include "libavformat/avio.h"
+#include "libavutil/imgutils.h"
+}
+
 #include "XVideoThread.h"
 #include "XDecode.h"
 #include <iostream>
 using namespace std;
 //打开，不管成功与否都清理
-bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call,int width,int height)
+bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, int height)
 {
-    if (!para)return false;
+    if (!para)
+    {
+        return false;
+    }
 
     Clear();
 
     vmux.lock();
     synpts = 0;
     //初始化显示窗口
-    this->call = call;
-    if (call)
-    {
-        call->Init(width, height);
-    }
+//    this->call = call;
+//    if (call)
+//    {
+//        call->Init(width, height);
+//    }
+    codecParam = para;
     vmux.unlock();
     int re = true;
     if (!decode->Open(para))
@@ -48,7 +61,7 @@ void XVideoThread::run()
         }
         cout << "Video...\n";
         //音视频同步
-        if (synpts >0 && synpts < decode->pts)
+        if (synpts > 0 && synpts < decode->pts)
         {
             vmux.unlock();
             cout << "syn\n";
@@ -66,20 +79,47 @@ void XVideoThread::run()
         //一次send 多次recv
         while (!isExit)
         {
-            AVFrame * frame = decode->Recv();
-            if (!frame) break;
-            //显示视频
-            if (call)
+            AVFrame *frame = decode->Recv();
+            if (!frame)
             {
-                call->Repaint(frame);
+                break;
             }
+            //显示视频
+//            if (call)
+//            {
+//                call->Repaint(frame);
+//            }
+            qDebug() << "send--------------------------";
+            showImage->sendimage(frameToImage(frame));
             msleep(1);
-
         }
         vmux.unlock();
     }
+    avcodec_parameters_free(&codecParam);
     cout << "videoTread exit \n";
 }
+
+QImage XVideoThread::frameToImage(AVFrame *frame)
+{
+    qDebug() << "frameToImage";
+    QImage output(frame->width, frame->height, QImage::Format_RGB32); //构造一个QImage用作输出
+    int outputLineSize[4];                                                       //构造AVFrame到QImage所需要的数据
+    av_image_fill_linesizes(outputLineSize, AV_PIX_FMT_RGB32, frame->width);
+    uint8_t *outputDst[] = {output.bits()};
+    //构造一个格式转换上下文
+    SwsContext *imgConvertContext = sws_getContext(
+                                        codecParam->width, codecParam->height,
+                                        (AVPixelFormat)codecParam->format, codecParam->width, codecParam->height,
+                                        AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
+
+    //把解码得到的损坏的像素数据剔除
+    sws_scale(imgConvertContext, frame->data, frame->linesize, 0, codecParam->height, outputDst, outputLineSize);
+    output.save("frameImg.jpg");
+    sws_freeContext(imgConvertContext);
+    av_frame_free(&frame);
+    return output;
+}
+
 bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt)
 {
     vmux.lock();
@@ -99,7 +139,9 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt)
     if (decode->pts >= seekPts)
     {
         if (call)
+        {
             call->Repaint(frame);
+        }
         vmux.unlock();
         return 1;
     }
@@ -109,6 +151,7 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt)
 }
 XVideoThread::XVideoThread()
 {
+    showImage = new ShowImage();
 }
 
 

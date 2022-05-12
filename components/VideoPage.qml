@@ -42,13 +42,13 @@ Window {
     }
 
     //与ShowImage类实例建立连接，接收刷新界面的信号
-//    Connections{
-//        target: MyImage
-//        function onCallQmlRefeshImg(){
-//            img.source = "";
-//            img.source = "image://Imgs";
-//        }
-//    }
+    Connections{
+        target: MyImage
+        function onCallQmlRefeshImg(){
+            img.source = "";
+            img.source = "image://Imgs";
+        }
+    }
 
     MouseArea{
         anchors.fill: parent
