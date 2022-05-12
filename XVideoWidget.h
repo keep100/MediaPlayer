@@ -17,6 +17,7 @@ public:
     XVideoWidget(QWidget *parent);
     ~XVideoWidget();
 
+
     virtual void Init(int width, int height);
 
     //不管成功与否都释放frame空间

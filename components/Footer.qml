@@ -10,9 +10,9 @@ Rectangle{
     height: 40
     color: videoPage.visible?setColor(0,0,0,0.6):setColor(43, 45, 47,0.95)
     focus: true  //得获取焦点，才能监听键盘事件
-
+    
     property variant pressedKeys: new Set()
-
+    
     Keys.onPressed:function(e) {
         //将键值加入set
         if(!e.isAutoRepeat){
@@ -33,7 +33,7 @@ Rectangle{
             timer.stop();
         }
     }
-
+    
     //用于控制遍历按键set的时机
     Timer{
         id:timer
@@ -45,17 +45,17 @@ Rectangle{
                 timer.stop();
                 return;
             }
-
+            
             //遍历已经按下的按键，处理多个按键
             for(let key of pressedKeys){
                 switch(key){
                 case Qt.Key_Space:     //处理空格键，暂停或播放音视频
                     console.log('sapce');
-                    if(isAudioPlay){
+                    if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
                     }
                     break;
-                case Qt.Key_Escape:     //处理空格键，暂停或播放音视频
+                case Qt.Key_Escape:     //处理esc键，退出全屏
                     console.log('esc');
                     if(isFullSreen){
                         isFullSreen=false;
@@ -101,17 +101,17 @@ Rectangle{
             }
         }
     }
-
+    
     Row{
         width: parent.width
         height: parent.height
-
+        
         //音频略缩图、歌名和歌手信息
         Row{
             leftPadding: 20
             height: parent.height
             opacity: isAudioPlay?1:0
-
+            
             //音频略缩图
             Image {
                 id: smallCover
@@ -120,7 +120,7 @@ Rectangle{
                 height: width
                 fillMode: Image.PreserveAspectFit
                 anchors.verticalCenter: parent.verticalCenter
-
+                
                 //向上弹出音频封面页的图标
                 Image {
                     id:upIcon
@@ -145,7 +145,7 @@ Rectangle{
                     }
                 }
             }
-
+            
             //音频名字与歌手
             Column{
                 height: parent.height
@@ -164,11 +164,11 @@ Rectangle{
                 }
             }
         }
-
+        
         //退出播放音视频的按钮
         Image {
             id: exitBtn
-            source: isAudioPlay?"qrc:/images/停止.png":"qrc:/images/停止-禁用.png"
+            source: isAudioPlay||isVideoPlay?"qrc:/images/停止.png":"qrc:/images/停止-禁用.png"
             width: 20
             height: 20
             x:parent.width*0.3
@@ -181,6 +181,10 @@ Rectangle{
                         isAudioPlay=false;
                         isPlaying=false;
                     }
+                    if(isVideoPlay){
+                        isVideoPlay=false;
+                        isPlaying=false;
+                    }
                     if(videoPage.visible){
                         mainWindow.visible=true;
                         videoPage.isShowQueue=false;
@@ -189,22 +193,22 @@ Rectangle{
                 }
             }
         }
-
+        
         //上一首按钮
         Image {
             id: prevBtn
-            source: isAudioPlay?"qrc:/images/上一首.png":"qrc:/images/上一首-禁用.png"
+            source: isAudioPlay||isVideoPlay?"qrc:/images/上一首.png":"qrc:/images/上一首-禁用.png"
             width: 26
             height: 26
             x:exitBtn.x+windowWidth*0.08
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
         }
-
+        
         //播放与暂停按钮
         Image {
             id: playBtn
-            source: isAudioPlay?(isPlaying?"qrc:/images/pause.png":"qrc:/images/播放.png")
+            source: isAudioPlay||isVideoPlay?(isPlaying?"qrc:/images/pause.png":"qrc:/images/播放.png")
                                :"qrc:/images/播放-禁用.png"
             width: 15
             height: 15
@@ -214,24 +218,24 @@ Rectangle{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    if(isAudioPlay){
+                    if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
                     }
                 }
             }
         }
-
+        
         //下一首按钮
         Image {
             id: nextBtn
-            source: isAudioPlay?"qrc:/images/下一首.png":"qrc:/images/下一首-禁用.png"
+            source: isAudioPlay||isVideoPlay?"qrc:/images/下一首.png":"qrc:/images/下一首-禁用.png"
             width: 26
             height: 26
             x:playBtn.x+windowWidth*0.06
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
         }
-
+        
         //音量图标
         Image {
             id: soundIcon
@@ -242,14 +246,14 @@ Rectangle{
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
         }
-
+        
         //音量控制条
         Slider {
             id: soundSlider
             value: 0.5
             x:soundIcon.x+windowWidth*0.02
             anchors.verticalCenter: parent.verticalCenter
-
+            
             background: Rectangle {//控制条背景
                 y: soundSlider.availableHeight / 2 - height / 2
                 implicitWidth: 100
@@ -258,7 +262,7 @@ Rectangle{
                 height: implicitHeight
                 radius: 2
                 color: "white"
-
+                
                 Rectangle {//滑块左侧控制条部分背景
                     width: soundSlider.visualPosition * parent.width
                     height: parent.height
@@ -266,7 +270,7 @@ Rectangle{
                     radius: 2
                 }
             }
-
+            
             handle: Rectangle {//滑块
                 x:  soundSlider.visualPosition * (soundSlider.availableWidth - width)
                 y:  soundSlider.availableHeight / 2 - height / 2
@@ -277,7 +281,7 @@ Rectangle{
                 border.color: "#bdbebf"
             }
         }
-
+        
         //当前播放模式图标
         Image {
             id: playMode
@@ -287,9 +291,9 @@ Rectangle{
             x:soundSlider.x+windowWidth*0.26
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
-
+            
             property bool isClicked: false
-
+            
             Rectangle{//可选播放模式区域
                 parent: myFooter
                 anchors.bottom: parent.top
@@ -297,7 +301,7 @@ Rectangle{
                 width: 110
                 color:"transparent"
                 visible: playMode.isClicked
-
+                
                 ListView{//播放模式列表
                     id:playModeList
                     width: parent.width
@@ -326,7 +330,7 @@ Rectangle{
                                 x:10
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-                            color:modeItem.hovered?"gray": setColor(43, 45, 47,0.95)
+                            color:modeItem.hovered?setColor(43, 45, 47,0.9):setColor(0,0,0,0.8)
                         }
                         onClicked: {
                             mainWindow.playMode=index;
@@ -335,13 +339,13 @@ Rectangle{
                     }
                 }
             }
-
+            
             MouseArea{
                 anchors.fill: parent
                 onClicked: playMode.isClicked=!playMode.isClicked
             }
         }
-
+        
         //全屏按钮
         Image {
             id: fullBtn
@@ -359,7 +363,7 @@ Rectangle{
                 }
             }
         }
-
+        
         //播放队列按钮
         Image {
             id: listBtn
@@ -369,7 +373,7 @@ Rectangle{
             x:fullBtn.x+windowWidth*0.04
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
-
+            
             MouseArea{
                 anchors.fill: parent
                 onClicked: {

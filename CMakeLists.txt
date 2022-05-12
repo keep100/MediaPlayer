@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+﻿cmake_minimum_required(VERSION 3.14)
 
 project(MediaPlayer VERSION 0.1 LANGUAGES CXX)
 
@@ -15,7 +15,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
 
 #提供位置定位.cmake文件
-set(Qt6_DIR C:/Qt/Qt6/6.3.0/msvc2019_64/lib/cmake/Qt6)
+set(Qt6_DIR D:/development/qt/6.3.0/msvc2019_64/lib/cmake/Qt6)
 
 find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 find_package(Qt6 REQUIRED COMPONENTS OpenGL)
@@ -39,9 +39,13 @@ set(PROJECT_SOURCES
         XAudioThread.h XAudioThread.cpp
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
-        xdemuxthread.h xdemuxthread.cpp
+        XDemuxThread.h XDemuxThread.cpp
         imageprovider.h imageprovider.cpp
         cursorposprovider.h
+        XDecodeThread.h XDecodeThread.cpp
+        OverloadSlider.h OverloadSlider.cpp
+        widget.h widget.cpp widget.ui
+        controller.h controller.cpp
 )
 
 

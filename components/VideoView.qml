@@ -83,6 +83,9 @@ Rectangle {
                         onClicked: {
                             videoPage.visible=true;
                             mainWindow.visible=false;
+//                            until.open();
+                            isVideoPlay=true;
+                            isPlaying=true;
                         }
                     }
                 }

@@ -78,7 +78,7 @@ bool XDemux::Seek(double pos)
 AVCodecParameters *XDemux::CopyVPara()
 {
     mtx.lock();
-    if (!ic)
+    if (!ic || videoStream < 0)
     {
         mtx.unlock();
         return NULL;
@@ -109,6 +109,12 @@ bool XDemux::Open(const char *url)
     Close();
     //参数设置
     AVDictionary *opt = NULL;
+
+    //设置rtsp流已tcp协议打开
+    av_dict_set(&opt, "rtsp_transport", "tcp", 0);
+
+    //网络延时时间
+    av_dict_set(&opt, "max_delay", "500", 0);
     //尽晚加锁，尽早释放
     mtx.lock();
     int ret = avformat_open_input(&ic, url, NULL, &opt);
@@ -146,15 +152,48 @@ bool XDemux::Open(const char *url)
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 
     //获取视频宽高
-    width = ic->streams[videoStream]->codecpar->width;
-    height = ic->streams[videoStream]->codecpar->height;
+    if (videoStream >= 0)
+    {
+        width = ic->streams[videoStream]->codecpar->width;
+        height = ic->streams[videoStream]->codecpar->height;
+    }
+
 
     //获取音频采样率和通道数
-    sampleRate = ic->streams[audioStream]->codecpar->sample_rate;
-    channels = ic->streams[audioStream]->codecpar->channels;
-    sampleFormat = ic->streams[audioStream]->codecpar->format;
+    if (audioStream >= 0)
+    {
+        sampleRate = ic->streams[audioStream]->codecpar->sample_rate;
+        channels = ic->streams[audioStream]->codecpar->channels;
+        sampleFormat = ic->streams[audioStream]->codecpar->format;
+    }
+
     mtx.unlock();
     return true;
+}
+AVPacket *XDemux::ReadVideo()
+{
+    mtx.lock();
+    if (!ic) //容错
+    {
+        mtx.unlock();
+        return 0;
+    }
+    mtx.unlock();
+
+    AVPacket *pkt = NULL;
+    //防止阻塞
+    for (int i = 0; i < 20; i++)
+    {
+        pkt = Read();
+        if (!pkt)
+            break;
+        if (pkt->stream_index == videoStream)
+        {
+            break;
+        }
+        av_packet_free(&pkt);
+    }
+    return pkt;
 }
 //空间需要调用者释放 ，释放AVPacket对象空间，和数据空间 av_packet_free
 AVPacket *XDemux::Read()

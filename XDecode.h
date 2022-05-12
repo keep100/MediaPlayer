@@ -7,9 +7,12 @@ struct AVCodecContext;
 struct AVFrame;
 struct AVPacket;
 #include <mutex>
+extern void XFreePacket(AVPacket **pkt);
+extern void XFreeFrame(AVFrame **frame);
 class XDecode
 {
 public:
+    long long pts = 0;
     bool isAudio = false;
 
     //打开解码器,不管成功与否都释放para空间

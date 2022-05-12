@@ -17,6 +17,7 @@ Window {
     property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
     property bool isFullSreen: false  //是否已经全屏
     property bool isAudioPlay: false  //是否有音频播放
+    property bool isVideoPlay: false     //是否有视频播放
     property bool isPlaying: false    //音视频是否正在播放
     property bool isCoverShow: false  //音频封面页是否已经展示
     property bool isShowQueue: false  //是否展示了播放列表
@@ -57,12 +58,24 @@ Window {
         }
     }
 
-    //监听是否有音视频在播放
+    //监听是否有音频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
             musicView.reset();
             playQueue.reset();
         }
+    }
+
+    //监听是否有视频在播放
+    onIsVideoPlayChanged: {
+        if(!isVideoPlay){
+            playQueue.reset();
+        }
+    }
+
+    //监听是否正在播放音视频
+    onIsPlayingChanged: {
+//        isPlaying?until.setPause(false):until.setPause(true);
     }
 
     //视频播放界面

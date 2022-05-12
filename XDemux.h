@@ -27,6 +27,8 @@ public:
     virtual void Clear();
     virtual void Close();
 
+    virtual AVPacket *ReadVideo();
+
 
     //总时长 毫秒
     int totalMs = 0;
@@ -36,12 +38,15 @@ public:
     int sampleRate = 0;
     int channels = 0;
     int sampleFormat = 2;
+
+
 protected:
     std::mutex mtx;
 
     AVFormatContext *ic = NULL;
-    int videoStream;
-    int audioStream;
+    int videoStream = -1;
+    int audioStream = -1;
+
 };
 
 #endif // XDEMUX_H
