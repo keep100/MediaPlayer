@@ -75,7 +75,7 @@ Window {
 
     //监听是否正在播放音视频
     onIsPlayingChanged: {
-        isPlaying?until.setPause(false):until.setPause(true);
+//        isPlaying?until.setPause(false):until.setPause(true);
     }
 
     //视频播放界面

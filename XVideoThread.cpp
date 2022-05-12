@@ -114,7 +114,7 @@ QImage XVideoThread::frameToImage(AVFrame *frame)
 
     //把解码得到的损坏的像素数据剔除
     sws_scale(imgConvertContext, frame->data, frame->linesize, 0, codecParam->height, outputDst, outputLineSize);
-    output.save("frameImg.jpg");
+//    output.save("frameImg.jpg");
     sws_freeContext(imgConvertContext);
     av_frame_free(&frame);
     return output;
