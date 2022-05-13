@@ -1,10 +1,12 @@
-#include <QGuiApplication>
+﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "imageprovider.h"
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "cursorposprovider.h"
+#include "myitem.h"
+#include <QQuickWindow>
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +14,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
 //    ShowImage *myImage = new ShowImage();
 //    engine.rootContext()->setContextProperty("MyImage", myImage);
@@ -33,6 +35,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
         }
     }, Qt::QueuedConnection);
+    qmlRegisterType<MyItem>("MyItem",1,0,"MyItem");
     engine.load(url);
 
 //    QImage image;

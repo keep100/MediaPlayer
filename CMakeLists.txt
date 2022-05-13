@@ -45,7 +45,10 @@ set(PROJECT_SOURCES
         XDecodeThread.h XDecodeThread.cpp
         OverloadSlider.h OverloadSlider.cpp
         widget.h widget.cpp widget.ui
-        controller.h controller.cpp
+        #controller.h controller.cpp
+        XMediaManager.h XMediaManager.cpp
+        myitem.h myitem.cpp
+        myrender.h myrender.cpp
 )
 
 
