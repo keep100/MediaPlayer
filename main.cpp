@@ -1,19 +1,25 @@
-#include <QGuiApplication>
+﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "imageprovider.h"
 #include "XVideoThread.h"
 #include "xdemuxthread.h"
 #include "cursorposprovider.h"
+<<<<<<< HEAD
 #include "XMediaManager.h"
 #include<QDebug>
+=======
+#include "OpenglItem/myitem.h"
+#include <QQuickWindow>
+
+>>>>>>> 02a2d00721b075226f4381dd010f1f85a8f4108b
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
 //    ShowImage *myImage = new ShowImage();
 //    engine.rootContext()->setContextProperty("MyImage", myImage);
@@ -40,6 +46,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
         }
     }, Qt::QueuedConnection);
+    qmlRegisterType<MyItem>("MyItem",1,0,"MyItem");
     engine.load(url);
 
 //    QImage image;
