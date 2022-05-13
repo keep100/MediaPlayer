@@ -5,7 +5,7 @@
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "cursorposprovider.h"
-#include "myitem.h"
+#include "OpenglItem/myitem.h"
 #include <QQuickWindow>
 
 int main(int argc, char *argv[])

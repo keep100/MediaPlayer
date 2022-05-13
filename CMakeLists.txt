@@ -47,8 +47,9 @@ set(PROJECT_SOURCES
         widget.h widget.cpp widget.ui
         #controller.h controller.cpp
         XMediaManager.h XMediaManager.cpp
-        myitem.h myitem.cpp
-        myrender.h myrender.cpp
+        OpenglItem/myitem.h OpenglItem/myitem.cpp
+        OpenglItem/myrender.h OpenglItem/myrender.cpp
+        DataManager/data.h DataManager/data.cpp
 )
 
 
