@@ -69,7 +69,7 @@ bool XDecode::Open(AVCodecParameters *para)
 
     ///配置解码器上下文参数
     avcodec_parameters_to_context(codec, para);
-//    avcodec_parameters_free(&para);
+    avcodec_parameters_free(&para);
 
     //八线程解码
     codec->thread_count = 8;
