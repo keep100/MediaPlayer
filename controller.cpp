@@ -70,3 +70,11 @@ void Controller::setVoice(float v){
     _voice = v;
     emit voiceChanged(v);
 }
+
+void Controller::searchAudio(QString s){
+    emit queryAudio(s);
+}
+
+void Controller::searchVideo(QString s){
+    emit queryVideo(s);
+}
