@@ -45,7 +45,8 @@ set(PROJECT_SOURCES
         XDecodeThread.h XDecodeThread.cpp
         OverloadSlider.h OverloadSlider.cpp
         widget.h widget.cpp widget.ui
-        #controller.h controller.cpp
+        PlayMode.h
+        controller.h controller.cpp
         XMediaManager.h XMediaManager.cpp
         OpenglItem/myitem.h OpenglItem/myitem.cpp
         OpenglItem/myrender.h OpenglItem/myrender.cpp
