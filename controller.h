@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include "playMode.h"
+#include "PlayMode.h"
 
 
 //提供方法给qml调用，并根据情况发出对应的信号
@@ -36,9 +36,9 @@ signals:
     void playSpeedChanged(float);           //播放速度改变
     void playAudio(int);                    //播放指定索引的音频
     void playVideo(int);                    //播放指定索引的视频
-    void importAudio(const QList<QString>&);//导入音频
+    void importAudio(const QList<QString> &); //导入音频
     void deleteAudio(int);       //删除音频
-    void importVideo(const QList<QString>&);//导入视频
+    void importVideo(const QList<QString> &); //导入视频
     void deleteVideo(int);       //删除视频
     void nextAudio();                       //下一个音频
     void nextVideo();                       //下一个视频频
