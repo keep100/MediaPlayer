@@ -1,18 +1,25 @@
-#include <QGuiApplication>
+﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "imageprovider.h"
 #include "XVideoThread.h"
-#include "XDemuxThread.h"
+#include "xdemuxthread.h"
 #include "cursorposprovider.h"
+<<<<<<< HEAD
+#include "XMediaManager.h"
+#include<QDebug>
+=======
+#include "OpenglItem/myitem.h"
+#include <QQuickWindow>
 
+>>>>>>> 02a2d00721b075226f4381dd010f1f85a8f4108b
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
 //    ShowImage *myImage = new ShowImage();
 //    engine.rootContext()->setContextProperty("MyImage", myImage);
@@ -23,6 +30,12 @@ int main(int argc, char *argv[])
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
 
+    QString fileName = "D:\\Videos\\[大体积]Evangelion.3.0+1.01.Thrice.Upon.a.Time.2021.中文字幕.WEBrip.AAC.1080p.x264-VINEnc.mp4";
+//    QString fileName = "‪C:\\Users\\16409\\Videos\\rick.and.morty.s05\\Rick.and.Morty.S05E01.Mort.Dinner.Rick.Andre.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[eztv.re].mkv";
+//    QString fileName = "C:\\Users\\16409\\Videos\\电影\\生化危机1.Resident Evil.2002.BluRay.HEVC.1080p.AC3.2Audios.中英特效.mp4";
+    BriefInfo briefInfo = XMediaManager::getBriefInfo(fileName.toLocal8Bit());
+    qDebug()<<briefInfo.mediaType;
+    briefInfo.qimage.save("C:\\Users\\16409\\Desktop\\oneFrame.jpg");
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
@@ -33,6 +46,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
         }
     }, Qt::QueuedConnection);
+    qmlRegisterType<MyItem>("MyItem",1,0,"MyItem");
     engine.load(url);
 
 //    QImage image;
