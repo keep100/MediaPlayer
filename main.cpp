@@ -1,9 +1,9 @@
 ﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-//#include "until/imageprovider.h"
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
+#include "until/imageprovider.h"
 #include "until/cursorposprovider.h"
 #include "XMediaManager.h"
 #include<QDebug>
@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
 
-    QString fileName = "D:\\Videos\\[大体积]Evangelion.3.0+1.01.Thrice.Upon.a.Time.2021.中文字幕.WEBrip.AAC.1080p.x264-VINEnc.mp4";
+//    QString fileName = "D:\\Videos\\[大体积]Evangelion.3.0+1.01.Thrice.Upon.a.Time.2021.中文字幕.WEBrip.AAC.1080p.x264-VINEnc.mp4";
 //    QString fileName = "‪C:\\Users\\16409\\Videos\\rick.and.morty.s05\\Rick.and.Morty.S05E01.Mort.Dinner.Rick.Andre.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[eztv.re].mkv";
 //    QString fileName = "C:\\Users\\16409\\Videos\\电影\\生化危机1.Resident Evil.2002.BluRay.HEVC.1080p.AC3.2Audios.中英特效.mp4";
-    BriefInfo briefInfo = XMediaManager::getBriefInfo(fileName.toLocal8Bit());
-    qDebug() << briefInfo.mediaType;
-    briefInfo.qimage.save("C:\\Users\\16409\\Desktop\\oneFrame.jpg");
+//    BriefInfo briefInfo = XMediaManager::getBriefInfo(fileName.toLocal8Bit());
+//    qDebug() << briefInfo.mediaType;
+//    briefInfo.qimage.save("C:\\Users\\16409\\Desktop\\oneFrame.jpg");
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
