@@ -1,18 +1,16 @@
 ﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "imageprovider.h"
+//#include "until/imageprovider.h"
 #include "XVideoThread.h"
-#include "xdemuxthread.h"
-#include "cursorposprovider.h"
-<<<<<<< HEAD
+#include "XDemuxThread.h"
+#include "until/cursorposprovider.h"
 #include "XMediaManager.h"
 #include<QDebug>
-=======
 #include "OpenglItem/myitem.h"
 #include <QQuickWindow>
 
->>>>>>> 02a2d00721b075226f4381dd010f1f85a8f4108b
+
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -34,7 +32,7 @@ int main(int argc, char *argv[])
 //    QString fileName = "‪C:\\Users\\16409\\Videos\\rick.and.morty.s05\\Rick.and.Morty.S05E01.Mort.Dinner.Rick.Andre.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[eztv.re].mkv";
 //    QString fileName = "C:\\Users\\16409\\Videos\\电影\\生化危机1.Resident Evil.2002.BluRay.HEVC.1080p.AC3.2Audios.中英特效.mp4";
     BriefInfo briefInfo = XMediaManager::getBriefInfo(fileName.toLocal8Bit());
-    qDebug()<<briefInfo.mediaType;
+    qDebug() << briefInfo.mediaType;
     briefInfo.qimage.save("C:\\Users\\16409\\Desktop\\oneFrame.jpg");
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -46,7 +44,8 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
         }
     }, Qt::QueuedConnection);
-    qmlRegisterType<MyItem>("MyItem",1,0,"MyItem");
+
+    qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
     engine.load(url);
 
 //    QImage image;
