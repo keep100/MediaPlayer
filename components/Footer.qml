@@ -11,7 +11,8 @@ Rectangle{
     color: videoPage.visible?setColor(0,0,0,0.6):setColor(43, 45, 47,0.95)
     focus: true  //得获取焦点，才能监听键盘事件
     
-    property variant pressedKeys: new Set()
+    property variant pressedKeys: new Set()  //存储按下还未释放的按键
+    required property string mediaType       //判断是否是视频底部栏
     
     Keys.onPressed:function(e) {
         //将键值加入set
@@ -209,7 +210,7 @@ Rectangle{
         Image {
             id: playBtn
             source: isAudioPlay||isVideoPlay?(isPlaying?"qrc:/images/pause.png":"qrc:/images/播放.png")
-                               :"qrc:/images/播放-禁用.png"
+                                            :"qrc:/images/播放-禁用.png"
             width: 15
             height: 15
             x:prevBtn.x+windowWidth*0.07
@@ -282,6 +283,76 @@ Rectangle{
             }
         }
         
+        //倍速，当且仅当视频播放时展示
+        Rectangle{
+            id:playSpeed
+            x:playMode.x-width-windowWidth*0.02
+            width: 50
+            height: parent.height*0.6
+            color: "transparent"
+            radius: 6
+            anchors.verticalCenter: parent.verticalCenter
+            visible: mediaType==="video"
+
+            property bool isClicked: false
+
+            Text {
+                text: mainWindow.playSpeed==="1.0x"?"倍速":mainWindow.playSpeed
+                font.pixelSize: 14
+                color: "white"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle{//可选播放模式区域
+                parent: myFooter
+                anchors.bottom: parent.top
+                x:playSpeed.x+playSpeed.width/2-width/2
+                width: 60
+                color:"transparent"
+                visible: playSpeed.isClicked
+
+                ListView{//播放模式列表
+                    id:playSpeedList
+                    width: parent.width
+                    height: 140
+                    anchors.bottom: parent.top
+                    model:['0.5x','1.0x','1.25x','1.5x','2.0x']
+                    delegate: ItemDelegate{//播放模式列表子项
+                        id:speedItem
+                        width: parent.width
+                        height: 28
+                        hoverEnabled: true
+
+                        Text {
+                            text: qsTr(modelData)
+                            font.pixelSize: 14
+                            color: modelData===mainWindow.playSpeed?
+                                       setColor(255, 100, 41):
+                                       (speedItem.hovered?setColor(255, 100, 41):"white")
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        background:Rectangle{
+                            color:setColor(0,0,0,0.8)
+                        }
+                        onClicked: {
+                            mainWindow.playSpeed=modelData;
+                            playSpeed.isClicked=false;
+                        }
+                    }
+                }
+            }
+
+            MouseArea{
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: playSpeed.color=setColor(255, 100, 41)
+                onExited: playSpeed.color="transparent"
+                onClicked: playSpeed.isClicked=!playSpeed.isClicked
+            }
+        }
+
         //当前播放模式图标
         Image {
             id: playMode
@@ -291,17 +362,17 @@ Rectangle{
             x:soundSlider.x+windowWidth*0.26
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
-            
+
             property bool isClicked: false
-            
+
             Rectangle{//可选播放模式区域
                 parent: myFooter
                 anchors.bottom: parent.top
                 x:playMode.x+playMode.width/2-width/2
-                width: 110
+                width: 100
                 color:"transparent"
                 visible: playMode.isClicked
-                
+
                 ListView{//播放模式列表
                     id:playModeList
                     width: parent.width
@@ -313,24 +384,18 @@ Rectangle{
                         width: parent.width
                         height: 28
                         hoverEnabled: true
-                        property bool isEnter: false
+
                         Text {
                             text: qsTr(modelData)
                             font.pixelSize: 14
-                            color: "white"
-                            rightPadding: 16
-                            anchors.right: parent.right
+                            color: index===mainWindow.playMode?
+                                       setColor(255, 100, 41):
+                                       (modeItem.hovered?setColor(255, 100, 41):"white")
                             anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                         background:Rectangle{
-                            Image {
-                                width: 16
-                                height: 16
-                                source: mainWindow.playMode===index?"qrc:/images/打钩.png":""
-                                x:10
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            color:modeItem.hovered?setColor(43, 45, 47,0.9):setColor(0,0,0,0.8)
+                            color:setColor(0,0,0,0.8)
                         }
                         onClicked: {
                             mainWindow.playMode=index;
@@ -339,13 +404,13 @@ Rectangle{
                     }
                 }
             }
-            
+
             MouseArea{
                 anchors.fill: parent
                 onClicked: playMode.isClicked=!playMode.isClicked
             }
         }
-        
+
         //全屏按钮
         Image {
             id: fullBtn

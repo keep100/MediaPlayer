@@ -40,8 +40,6 @@ set(PROJECT_SOURCES
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
         XDemuxThread.h XDemuxThread.cpp
-#        imageprovider.h imageprovider.cpp
-#        cursorposprovider.h
         until/cursorposprovider.h
         until/imageprovider.h until/imageprovider.cpp
         XDecodeThread.h XDecodeThread.cpp

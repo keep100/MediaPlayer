@@ -7,7 +7,7 @@ class XDecode;
 #include <QThread>
 #include "IVideoCall.h"
 #include "XDecodeThread.h"
-#include "imageprovider.h"
+#include "until/imageprovider.h"
 
 class XVideoThread: public XDecodeThread
 {

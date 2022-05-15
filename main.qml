@@ -8,8 +8,8 @@ Window {
     id:mainWindow
     width: windowWidth
     height: windowHeight
-    minimumWidth: 800
-    minimumHeight: 500
+//    minimumWidth: 800
+//    minimumHeight: 500
     visible: true
     flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
@@ -23,6 +23,7 @@ Window {
     property bool isShowQueue: false  //是否展示了播放列表
     property int playMode: 0          //播放模式
     property int curIdx: 0            //当前页面，0代表视频页面，1代表音频页面
+    property string playSpeed: '1.0x'      //当前视频播放速度
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -193,42 +194,61 @@ Window {
         easing.type: Easing.InOutExpo //渐变滑出效果
     }
 
-    //播放进度条
+    //音频播放进度条
     Slider {
-        id: mySlider
+        id: audioSlider
         value: 0.2
-        y:footer.y-mySlider.availableHeight / 2
+        y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay
 
         background: Rectangle {
-            y: mySlider.availableHeight / 2 - height / 2
+            y: audioSlider.availableHeight / 2 - height / 2
             implicitWidth: windowWidth
             implicitHeight: 4
-            width: mySlider.availableWidth
+            width: audioSlider.availableWidth
             height: implicitHeight
             radius: 2
             color: "white"
 
             Rectangle {
-                width: mySlider.visualPosition * parent.width
+                width: audioSlider.visualPosition * parent.width
                 height: parent.height
                 color: setColor(22, 132, 252)
                 radius: 2
+
+                //监听鼠标是否进入，对控制点进行显示或隐藏
+                MouseArea{
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        audioSlider.background.implicitHeight=6;
+                        audioSlider.handle.visible=true;
+                    }
+
+                    onExited: {
+                        audioSlider.background.implicitHeight=4;
+                        audioSlider.handle.visible=false;
+                    }
+                }
             }
         }
 
         handle: Rectangle {
-            x:  mySlider.visualPosition * (mySlider.availableWidth - width)
-            y:  mySlider.availableHeight / 2 - height / 2
+            x:  audioSlider.visualPosition * (audioSlider.availableWidth - width)
+            y:  audioSlider.availableHeight / 2 - height / 2
             implicitWidth: 10
             implicitHeight: 10
             radius: 100
-            color: mySlider.pressed ? "#f0f0f0" : "#f6f6f6"
+            color: audioSlider.pressed ? "#f0f0f0" : "#f6f6f6"
             border.color: "#bdbebf"
+            visible: false
         }
     }
 
-    //底部控制栏
-    Footer{id:footer}
+    //音频底部控制栏
+    Footer{
+        id:footer
+        mediaType: 'audio'
+    }
 }

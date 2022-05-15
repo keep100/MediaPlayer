@@ -126,10 +126,62 @@ Window {
             x:isShowQueue?windowWidth-videoQueue.width:windowWidth
         }
 
+        //视频播放进度条
+        Slider {
+            id: videoSlider
+            value: 0.2
+            y:footer.y-videoSlider.availableHeight / 2
+            z:1
+            visible: isVideoPlay
+
+            background: Rectangle {
+                y: videoSlider.availableHeight / 2 - height / 2
+                implicitWidth: windowWidth
+                implicitHeight: 4
+                width: videoSlider.availableWidth
+                height: implicitHeight
+                radius: 2
+                color: "white"
+
+                Rectangle {
+                    width: videoSlider.visualPosition * parent.width
+                    height: parent.height
+                    color: setColor(22, 132, 252)
+                    radius: 2
+
+                    MouseArea{
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered: {
+                            videoSlider.background.implicitHeight=6;
+                            videoSlider.handle.visible=true;
+                        }
+
+                        onExited: {
+                            videoSlider.background.implicitHeight=4;
+                            videoSlider.handle.visible=false;
+                        }
+                    }
+                }
+            }
+
+            handle: Rectangle {
+                x:  videoSlider.visualPosition * (videoSlider.availableWidth - width)
+                y:  videoSlider.availableHeight / 2 - height / 2
+                implicitWidth: 10
+                implicitHeight: 10
+                radius: 100
+                color: videoSlider.pressed ? "#f0f0f0" : "#f6f6f6"
+                border.color: "#bdbebf"
+                visible: false
+            }
+        }
+
         //底部控制栏
         Footer{
             id:footer
             y:windowHeight-footer.height
+            mediaType:'video'
 
             Behavior on y {
                 enabled: !isFullSreen||isEnabled
