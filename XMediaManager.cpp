@@ -1,4 +1,8 @@
 #include "XMediaManager.h"
+#include "XDemuxThread.h"
+#include "XDemux.h"
+#include "XVideoThread.h"
+#include "XAudioThread.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
@@ -12,25 +16,25 @@ extern "C" {
 #include <QDebug>
 using namespace std;
 
-BriefInfo XMediaManager::getBriefInfo(const char * url){
+BriefInfo XMediaManager::getBriefInfo(const char* url){
+
     BriefInfo briefInfo;
     if (url == 0 || url[0] == '\0')
         return briefInfo;
     XDemux *demux = new XDemux();
     XDecode *decode = new XDecode();
     demux->Open(url);
+
     briefInfo.totalMs = demux->totalMs;
     briefInfo.width = demux->width;
     briefInfo.height = demux->height;
     briefInfo.channels = demux->channels;
     briefInfo.sampleRate = demux->sampleRate;
-    if (demux->CopyVPara())
-        briefInfo.mediaType = "video" ;
-    else briefInfo.mediaType = "audio" ;
-
-    qDebug()<<briefInfo.mediaType;
-
-    if(decode->Open(demux->CopyVPara())){
+    briefInfo.mediaType = QString(url).split(".").last();
+//    qDebug()<<briefInfo.mediaType;
+    qDebug()<<demux->CopyAPara();
+    qDebug()<<demux->CopyVPara();
+    if(QString("mp4, flv, avi, mkv").contains(briefInfo.mediaType)){//是视频就提取视频的相关信息
         AVFrame *pFrame = av_frame_alloc();
         demux->Seek(0.5);
         //先recv，后send
@@ -56,10 +60,15 @@ BriefInfo XMediaManager::getBriefInfo(const char * url){
             }
 //            qDebug() << "send--------------------------";
             AVPacket *pkt = demux->ReadVideo();
-            qDebug()<<decode->Send(pkt);
+            decode->Send(pkt);
         }
         briefInfo.qimage = getQImageFromFrame(pFrame, demux->CopyVPara());
     }
+    else if(QString("mp3, flac, wav, rm").contains(briefInfo.mediaType)){//是视频就提取视频的相关信息
+
+    }
+
+
     return briefInfo;
 }
 
@@ -86,3 +95,106 @@ QImage XMediaManager::getQImageFromFrame(const AVFrame* frame, AVCodecParameters
     return output;
 
 }
+
+XMediaManager::XMediaManager(){
+    _curState = INITIAL;
+    if(!demuxThread)
+        demuxThread = new XDemuxThread();
+    demuxThread->Clear();
+}
+
+bool XMediaManager::open(const char *url){
+    if(_curState==INITIAL){
+        _curState = READY;
+        if(!demuxThread)
+            demuxThread = new XDemuxThread();
+        return demuxThread->Open(url, NULL);
+
+    }
+    else if(_curState==END){
+        _curState = READY;
+        if(!demuxThread)
+            demuxThread = new XDemuxThread();
+        return demuxThread->Open(url, NULL);
+    }
+    else{
+        _curState = INITIAL;
+        qDebug()<<"error at XMediaManager::open()";
+        return false;
+    }
+    return false;
+}
+
+void XMediaManager::play(){
+    if(_curState==READY){
+        _curState = PLAYING;
+        if(!demuxThread){
+            _curState = END;
+            qDebug()<<"error at XMediaManager::play()1";
+            return;
+        }
+        demuxThread->Start();
+    }
+    else if(_curState==PAUSED){
+        _curState = PLAYING;
+        if(!demuxThread){
+            _curState = END;
+            qDebug()<<"error at XMediaManager::play()2";
+            return;
+        }
+        demuxThread->SetPause(false);
+    }
+    else{
+        _curState = INITIAL;
+        qDebug()<<"error at XMediaManager::play()3";
+        return;
+    }
+
+}
+
+void XMediaManager::pause(){
+    if(_curState==PLAYING){
+        _curState = PAUSED;
+        if(!demuxThread){
+            _curState = END;
+            qDebug()<<"error at XMediaManager::pause()1";
+            return;
+        }
+        demuxThread->SetPause(true);
+    }
+    else{
+        _curState = INITIAL;
+        qDebug()<<"error at XMediaManager::pause()2";
+        return;
+    }
+
+}
+
+void XMediaManager::seek(double pos){
+    if(_curState==PLAYING||_curState==PAUSED){
+        if(!demuxThread){
+            _curState = END;
+            qDebug()<<"error at XMediaManager::seek()1";
+            return;
+        }
+        demuxThread->Seek(pos);
+
+    }
+    else{
+        _curState = INITIAL;
+        qDebug()<<"error at XMediaManager::seek()2";
+        return;
+    }
+}
+
+void XMediaManager::end(){
+    _curState = END;
+    if(demuxThread){
+        demuxThread->Clear();
+        demuxThread->Close();
+    }
+    return;
+}
+
+
+
