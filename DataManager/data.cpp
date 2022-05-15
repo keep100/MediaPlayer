@@ -11,7 +11,6 @@ QString getFileMd5(const QString &path)
     QFile sourceFile(path);
     qint64 fileSize = sourceFile.size();
     const int bufferSize = 2048;
-
     if (sourceFile.open(QIODevice::ReadOnly)) {
         char buffer[bufferSize];
         int bytesRead;
@@ -37,17 +36,19 @@ bool Data::verify(){
     return false;
 }
 
-Data::Data(const BriefInfo& info,const QString& path){
-    QFileInfo f(path);
+Data::Data(const BriefInfo& info,const QFileInfo& f){
     assert(f.isFile());
     _duration = info.totalMs;
     _fileName = f.fileName();
-    _filePath = path;
-    _md5 = getFileMd5(path);
+    _filePath = f.filePath();
+    _md5 = getFileMd5(_filePath);
     _lastTime = 0;
     dir.mkpath(info.mediaType);
-    if(!info.qimage.isNull())
-        info.qimage.save(dir.filePath(info.mediaType+"/"+_fileName+".jpg"));
+    if(!info.qimage.isNull()){
+        _imgPath = dir.filePath(info.mediaType+"/"+_fileName+".jpg");
+        info.qimage.save(_imgPath);
+    }
+
 }
 
 void Data::setLastTime(qint64 time){
@@ -61,6 +62,8 @@ QJsonObject Data::toJson(){
     json.insert("md5",_md5);
     json.insert("duration",_duration);
     json.insert("lastTime",_lastTime);
+    json.insert("isAudio",_isAudio);
+    json.insert("imgPath",_imgPath);
     return json;
 }
 
@@ -71,6 +74,8 @@ Data::Data(const QJsonObject& json)
     _md5 = json["md5"].toString();
     _duration = json["duration"].toInteger();
     _lastTime = json["lastTime"].toInteger();
+    _isAudio = json["isAudio"].toBool();
+    _imgPath = json["imgPath"].toString();
 }
 
 

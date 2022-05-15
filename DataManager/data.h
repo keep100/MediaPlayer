@@ -11,11 +11,13 @@ class Data
 {
     Q_GADGET
 
-    Q_PROPERTY(QString fileName READ fileName)
-    Q_PROPERTY(QString filePath READ filePath)
-    Q_PROPERTY(qint64 duration READ duration)
-    Q_PROPERTY(qint64 lastTime READ duration)
-    Q_PROPERTY(int index READ index )
+    Q_PROPERTY(QString fileName READ fileName)      //文件名
+    Q_PROPERTY(QString filePath READ filePath)      //文件路径
+    Q_PROPERTY(qint64 duration READ duration)       //持续时间
+    Q_PROPERTY(qint64 lastTime READ duration)       //上次播放的时间
+    Q_PROPERTY(int index READ index )               //索引
+    Q_PROPERTY(bool isAudio READ isAudio )          //是否是音频
+    Q_PROPERTY(QString imgPath READ imgPath)        //图片地址（可以通过图片地址是否为空来判断有无图片）
 
 public:
     inline QString fileName(){return _fileName;}
@@ -23,24 +25,30 @@ public:
     inline qint64 duration(){return _duration;}
     inline qint64 lastTime(){return _lastTime;}
     inline int index(){return _index;}
+    inline int isAudio(){return _isAudio;}
+    inline QString imgPath(){return _imgPath;}
 
     bool verify();                      //验证文件是否出错：1）判断文件是否存在 2）计算md5码
     void setLastTime(qint64 time);      //设置文件上次的播放时间
     void setIndex(int i){_index = i;}   //设置序号
     Data(){}
-    Data(const BriefInfo& info,const QString& path);
+    Data(const BriefInfo& info,const QFileInfo&);
     Data(const QJsonObject& json);
     QJsonObject toJson();
 
-
+public:
     static QDir dir;
+
 private:
     QString _md5 = "";
     QString _fileName = "";
     QString _filePath = "";
     qint64 _duration = 0;
     qint64 _lastTime = 0;
+    QString _imgPath = "";
+    bool _isAudio = false;
     int _index = 0;
+
 };
 
 #endif // DATA_H
