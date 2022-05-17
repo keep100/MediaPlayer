@@ -6,11 +6,6 @@
 #include <QMap>
 #include "playMode.h"
 
-enum State{
-    Normal,
-    Miss,
-    Error
-};
 
 class DataManager : public QObject
 {
@@ -33,29 +28,27 @@ signals:
     void curAudioChanged();
 
 public:
-    State importVideo(const QString&);          //导入视频
-    State importAudio(const QString&);          //导入音频
-    void deleteVideo(int);                      //删除指定索引的视频
-    void deleteAudio(int);                      //删除指定索引的音频
-    State checkVideo(int);                      //检查视频文件
-    State checkAudio(int);                      //检查音频文件
-    int nextVideo();                            //下一个视频
-    int nextAudio();                            //下一个音频
-    int preVideo();                             //上一个视频
-    int preAudio();                             //上一个音频
-    Data getVideo(int);                         //获取当前视频
-    Data getAudio(int);                         //获取当前音频
-    void recordVideo(int time);                 //记录当前播放历史
-    void setCurVideo(int);                      //设置当前视频
-    void setCurAudio(int);                      //设置当前音频
-    void setMode(PlayMode::mode m);             //设置播放模式
-    ~DataManager();                             //析构函数
+    State importData(const QString&,bool isAudio);  //导入视频
+    void deleteData(int,bool isAudio);              //删除指定索引的视频
+    State check(int,bool isAudio);                  //检查文件
+    int next();                                     //下一个（返回索引）
+    int pre();                                      //上一个
+    Data getData(int,bool isAudio);                 //通过索引获取指定文件的数据
+    void recordVideo(long long time);               //记录当前播放历史（播放切换时调用，用于保留历史）
+    void setCur(int,bool isAudio);                  //开始播放时调用，用于记录当前播放哪个文件
+    void setMode(PlayMode::mode m);                 //设置播放模式
+    void readData();                                //加载初始数据
+    void writeData();                               //将数据写回文件中
+    ~DataManager();                                 //析构函数
 
 private:
+    bool _isAudio = false;
     QList<Data> _videoList,_audioList;
+    QList<int> _videoOrder,_audioOrder;             //播放顺序（随机播放）
     PlayMode::mode mode;
-    int videoIndex = -1,audioIndex = -1;
-
+    int curIndex;                                   //当前对应着数据列表中的哪一项
+    int curOrder = -1;                              //当前对应着顺序列表中哪一项（随机播放）
+    QDir dir;
 };
 
 #endif // DATAMANAGER_H

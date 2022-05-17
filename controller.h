@@ -20,20 +20,14 @@ public:
     explicit Controller(QObject *parent = nullptr);
 
     //供前端调用（前端--》控制器）
-    Q_INVOKABLE void stopVideo();       //暂停播放
-    Q_INVOKABLE void stopAudio();       //暂停播放
-    Q_INVOKABLE void startPlayVideo(int index);     //开始播放视频
-    Q_INVOKABLE void startPlayAudio(int index);     //开始播放音频
-    Q_INVOKABLE void importAudio(const QList<QString>& list);   //导入音频数据
-    Q_INVOKABLE void importVideo(const QList<QString>& list);   //导入视频数据
-    Q_INVOKABLE void deleteAudio(int index);        //删除音频数据
-    Q_INVOKABLE void deleteVideo(int index);        //删除视频数据
-    Q_INVOKABLE void playNextVideo();   //下一个
-    Q_INVOKABLE void playPreVideo();    //上一个
-    Q_INVOKABLE void playNextAudio();   //下一首
-    Q_INVOKABLE void playPreAudio();    //上一首
-    Q_INVOKABLE void exit();            //退出播放
-    Q_INVOKABLE void setTime(int t);    //设置播放时间（当前端拖动完进度条之后就调用）
+    Q_INVOKABLE void stop();                                                //暂停播放
+    Q_INVOKABLE void startPlay(int index,bool isAudio);                     //开始播放视频
+    Q_INVOKABLE void importData(const QList<QString>& list,bool isAudio);   //导入音频数据
+    Q_INVOKABLE void deleteData(int index,bool isAudio);                    //删除数据
+    Q_INVOKABLE void playNext(bool isAudio);                                //下一个
+    Q_INVOKABLE void playPre(bool isAudio);                                 //上一个
+    Q_INVOKABLE void exit();                                                //退出播放
+    Q_INVOKABLE void setTime(int t);             //设置播放时间（当前端拖动完进度条之后就调用）
 
 signals:
     //不需要主动连接（控制器--》前端）
@@ -41,8 +35,9 @@ signals:
     void timeChanged();                     //时间改变（后端--》前端,用于通知前端更新进度条）
 
     //需要前端主动连接（控制器--》前端）
-    void fileMiss(const QString& path);     //文件缺失
-    void fileError(const QString& paht);    //文件错误
+    void fileMiss(Data path);                   //文件缺失
+    void fileError(Data path);                  //文件错误
+    void fileImportFail(const QString& path);   //文件导入失败
 
     //需要后端连接（控制器--》后端）
     void playSpeedChanged(float);           //播放速度改变
