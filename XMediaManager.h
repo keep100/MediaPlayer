@@ -3,7 +3,7 @@
 #include <QThread>
 #include <QImage>
 #include <QDebug>
-#include "xdemuxthread.h"
+#include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XDecode.h"
 #include "IVideoCall.h"
@@ -13,7 +13,7 @@ struct AVPacket;
 struct AVFrame;
 struct AVCodecParameters;
 struct BriefInfo{
-    QString mediaType = "";     //媒体类型（后缀名）
+    QString mediaType = "";     //媒体类型 "video"/"audio"/""
     int totalMs = 0;            //总时长（毫秒）
     //视频信息
     int width = 0;

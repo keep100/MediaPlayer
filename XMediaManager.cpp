@@ -29,9 +29,9 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
     briefInfo.totalMs = demux->totalMs;
     briefInfo.width = demux->width;
     briefInfo.height = demux->height;
-    briefInfo.mediaType = QString(url).split(".").last();
+    QString suffix = QString(url).split(".").last();
 //    qDebug()<<briefInfo.mediaType;
-    if(QString("mp4, flv, avi, mkv").contains(briefInfo.mediaType)){//是视频就提取缩略图
+    if(QString("mp4, flv, avi, mkv").contains(suffix)){//是视频就提取缩略图
         AVFrame *pFrame = av_frame_alloc();
         demux->Seek(0.5);
         //先recv，后send
@@ -58,9 +58,10 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
             decode->Send(pkt);
         }
         briefInfo.img = getQImageFromFrame(pFrame, demux->CopyVPara());
-        briefInfo.img.save("C:\\Users\\16409\\Desktop\\thumbnail.jpg");
+        briefInfo.mediaType = "vedio";
+//        briefInfo.img.save("C:\\Users\\16409\\Desktop\\thumbnail.jpg");
     }
-    else if(QString("mp3, flac, wav, rm").contains(briefInfo.mediaType)){//是音频就提取音频的相关信息
+    else if(QString("mp3, flac, wav, rm").contains(suffix)){//是音频就提取音频的相关信息
         AVFormatContext *m_AVFormatContext = NULL;
         int result = avformat_open_input(&m_AVFormatContext, url, nullptr, nullptr);
         if (result != 0 || m_AVFormatContext == nullptr){
@@ -103,9 +104,11 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
         }
         briefInfo.img = mInfoImage;
         qDebug()<<mInfoMap;
-        mInfoImage.save("C:\\Users\\16409\\Desktop\\cover.jpg");
+//        mInfoImage.save("C:\\Users\\16409\\Desktop\\cover.jpg");
 
+        briefInfo.mediaType = "audio";
     }
+
     return briefInfo;
 }
 
