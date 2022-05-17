@@ -11,7 +11,8 @@ public:
     enum mode{
             Random,     //随机
             Order,      //顺序
-            Loop        //循环
+            Loop,       //循环
+            Once        //播放一次即暂停
         };
     Q_ENUM(mode)
 };

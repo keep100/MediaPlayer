@@ -7,12 +7,10 @@ Controller::Controller(QObject *parent)
 
 }
 
-void Controller::stopVideo(){
+void Controller::stop(){
     emit pause();
 }
-void Controller::stopAudio(){
-    emit pause();
-}
+
 
 void Controller::exit(){
     //退出播放前先记录播放历史
@@ -41,93 +39,48 @@ void Controller::setTime(int t){
     emit skipTime(t);
 }
 
-void Controller::startPlayAudio(int index){
+void Controller::startPlay(int index,bool isAudio){
     //先进行检查
-    State s = manager.checkAudio(index);
+    State s = manager.check(index,isAudio);
     if(s == State::Normal){
         //设置当前视频
-        manager.setCurAudio(index);
+        manager.setCur(index,isAudio);
         //发送对应的信号
-        emit playMedia(manager.getAudio(index).filePath());
+        emit playMedia(manager.getData(index,isAudio).filePath());
     }
     else if(s==State::Error){
-        emit fileError(manager.getAudio(index).filePath());
+        emit fileError(manager.getData(index,isAudio));
     }
     else if(s==State::Miss){
-        emit fileMiss(manager.getAudio(index).filePath());
+        emit fileMiss(manager.getData(index,isAudio));
     }
 }
 
-void Controller::startPlayVideo(int index){
-    //先进行检查
-    State s = manager.checkVideo(index);
-    if(s == State::Normal){
-        //记录之前的播放历史
-        manager.recordVideo(_time);
-        //设置当前视频
-        manager.setCurVideo(index);
-        //发送对应的信号
-        emit playMedia(manager.getVideo(index).filePath());
-    }
-    else if(s==State::Error){
-        emit fileError(manager.getVideo(index).filePath());
-    }
-    else if(s==State::Miss){
-        emit fileMiss(manager.getVideo(index).filePath());
-    }
+
+void Controller::playNext(bool isAudio){
+    startPlay( manager.next(),isAudio);
 }
 
-void Controller::playNextAudio(){
-    int index = manager.nextAudio();
-    startPlayAudio(index);
+void Controller::playPre(bool isAudio){
+    startPlay(manager.pre(),isAudio);
 }
 
-void Controller::playPreAudio(){
-    int index = manager.preAudio();
-    startPlayAudio(index);
-}
 
-void Controller::playNextVideo(){
-    int index = manager.nextVideo();
-    startPlayAudio(index);
-}
-
-void Controller::playPreVideo(){
-    int index = manager.preVideo();
-    startPlayAudio(index);
-}
-
-void Controller::importVideo(const QList<QString>& list){
+void Controller::importData(const QList<QString>& list,bool isAudio){
     State s;
     for(auto& item:list){
-        s = manager.importVideo(item);
+        s = manager.importData(item,isAudio);
         if(s==State::Error){
-            emit fileError(item);
+            emit fileImportFail(item);
         }
         else if(s==State::Miss){
-            emit fileMiss(item);
+            emit fileImportFail(item);
         }
     }
 }
 
-void Controller::importAudio(const QList<QString>& list){
-    State s;
-    for(auto& item:list){
-        s = manager.importAudio(item);
-        if(s==State::Error){
-            emit fileError(item);
-        }
-        else if(s==State::Miss){
-            emit fileMiss(item);
-        }
-    }
+void Controller::deleteData(int index,bool isAudio){
+    manager.deleteData(index,isAudio);
 }
 
-void Controller::deleteAudio(int index){
-    manager.deleteAudio(index);
-}
-
-void Controller::deleteVideo(int index){
-    manager.deleteVideo(index);
-}
 
