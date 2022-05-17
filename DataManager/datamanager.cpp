@@ -50,7 +50,7 @@ void DataManager::readData(){
     QFileInfo info(dir.filePath("audio.json"));
     if(info.isFile()){
         QFile file(info.filePath());
-        if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        if(file.open(QFile::ReadOnly)){
             QJsonParseError parseJsonErr;
             QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseJsonErr);
             file.close();
@@ -72,7 +72,7 @@ void DataManager::readData(){
     info.setFile(dir.filePath("video.json"));
     if(info.isFile()){
         QFile file(info.filePath());
-        if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        if(file.open(QFile::ReadOnly)){
             QJsonParseError parseJsonErr;
             QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseJsonErr);
             file.close();
@@ -86,6 +86,7 @@ void DataManager::readData(){
                     _videoList.append(item.toObject());
                     _videoOrder.append(_videoOrder.size());
                 }
+
             }
         }
     }
@@ -102,7 +103,7 @@ void DataManager::writeData(){
     }
 
     //将音频列表写入json文件中
-    QFile audioFile(dir.filePath("audio.josn"));
+    QFile audioFile(dir.filePath("audio.json"));
     if(audioFile.open(QFile::WriteOnly)){
         QJsonArray array;
         for(auto& item:_audioList){
@@ -114,7 +115,7 @@ void DataManager::writeData(){
     }
 
     //将视频列表写入json文件中
-    QFile videoFile(dir.filePath("video.josn"));
+    QFile videoFile(dir.filePath("video.json"));
     if(videoFile.open(QFile::WriteOnly)){
         QJsonArray array;
         for(auto& item:_videoList){
@@ -164,13 +165,11 @@ State DataManager::importData(const QString& path,bool isAudio){
         //判断文件是否已经存在于列表中
         int index = 0;
         for(;index<list.size();index++){
-            if(list[index].filePath() == path)
+            if(list[index].filePath() == f.filePath())
                 break;
         }
-        qDebug()<<index<<' '<<list.size();
         //如果不存在则在列表尾部添加
         if(index==list.size()){
-            qDebug()<<Data(info,f).toJson();
             list.append(Data(info,f));
             order.append(index);
         }

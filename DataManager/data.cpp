@@ -37,15 +37,19 @@ State Data::verify(){
 }
 
 Data::Data(const BriefInfo& info,const QFileInfo& f){
+    _isAudio = info.mediaType=="audio"?true:false;
     _duration = info.totalMs;
-    _fileName = f.fileName();
+    _fileName = info.title!=""?info.title:f.fileName();
     _filePath = f.filePath();
     _md5 = getFileMd5(_filePath);
     _lastTime = 0;
-    dir.mkpath(info.mediaType);
     _album = info.album;
+    _artist = info.artist;
+    dir.mkpath(info.mediaType);
     if(!info.img.isNull()){
-        _imgPath = dir.filePath(info.mediaType+"/"+_fileName+".jpg");
+        QCryptographicHash hash(QCryptographicHash::Md5);
+        hash.addData(_filePath.toLocal8Bit());
+        _imgPath = dir.filePath(info.mediaType+"/"+hash.result().toHex()+".jpg");
         info.img.save(_imgPath);
     }
 
@@ -64,6 +68,8 @@ QJsonObject Data::toJson(){
     json.insert("lastTime",_lastTime);
     json.insert("isAudio",_isAudio);
     json.insert("imgPath",_imgPath);
+    json.insert("album",_album);
+    json.insert("artist",_artist);
     return json;
 }
 
@@ -76,6 +82,8 @@ Data::Data(const QJsonObject& json)
     _lastTime = json["lastTime"].toInteger();
     _isAudio = json["isAudio"].toBool();
     _imgPath = json["imgPath"].toString();
+    _album = json["album"].toString();
+    _artist = json["artist"].toString();
 }
 
 

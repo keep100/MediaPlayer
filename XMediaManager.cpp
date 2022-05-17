@@ -1,4 +1,4 @@
-#include "XMediaManager.h"
+﻿#include "XMediaManager.h"
 #include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XVideoThread.h"
@@ -58,7 +58,7 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
             decode->Send(pkt);
         }
         briefInfo.img = getQImageFromFrame(pFrame, demux->CopyVPara());
-        briefInfo.mediaType = "vedio";
+        briefInfo.mediaType = "video";
 //        briefInfo.img.save("C:\\Users\\16409\\Desktop\\thumbnail.jpg");
     }
     else if(QString("mp3, flac, wav, rm").contains(suffix)){//是音频就提取音频的相关信息
@@ -87,7 +87,7 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
         {
             QString keyString = tag->key;
             QString valueString = QString::fromUtf8(tag->value);
-            mInfoMap.insert(keyString, valueString);
+            mInfoMap.insert(keyString.toLower(), valueString);
         }
         briefInfo.album = mInfoMap["album"];
         briefInfo.artist = mInfoMap["artist"];
@@ -103,7 +103,7 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
             }
         }
         briefInfo.img = mInfoImage;
-        qDebug()<<mInfoMap;
+        //qDebug()<<mInfoMap;
 //        mInfoImage.save("C:\\Users\\16409\\Desktop\\cover.jpg");
 
         briefInfo.mediaType = "audio";
