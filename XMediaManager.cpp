@@ -24,26 +24,22 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
     XDemux *demux = new XDemux();
     XDecode *decode = new XDecode();
     demux->Open(url);
+    decode->Open(demux->CopyVPara());
 
     briefInfo.totalMs = demux->totalMs;
     briefInfo.width = demux->width;
     briefInfo.height = demux->height;
-    briefInfo.channels = demux->channels;
-    briefInfo.sampleRate = demux->sampleRate;
     briefInfo.mediaType = QString(url).split(".").last();
 //    qDebug()<<briefInfo.mediaType;
-    qDebug()<<demux->CopyAPara();
-    qDebug()<<demux->CopyVPara();
-    if(QString("mp4, flv, avi, mkv").contains(briefInfo.mediaType)){//是视频就提取视频的相关信息
+    if(QString("mp4, flv, avi, mkv").contains(briefInfo.mediaType)){//是视频就提取缩略图
         AVFrame *pFrame = av_frame_alloc();
         demux->Seek(0.5);
         //先recv，后send
         while (true)
         {
             pFrame = decode->Recv();
-            if (pFrame)
-            {
-//                qDebug() << "receive--------------------------";
+            if (pFrame){//receive
+//                qDebug()<<"receive";
                 QImage temp = getQImageFromFrame(pFrame, demux->CopyVPara());
                 if(!temp.isNull()&&temp.bits()){
                     int w = temp.width(), h = temp.height();
@@ -54,28 +50,69 @@ BriefInfo XMediaManager::getBriefInfo(const char* url){
                         qDebug()<<"有东西的图";
                         break;
                     }
-
                 }
-//                break;
             }
-//            qDebug() << "send--------------------------";
-            AVPacket *pkt = demux->ReadVideo();
+//            qDebug()<<"send";
+            AVPacket *pkt = demux->ReadVideo();//send
+//            qDebug()<<pkt;
             decode->Send(pkt);
         }
-        briefInfo.qimage = getQImageFromFrame(pFrame, demux->CopyVPara());
+        briefInfo.img = getQImageFromFrame(pFrame, demux->CopyVPara());
+        briefInfo.img.save("C:\\Users\\16409\\Desktop\\thumbnail.jpg");
     }
-    else if(QString("mp3, flac, wav, rm").contains(briefInfo.mediaType)){//是视频就提取视频的相关信息
+    else if(QString("mp3, flac, wav, rm").contains(briefInfo.mediaType)){//是音频就提取音频的相关信息
+        AVFormatContext *m_AVFormatContext = NULL;
+        int result = avformat_open_input(&m_AVFormatContext, url, nullptr, nullptr);
+        if (result != 0 || m_AVFormatContext == nullptr){
+            qDebug()<<"fffff";
+            return briefInfo;
+        }
+
+        // 查找流信息，把它存入AVFormatContext中
+        result = avformat_find_stream_info(m_AVFormatContext, nullptr);
+        if(result){
+            qDebug()<<"fffff1";
+            return briefInfo;
+        }
+
+        int streamsCount = m_AVFormatContext->nb_streams;
+        qDebug()<<"streamsCount: "<<streamsCount;
+
+        // 读取详细信息
+        QMap<QString, QString> mInfoMap;
+        QImage mInfoImage;
+        AVDictionaryEntry *tag = nullptr;
+        while (tag = av_dict_get(m_AVFormatContext->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))
+        {
+            QString keyString = tag->key;
+            QString valueString = QString::fromUtf8(tag->value);
+            mInfoMap.insert(keyString, valueString);
+        }
+        briefInfo.album = mInfoMap["album"];
+        briefInfo.artist = mInfoMap["artist"];
+        briefInfo.title = mInfoMap["title"];
+
+        for (int i=0; i<streamsCount; ++i)
+        {
+            if (m_AVFormatContext->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC)
+            {
+                qDebug()<<"-----"<<i;
+                AVPacket pkt = m_AVFormatContext->streams[i]->attached_pic;
+                mInfoImage = QImage::fromData((uchar*)pkt.data, pkt.size);
+            }
+        }
+        briefInfo.img = mInfoImage;
+        qDebug()<<mInfoMap;
+        mInfoImage.save("C:\\Users\\16409\\Desktop\\cover.jpg");
 
     }
-
-
     return briefInfo;
 }
 
 QImage XMediaManager::getQImageFromFrame(const AVFrame* frame, AVCodecParameters *para)
 {
 
-    qDebug() << "frameToImage";
+//    qDebug() << "frameToImage";
     QImage output(frame->width, frame->height, QImage::Format_RGB32); //构造一个QImage用作输出
 //    qDebug()<<frame->width<<", "<<frame->height;
     int outputLineSize[4];                                            //构造AVFrame到QImage所需要的数据
