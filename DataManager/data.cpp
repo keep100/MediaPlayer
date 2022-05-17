@@ -3,7 +3,7 @@
 #include<QCryptographicHash>
 #include<QFileInfo>
 
-QDir Data::dir = QDir("./data/thumpnail");
+QDir Data::dir = QDir("./Data/thumpnail");
 
 //获取文件md5码，只获取前2048个字节
 QString getFileMd5(const QString &path)
@@ -43,9 +43,10 @@ Data::Data(const BriefInfo& info,const QFileInfo& f){
     _md5 = getFileMd5(_filePath);
     _lastTime = 0;
     dir.mkpath(info.mediaType);
-    if(!info.qimage.isNull()){
+    _album = info.album;
+    if(!info.img.isNull()){
         _imgPath = dir.filePath(info.mediaType+"/"+_fileName+".jpg");
-        info.qimage.save(_imgPath);
+        info.img.save(_imgPath);
     }
 
 }

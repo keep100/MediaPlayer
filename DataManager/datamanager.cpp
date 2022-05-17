@@ -115,7 +115,7 @@ void DataManager::writeData(){
 
     //将视频列表写入json文件中
     QFile videoFile(dir.filePath("video.josn"));
-    if(audioFile.open(QFile::WriteOnly)){
+    if(videoFile.open(QFile::WriteOnly)){
         QJsonArray array;
         for(auto& item:_videoList){
             array.append(item.toJson());
@@ -156,21 +156,21 @@ State DataManager::importData(const QString& path,bool isAudio){
         QString type = isAudio?"audio":"video";
         QList<Data>& list = isAudio?_audioList:_videoList;
         QList<int>& order = _isAudio?_audioOrder:_videoOrder;
-        qDebug()<<6666;
         //对文件进行解析
         auto info = XMediaManager::getBriefInfo(path.toLocal8Bit());
-        qDebug()<<7778;
         if(info.mediaType!=type){
             return State::Error;
         }
         //判断文件是否已经存在于列表中
         int index = 0;
-        for(int i=0;i<list.size();i++){
-            if(list[i].filePath() == path)
+        for(;index<list.size();index++){
+            if(list[index].filePath() == path)
                 break;
         }
+        qDebug()<<index<<' '<<list.size();
         //如果不存在则在列表尾部添加
         if(index==list.size()){
+            qDebug()<<Data(info,f).toJson();
             list.append(Data(info,f));
             order.append(index);
         }
