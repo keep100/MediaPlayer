@@ -88,7 +88,7 @@ void XDemuxThread::run()
 
             if (vt)vt->Push(pkt);
             mux.unlock();
-            msleep(1);
+            usleep(1);
         }
 
 
