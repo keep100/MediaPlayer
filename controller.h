@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "playMode.h"
 #include "DataManager/datamanager.h"
+#include <QQmlApplicationEngine>
 
 
 //提供方法给qml调用，并根据情况发出对应的信号
@@ -17,7 +18,7 @@ class Controller : public QObject
     Q_PROPERTY(int time READ time NOTIFY timeChanged)         //时间
 
 public:
-    explicit Controller(QObject *parent = nullptr);
+    explicit Controller(QQmlApplicationEngine& engine,QObject *parent = nullptr);
 
     //供前端调用（前端--》控制器）
     Q_INVOKABLE void stop();                                                //暂停播放

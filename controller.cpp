@@ -1,10 +1,11 @@
 ﻿#include "controller.h"
+#include <QQmlContext>
 
-
-Controller::Controller(QObject *parent)
+Controller::Controller(QQmlApplicationEngine& engine,QObject *parent)
     : QObject{parent}
 {
-
+    engine.rootContext()->setContextProperty("controller",this);
+    engine.rootContext()->setContextProperty("dataMgr",&manager);
 }
 
 void Controller::stop(){
