@@ -15,6 +15,7 @@ void Controller::stop(){
 void Controller::exit(){
     //退出播放前先记录播放历史
     manager.recordVideo(_time);
+    manager.reset();
     emit exitPlay();
 }
 

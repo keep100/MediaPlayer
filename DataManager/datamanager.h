@@ -4,6 +4,7 @@
 #include <QObject>
 #include "data.h"
 #include <QMap>
+#include "randomlist.h"
 #include "playMode.h"
 
 
@@ -40,14 +41,14 @@ public:
     void readData();                                //加载初始数据
     void writeData();                               //将数据写回文件中
     ~DataManager();                                 //析构函数
+    void reset();                                   //重置，当退出播放时调用
 
 private:
     bool _isAudio = false;
     QList<Data> _videoList,_audioList;
-    QList<int> _videoOrder,_audioOrder;             //播放顺序（随机播放）
-    PlayMode::mode mode;
-    int curIndex;                                   //当前对应着数据列表中的哪一项
-    int curOrder = -1;                              //当前对应着顺序列表中哪一项（随机播放）
+    RandomList _videoOrder,_audioOrder;             //播放顺序（随机播放）
+    PlayMode::mode mode = PlayMode::Order;
+    int curIndex = -1;                               //当前对应着数据列表中的哪一项
     QDir dir;
 };
 

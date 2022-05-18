@@ -36,8 +36,9 @@ signals:
 
     //需要前端主动连接（控制器--》前端）
     void fileMiss(Data path);                   //文件缺失
-    void fileError(Data path);                  //文件错误
+    void fileError(Data path);                  //文件错误(md5对不上，或者解析失败）
     void fileImportFail(const QString& path);   //文件导入失败
+    void fileFinish();                          //当前文件播放结束
 
     //需要后端连接（控制器--》后端）
     void playSpeedChanged(float);           //播放速度改变
@@ -45,6 +46,8 @@ signals:
     void exitPlay();                        //退出播放
     void pause();                           //暂停
     void skipTime(int time);                //时间跳转（前端拖动进度条导致）
+
+    //前后端都连接（通知前端开始准备播放，后端开始解码）
     void playMedia(const QString& path);    //播放
 
 public:

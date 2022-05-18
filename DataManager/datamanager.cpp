@@ -8,21 +8,21 @@ DataManager::DataManager(QObject *parent)
 {
     dir.setPath("./Data");
     readData();
+    _audioOrder.ini(_audioList.size());
+    _videoOrder.ini(_videoList.size());
 }
 
 void DataManager::setMode(PlayMode::mode m){
     mode = m;
-    if(m==PlayMode::mode::Random){
-        std::random_device rd;
-        std::mt19937 rng(rd());
-        QList<int>& list = _isAudio?_audioOrder:_videoOrder;
-        //对order列表进行洗牌操作
-        std::shuffle(list.begin(),list.end(),rng);
-        //把当前正在播放的设置为列表头
-        int pos = list.indexOf(curIndex);
-        if(pos>=0){
-            list.swapItemsAt(pos,0);
-            curOrder = 0;
+    if(m!=PlayMode::mode::Random){
+        _audioOrder.reset();
+        _videoOrder.reset();
+    }
+    else{
+        if(_isAudio)
+            _audioOrder.setOredr(curIndex);
+        else{
+            _videoOrder.setOredr(curIndex);
         }
     }
 }
@@ -33,7 +33,11 @@ void DataManager::setCur(int index,bool isAudio){
 
     //如果是随机播放就调整curOrder的值
     if(mode==PlayMode::Random){
-        curOrder = isAudio?_audioOrder.indexOf(index):_videoOrder.indexOf(index);
+        if(_isAudio)
+            _audioOrder.setOredr(curIndex);
+        else{
+            _videoOrder.setOredr(curIndex);
+        }
     }
 
     if(isAudio){
@@ -62,7 +66,6 @@ void DataManager::readData(){
                 QJsonArray jsonArray = document.array();
                 for(auto item:jsonArray){
                     _audioList.append(item.toObject());
-                    _audioOrder.append(_audioOrder.size());
                 }
             }
         }
@@ -84,7 +87,6 @@ void DataManager::readData(){
                 QJsonArray jsonArray = document.array();
                 for(auto item:jsonArray){
                     _videoList.append(item.toObject());
-                    _videoOrder.append(_videoOrder.size());
                 }
 
             }
@@ -133,21 +135,25 @@ DataManager::~DataManager(){
 }
 
 void DataManager::deleteData(int index,bool isAudio){
+    //如果删除当前正在播放的则直接返回
+    if(index==curIndex&&isAudio==_isAudio){
+        return;
+    }
     QList<Data>& list = isAudio?_audioList:_videoList;
-    QList<int>& order = _isAudio?_audioOrder:_videoOrder;
+    RandomList& order = isAudio?_audioOrder:_videoOrder;
     if(index<list.size()&&index>=0){
         list.removeAt(index);
-
-        //同步修改顺序列表中的元素
-        for(int i=0;i<order.size();i++){
-            order[i] -= order[i]>index?1:0;
+        order.moveOrder(index);     //同步修改顺序列表
+        //如果修改的是当前正在播放的列表则修改对应的索引
+        if(index<curIndex&&isAudio==_isAudio){
+            curIndex --;
         }
-        order.removeOne(index);
-
-        if(isAudio)
+        if(isAudio){
             emit audioListChanged();
-        else
+        }
+        else{
             emit videoListChanged();
+        }
     }
 }
 
@@ -156,7 +162,7 @@ State DataManager::importData(const QString& path,bool isAudio){
     if(f.isFile()){
         QString type = isAudio?"audio":"video";
         QList<Data>& list = isAudio?_audioList:_videoList;
-        QList<int>& order = _isAudio?_audioOrder:_videoOrder;
+        RandomList& order = isAudio?_audioOrder:_videoOrder;
         //对文件进行解析
         auto info = XMediaManager::getBriefInfo(path.toLocal8Bit());
         if(info.mediaType!=type){
@@ -170,8 +176,8 @@ State DataManager::importData(const QString& path,bool isAudio){
         }
         //如果不存在则在列表尾部添加
         if(index==list.size()){
+            order.addOrder();        //同步修改顺序列表
             list.append(Data(info,f));
-            order.append(index);
         }
         else{
             //如果是已经存在则直接修改
@@ -206,8 +212,9 @@ Data DataManager::getData(int index,bool isAudio){
 
 QVariantList DataManager::videoList(){
     QVariantList list;
-    for(auto& item:_videoList){
-        list<<QVariant::fromValue(item);
+    for(int i = 0;i<_videoList.size();i++){
+        _videoList[i].setIndex(i);
+        list<<QVariant::fromValue(_videoList[i]);
     }
     return list;
 }
@@ -223,71 +230,60 @@ QVariantList DataManager::audioList(){
 
 int DataManager::next(){
     QList<Data>& list = _isAudio?_audioList:_videoList;
-    QList<int>& order = _isAudio?_audioOrder:_videoOrder;
+    RandomList& order = _isAudio?_audioOrder:_videoOrder;
 
     //如果不是随机播放就直接返回下一个
     if(mode!=PlayMode::Random){
         if(curIndex>=list.size()-1){
-            curIndex = 0;
+            return 0;
         }
-        else{
-            curIndex++;
-        }
-        return curIndex;
+        return curIndex+1;
     }
     else{
-        if(curOrder>=order.size()-1){
-            curOrder = 0;
-        }
-        else{
-            curOrder++;
-        }
-        return order[curOrder];
+        return order.next();
     }
 }
 
 int DataManager::pre(){
     QList<Data>& list = _isAudio?_audioList:_videoList;
-    QList<int>& order = _isAudio?_audioOrder:_videoOrder;
+    RandomList& order = _isAudio?_audioOrder:_videoOrder;
 
-    //如果不是随机播放就直接返回下一个
+    //如果不是随机播放就直接返回上一个
     if(mode!=PlayMode::Random){
         if(curIndex<=0){
-            curIndex = list.size()-1;
+            return list.size()-1;
         }
-        else{
-            curIndex--;
-        }
-        return curIndex;
+        return curIndex-1;
     }
     else{
-        if(curOrder<=0){
-            curOrder = order.size()-1;
-        }
-        else{
-            curOrder--;
-        }
-        return order[curOrder];
+        return order.pre();
     }
 
 }
 
 Data DataManager::curAudio(){
-    if(_isAudio)
+    if(_isAudio&&curIndex<=_audioList.size()&&curIndex>=0)
         return _audioList[curIndex];
     return Data();
 }
 
 Data DataManager::curVideo(){
-    if(!_isAudio)
+    if(!_isAudio&&curIndex<=_videoList.size()&&curIndex>=0)
         return _videoList[curIndex];
     return Data();
 }
 
 void DataManager::recordVideo(long long time){
-    if(!_isAudio){
+    if(!_isAudio&&curIndex<=_videoList.size()&&curIndex>=0){
         _videoList[curIndex].setLastTime(time);
     }
+}
+void DataManager::reset(){
+    curIndex = -1;
+    _audioOrder.reset();
+    _videoOrder.reset();
+    emit curAudioChanged();
+    emit curVideoChanged();
 }
 
 
