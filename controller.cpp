@@ -16,6 +16,7 @@ void Controller::exit(){
     //退出播放前先记录播放历史
     manager.recordVideo(_time);
     manager.reset();
+    _time = 0;
     emit exitPlay();
 }
 
@@ -44,10 +45,13 @@ void Controller::startPlay(int index,bool isAudio){
     //先进行检查
     State s = manager.check(index,isAudio);
     if(s == State::Normal){
+        //记录历史
+        manager.recordVideo(_time);
         //设置当前视频
         manager.setCur(index,isAudio);
         //发送对应的信号
         emit playMedia(manager.getData(index,isAudio).filePath());
+        setTime(_time);
     }
     else if(s==State::Error){
         emit fileError(manager.getData(index,isAudio));
