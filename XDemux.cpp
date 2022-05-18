@@ -68,8 +68,8 @@ bool XDemux::Seek(double pos)
     avformat_flush(ic);
 
     long long seekPos = 0;
-    seekPos = ic->streams[videoStream]->duration * pos;
-    int re = av_seek_frame(ic, videoStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    seekPos = ic->streams[audioStream]->duration * pos;
+    int re = av_seek_frame(ic, audioStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;
     return true;
