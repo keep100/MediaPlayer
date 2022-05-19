@@ -6,6 +6,7 @@
 #include "playMode.h"
 #include "DataManager/datamanager.h"
 #include <QQmlApplicationEngine>
+#include "OpenglItem/myrender.h"
 
 
 //提供方法给qml调用，并根据情况发出对应的信号
@@ -40,6 +41,7 @@ signals:
     void fileError(Data path);                  //文件错误(md5对不上，或者解析失败）
     void fileImportFail(const QString& path);   //文件导入失败
     void fileFinish();                          //当前文件播放结束
+    void update(YUVData*);                      //通知渲染组件进行更新
 
     //需要后端连接（控制器--》后端）
     void playSpeedChanged(float);           //播放速度改变
@@ -63,6 +65,12 @@ public:
     void setMode(PlayMode::mode m);
     void setPlaySpeed(float s);
     void setVoice(float v);
+
+    //需要与其他部分进行连接
+    void onUpdate(YUVData*,int time);       //连接后端传来的信号
+
+private:
+
 
 private:
     DataManager manager;

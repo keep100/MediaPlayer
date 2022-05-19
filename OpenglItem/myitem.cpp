@@ -1,6 +1,6 @@
 ﻿#include "myitem.h"
 #include "myrender.h"
-
+#include "controller.h"
 
 MyItem::MyItem()
 {
@@ -19,8 +19,8 @@ void MyItem::timerEvent(QTimerEvent* event)
         update();
 }
 
-void MyItem::bind(QObject* obj){
-
+void MyItem::bind(Controller* obj){
+    connect(obj,&Controller::update,this,&MyItem::onUpdate);
 }
 
 

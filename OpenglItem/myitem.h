@@ -3,7 +3,7 @@
 #include "myrender.h"
 #include <QQuickFramebufferObject>
 #include <QSGNode>
-
+#include "controller.h"
 
 
 class MyItem : public QQuickFramebufferObject
@@ -16,8 +16,8 @@ public:
     Renderer* createRenderer() const override;
     bool isPlay(){return _isPlay;}
     void setIsPlay(bool state){_isPlay = state;emit isPlayChanged();}
-    void bind(QObject* obj);
-    void updateFrame(YUVData* data){this->data = data;}
+    void bind(Controller* obj);
+    void onUpdate(YUVData* data){this->data = data;}
 
 public:
     YUVData* data;
