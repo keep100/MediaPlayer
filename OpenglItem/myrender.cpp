@@ -4,12 +4,11 @@
 #include <QQuickOpenGLUtils>
 #include <QOpenGLPixelTransferOptions>
 #include <QFile>
+#include "myitem.h"
 #define ver 0
 #define tex 1
 
-MyRender::MyRender(QObject *parent)
-    : QObject{parent}
-{
+MyRender::MyRender(){
     init();
 }
 
@@ -68,6 +67,9 @@ void MyRender::render(){
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     mProgram.bind();
 
+    if(data==nullptr)
+        return;
+
     //调整glViewport的大小使其比例不变
     float scale = (windowWidth/data->yWidth<windowHeight/data->yHeight)?(windowWidth/data->yWidth):(windowHeight/data->yHeight);
     float offsetX = (windowWidth-scale*data->yWidth>0)?(windowWidth-scale*data->yWidth):0;
@@ -120,32 +122,36 @@ QOpenGLFramebufferObject* MyRender::createFramebufferObject(const QSize& size){
     return new QOpenGLFramebufferObject(size, format);
 }
 
-void MyRender::synchronize(QQuickFramebufferObject* item){
-    updateData();
+void MyRender::synchronize(QQuickFramebufferObject* obj){
+    MyItem* item = dynamic_cast<MyItem*>(obj);
+    if(item!=nullptr){
+        data = item->data;
+    }
+    //updateData();
 }
 
 //更新YUV数据
 void MyRender::updateData(){
-    if(fp==nullptr){
-        fp = fopen("C:\\Users\\17866\\Desktop\\qttemp\\build-MyPlayer-Desktop_Qt_6_3_0_MSVC2019_64bit-Debug\\out240x128.yuv", "rb");
-        if (fp==nullptr)
-        {
-            qDebug()<<("out240x128.yuv file open failed!");
-        }
-    }
-    if(fp!=nullptr){
-        if (feof(fp))
-        {
-            fseek(fp, 0, SEEK_SET);
-        }
-        const int width = 240;
-        const int height = 128;
-        this->data = std::make_shared<YUVData>();
-        data->yHeight = height;data->yWidth = width;
-        data->uHeight = height/2;data->uWidth = width/2;
-        data->vHeight = height/2;data->vWidth = width/2;
-        fread(data->Y, 1, width * height, fp);
-        fread(data->U, 1, width * height / 4, fp);
-        fread(data->V, 1, width * height / 4, fp);
-    }
+//    if(fp==nullptr){
+//        fp = fopen("C:\\Users\\17866\\Desktop\\qttemp\\build-MyPlayer-Desktop_Qt_6_3_0_MSVC2019_64bit-Debug\\out240x128.yuv", "rb");
+//        if (fp==nullptr)
+//        {
+//            qDebug()<<("out240x128.yuv file open failed!");
+//        }
+//    }
+//    if(fp!=nullptr){
+//        if (feof(fp))
+//        {
+//            fseek(fp, 0, SEEK_SET);
+//        }
+//        const int width = 240;
+//        const int height = 128;
+//        this->data = std::make_shared<YUVData>();
+//        data->yHeight = height;data->yWidth = width;
+//        data->uHeight = height/2;data->uWidth = width/2;
+//        data->vHeight = height/2;data->vWidth = width/2;
+//        fread(data->Y, 1, width * height, fp);
+//        fread(data->U, 1, width * height / 4, fp);
+//        fread(data->V, 1, width * height / 4, fp);
+//    }
 }

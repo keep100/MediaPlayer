@@ -16,9 +16,15 @@ public:
     Renderer* createRenderer() const override;
     bool isPlay(){return _isPlay;}
     void setIsPlay(bool state){_isPlay = state;emit isPlayChanged();}
+    void bind(QObject* obj);
+    void updateFrame(YUVData* data){this->data = data;}
+
+public:
+    YUVData* data;
 
 private:
     bool _isPlay = true;
+
 
 signals:
     void isPlayChanged();
