@@ -104,7 +104,7 @@ Rectangle{
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Image {
-                            x: parent.width*0.45
+                            x: parent.width*0.42
                             width: 14
                             height: 14
                             source: "qrc:/images/播放.png"
@@ -120,12 +120,34 @@ Rectangle{
                             }
                         }
                         Image {
-                            x: parent.width*0.53
+                            x: parent.width*0.48
                             width: 16
                             height: 16
                             source: "qrc:/images/more.png"
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    morePopup.open()
+                                    //                                    console.log(musicData.get(index).singer)
+                                }
+                            }
+                        }
+                        Image {
+                            x: parent.width*0.53
+                            width: 16
+                            height: 16
+                            source: "qrc:/images/删除.png"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    delDialog.open()
+                                    //                                    console.log(musicData.get(index).singer)
+                                }
+                            }
                         }
                         Text {
                             leftPadding: parent.width*0.6
@@ -160,13 +182,19 @@ Rectangle{
             ListView{
                 id:musicList
                 width: parent.width
-                height:windowHeight*0.35
+                height:titleBar.isMaximized||isFullSreen?windowHeight*0.48:windowHeight*0.35
                 model:musicData
                 clip: true
                 delegate:musicDelegate
             }
         }
     }
+
+    //删除对话框
+    DelDialog{id:delDialog;mediaType: '音频'}
+
+    //详细信息弹窗
+    InfoPopup{id:morePopup;mediaType: '音频'}
 
     //无音频的空状态展示区
     Column{

@@ -63,11 +63,11 @@ Rectangle{
                         showInitial();
                     }
                     break;
-                case Qt.Key_F:         //处理Ctrl+F，全屏或小屏
+                case Qt.Key_F:         //处理Ctrl+F，全屏
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl F');
-                        isFullSreen=!isFullSreen;
-                        isFullSreen?showFull():showInitial();
+                        isFullSreen=true;
+                        showFull();
                     }
                     break;
                 case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
@@ -253,6 +253,7 @@ Rectangle{
             id: soundSlider
             value: 0.5
             x:soundIcon.x+windowWidth*0.02
+            pressed: false
             anchors.verticalCenter: parent.verticalCenter
             
             background: Rectangle {//控制条背景
@@ -280,6 +281,11 @@ Rectangle{
                 radius: 100
                 color: soundSlider.pressed ? "#f0f0f0" : "#f6f6f6"
                 border.color: "#bdbebf"
+            }
+            onPressedChanged: {//监听最后释放位置
+                if(!pressed){
+                    console.log(value)
+                }
             }
         }
         

@@ -12,5 +12,7 @@
         <file>components/CoverPage.qml</file>
         <file>components/PlayQueue.qml</file>
         <file>components/VideoPage.qml</file>
+        <file>components/InfoPopup.qml</file>
+        <file>components/DelDialog.qml</file>
     </qresource>
 </RCC>

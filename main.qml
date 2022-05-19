@@ -8,8 +8,6 @@ Window {
     id:mainWindow
     width: windowWidth
     height: windowHeight
-//    minimumWidth: 800
-//    minimumHeight: 500
     visible: true
     flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
@@ -76,7 +74,7 @@ Window {
 
     //监听是否正在播放音视频
     onIsPlayingChanged: {
-//        isPlaying?until.setPause(false):until.setPause(true);
+        //        isPlaying?until.setPause(false):until.setPause(true);
     }
 
     //视频播放界面
@@ -158,11 +156,13 @@ Window {
     //本地文件选择框
     FileDialog {
         id: fileDialog
-        //        currentFile: document.source
         fileMode:FileDialog.OpenFiles  //支持文件多选
-        folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]  //打开默认文件夹
+        title:curIdx===0?"选择视频":"选择音频"
         nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
                                :["audio files (*.mp3 *.flac *.wav *rm)"]
+        onAccepted:{
+            console.log(files)
+        }
     }
 
     //标题栏
