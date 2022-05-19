@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include "playMode.h"
+#include "PlayMode.h"
 #include "DataManager/datamanager.h"
 #include <QQmlApplicationEngine>
 #include "OpenglItem/myrender.h"
@@ -19,13 +19,13 @@ class Controller : public QObject
     Q_PROPERTY(int time READ time NOTIFY timeChanged)         //时间
 
 public:
-    explicit Controller(QQmlApplicationEngine& engine,QObject *parent = nullptr);
+    explicit Controller(QQmlApplicationEngine &engine, QObject *parent = nullptr);
 
     //供前端调用（前端--》控制器）
     Q_INVOKABLE void stop();                                                //暂停播放
-    Q_INVOKABLE void startPlay(int index,bool isAudio);                     //开始播放视频
-    Q_INVOKABLE void importData(const QList<QString>& list,bool isAudio);   //导入音频数据
-    Q_INVOKABLE void deleteData(int index,bool isAudio);                    //删除数据
+    Q_INVOKABLE void startPlay(int index, bool isAudio);                    //开始播放视频
+    Q_INVOKABLE void importData(const QList<QString> &list, bool isAudio);  //导入音频数据
+    Q_INVOKABLE void deleteData(int index, bool isAudio);                   //删除数据
     Q_INVOKABLE void playNext(bool isAudio);                                //下一个
     Q_INVOKABLE void playPre(bool isAudio);                                 //上一个
     Q_INVOKABLE void exit();                                                //退出播放
@@ -39,9 +39,9 @@ signals:
     //需要前端主动连接（控制器--》前端）
     void fileMiss(Data path);                   //文件缺失
     void fileError(Data path);                  //文件错误(md5对不上，或者解析失败）
-    void fileImportFail(const QString& path);   //文件导入失败
+    void fileImportFail(const QString &path);   //文件导入失败
     void fileFinish();                          //当前文件播放结束
-    void update(YUVData*);                      //通知渲染组件进行更新
+    void update(YUVData *);                     //通知渲染组件进行更新
 
     //需要后端连接（控制器--》后端）
     void playSpeedChanged(float);           //播放速度改变
@@ -51,15 +51,27 @@ signals:
     void skipTime(int time);                //时间跳转（前端拖动进度条导致）
 
     //前后端都连接（通知前端开始准备播放，后端开始解码）
-    void playMedia(const QString& path);    //播放
+    void playMedia(const QString &path);    //播放
 
 public:
 
     //get
-    inline PlayMode::mode mode(){return _mode;}
-    inline float voice(){return _voice;}
-    inline float playSpeed(){return _playSpeed;}
-    inline int time(){return _time;}
+    inline PlayMode::mode mode()
+    {
+        return _mode;
+    }
+    inline float voice()
+    {
+        return _voice;
+    }
+    inline float playSpeed()
+    {
+        return _playSpeed;
+    }
+    inline int time()
+    {
+        return _time;
+    }
 
     //set
     void setMode(PlayMode::mode m);
@@ -67,7 +79,7 @@ public:
     void setVoice(float v);
 
     //需要与其他部分进行连接
-    void onUpdate(YUVData*,int time);       //连接后端传来的信号
+    void onUpdate(YUVData *, int time);     //连接后端传来的信号
 
 private:
 
