@@ -18,11 +18,10 @@ struct YUVData
     int vHeight=0,vWidth=0;
 };
 
-class MyRender : public QObject,public QQuickFramebufferObject::Renderer,protected QOpenGLFunctions
+class MyRender :public QQuickFramebufferObject::Renderer,protected QOpenGLFunctions
 {
-    Q_OBJECT
 public:
-    explicit MyRender(QObject *parent = nullptr);
+    MyRender();
     void render() override;
     QOpenGLFramebufferObject* createFramebufferObject(const QSize& size) override;
     void synchronize(QQuickFramebufferObject*) override;
@@ -37,7 +36,7 @@ private:
     QVector<QVector2D> mVertices;   //顶点数组
     QVector<QVector2D> mTexcoords;  //纹理坐标数组
     unsigned int texArray[3] = {0}; //贴图数组，每一项对应一个贴图
-    std::shared_ptr<YUVData> data;  //存放YUV数据
+    YUVData* data;                  //存放YUV数据
     float windowHeight,windowWidth; //存放窗口大小（用float是为了除法运算）
     FILE* fp = nullptr;
 private:

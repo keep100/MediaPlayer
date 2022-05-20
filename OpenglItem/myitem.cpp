@@ -1,11 +1,11 @@
 ﻿#include "myitem.h"
 #include "myrender.h"
-
+#include "controller.h"
 
 MyItem::MyItem()
 {
     setFlag(QQuickItem::ItemHasContents,true);
-    startTimer(1000 / 24);
+    //startTimer(1000 / 24);
 }
 
 QQuickFramebufferObject::Renderer* MyItem::createRenderer()const{
@@ -18,3 +18,9 @@ void MyItem::timerEvent(QTimerEvent* event)
     if(_isPlay)
         update();
 }
+
+void MyItem::bind(Controller* obj){
+    connect(obj,&Controller::update,this,&MyItem::onUpdate);
+}
+
+
