@@ -37,7 +37,7 @@ Rectangle {
                         hoverEnabled: true
 
                         Image {//视频第一帧图片
-                            source: src
+                            source: modelData.imgPath
                             width: parent.width-2
                             height: parent.height-2
                             anchors.centerIn: parent
@@ -89,7 +89,6 @@ Rectangle {
                         onClicked: {
                             videoPage.visible=true;
                             mainWindow.visible=false;
-                            //                            until.open();
                             isVideoPlay=true;
                             isPlaying=true;
                         }
@@ -97,7 +96,10 @@ Rectangle {
                 }
 
                 Text {//视频名称
-                    text: videoName
+                    text: modelData.fileName
+                    width: parent.width
+                    clip: true
+                    elide: Text.ElideRight
                     font.pixelSize:titleBar.isMaximized||isFullSreen?16:14
                     topPadding: 8
                     color: "white"
@@ -113,9 +115,6 @@ Rectangle {
     //详细信息弹窗
     InfoPopup{id:morePopup;mediaType: '视频'}
 
-    //视频数据列表
-    VideoListData {id:videoData }
-
     //网格布局
     GridView {
         id: grid
@@ -123,15 +122,15 @@ Rectangle {
         cellWidth:  titleBar.isMaximized||isFullSreen?240:180
         cellHeight: cellWidth*0.7
         clip: true
-        visible: videoData.count>0
+        visible: dataMgr?.videoList.length>0
 
-        model:videoData
+        model:dataMgr?.videoList
         delegate: videoDelegate
     }
 
     Column{
         anchors.centerIn: parent
-        visible: videoData.count===0
+        visible: dataMgr?.videoList.length===0
 
         Image {
             width: 110

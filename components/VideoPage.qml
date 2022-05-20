@@ -294,7 +294,9 @@ Window {
         //视频播放进度条
         Slider {
             id: videoSlider
-            value: 0.2
+            from: 0
+            value: controller?.time ?? 0
+            to:100
             y:footer.y-videoSlider.availableHeight / 2
             z:1
             visible: footer.y!==windowHeight

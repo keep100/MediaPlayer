@@ -3,11 +3,12 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 
 Popup{
-    id:morePopup
+    id: morePopup
     modal: true
     dim: true
     anchors.centerIn: parent
     closePolicy: Popup.NoAutoClose
+    property var file: null       //文件对象
     required property string mediaType
 
     background: Rectangle {
@@ -83,7 +84,7 @@ Popup{
                 color: "white"
             }
             Label{
-                text: '这是音频名称'
+                text: file?.fileName ?? "-"
                 font.pixelSize: 13
                 color: "white"
             }
@@ -101,7 +102,7 @@ Popup{
                 color: "white"
             }
             Label{
-                text:'mp3'
+                text: file?.filePath.split('.')[1] ?? "-"
                 font.pixelSize: 13
                 color: "white"
             }
@@ -117,7 +118,7 @@ Popup{
                 color: "white"
             }
             Label{
-                text:"C:\\user\\audio"
+                text: file?.filePath.substring(0,file?.filePath.lastIndexOf('/')) ?? "-"
                 font.pixelSize: 13
                 color: "white"
             }
@@ -151,7 +152,12 @@ Popup{
                 color: "white"
             }
             Label{
-                text:"-"
+                text: file?.isAudio? (file?.album? file?.album : "-"):"-"
+                width: 170
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
                 font.pixelSize: 13
                 color: "white"
             }
@@ -159,7 +165,7 @@ Popup{
 
         Row{
             topPadding: 10
-            bottomPadding: 40
+            bottomPadding: 30
             Label{
                 text: mediaType==='音频'?'歌手: ':'分辨率: '
                 width:110
@@ -167,7 +173,12 @@ Popup{
                 color: "white"
             }
             Label{
-                text:"-"
+                text: file?.isAudio? (file?.artist? file?.artist:"-"):"-"
+                width: 170
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
                 font.pixelSize: 13
                 color: "white"
             }

@@ -98,7 +98,7 @@ Rectangle{
                         }
                         Text {
                             leftPadding: parent.width*0.1
-                            text: qsTr(musicName)
+                            text: qsTr(modelData.fileName)
                             color: "white"
                             font.pixelSize: 13
                             anchors.verticalCenter: parent.verticalCenter
@@ -113,7 +113,8 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    musicList.currentIndex=index;
+                                    musicList.currentIndex=modelData.index;
+                                    controller.startPlay(modelData.index,true);
                                     isAudioPlay=true;
                                     isPlaying=true;
                                 }
@@ -129,8 +130,8 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    morePopup.open()
-                                    //                                    console.log(musicData.get(index).singer)
+                                    morePopup.file=modelData;
+                                    morePopup.open();
                                 }
                             }
                         }
@@ -144,21 +145,24 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    delDialog.open()
-                                    //                                    console.log(musicData.get(index).singer)
+                                    delDialog.open();
+                                    delDialog.delIdx=modelData.index;
                                 }
                             }
                         }
                         Text {
                             leftPadding: parent.width*0.6
-                            text: qsTr(singer)
+                            text: qsTr(modelData.artist)
+                            width: parent.width*0.85
+                            clip: true
+                            elide: Text.ElideRight
                             color: "white"
                             font.pixelSize: 13
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
                             leftPadding: parent.width*0.9
-                            text: qsTr(duration)
+                            text: qsTr(formatTime(modelData.duration))
                             color: "white"
                             font.pixelSize: 13
                             anchors.verticalCenter: parent.verticalCenter
@@ -171,21 +175,20 @@ Rectangle{
                         onEntered: musicItem.isEnter=true
                         onExited: musicItem.isEnter=false
                     }
-                    Component.onCompleted: musicList.currentIndex=-1
                 }
             }
-
-            //音频列表数据
-            MusicListData{id:musicData}
 
             //列表内容部分
             ListView{
                 id:musicList
                 width: parent.width
                 height:titleBar.isMaximized||isFullSreen?windowHeight*0.48:windowHeight*0.35
-                model:musicData
+                model:dataMgr?.audioList
                 clip: true
                 delegate:musicDelegate
+                visible: dataMgr?.audioList.length>0
+                //音频数据列表改变
+                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr.curAudio.index:reset()
             }
         }
     }
@@ -199,7 +202,7 @@ Rectangle{
     //无音频的空状态展示区
     Column{
         anchors.centerIn: parent
-        visible: musicList.count===0
+        visible: dataMgr?.audioList.length===0
 
         Image {
             width: 100

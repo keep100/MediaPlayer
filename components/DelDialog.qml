@@ -7,7 +7,9 @@ Dialog {
     modal: true
     anchors.centerIn: parent
     closePolicy: Popup.NoAutoClose
-    required property string mediaType
+    property bool fileMiss: false
+    property int delIdx: 0                //要删除的文件index
+    required property string mediaType    //要删除的文件类别
 
     background: Rectangle{
         anchors.fill: parent
@@ -20,7 +22,7 @@ Dialog {
         bottomPadding: 10
         rightPadding: 10
         Label{
-            text: '确定要从该媒体库中移除该'+mediaType+'?'
+            text: fileMiss?'该文件已经被移动，是否选择删除该文件？':'确定要从该媒体库中移除该'+mediaType+'?'
             font.pixelSize: 15
             rightPadding: 40
             color: "white"
@@ -106,8 +108,8 @@ Dialog {
                 onEntered: parent.isHover=true
                 onExited: parent.isHover=false
                 onClicked: {
-                    delDialog.close()
-
+                    controller.deleteData(delIdx,mediaType==='音频');
+                    delDialog.close();
                 }
             }
         }

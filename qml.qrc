@@ -2,9 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>components/TitleBar.qml</file>
-        <file>components/VideoListData.qml</file>
         <file>components/Footer.qml</file>
-        <file>components/MusicListData.qml</file>
         <file>components/LeftMenu.qml</file>
         <file>components/SearchBox.qml</file>
         <file>components/VideoView.qml</file>
@@ -14,5 +12,6 @@
         <file>components/VideoPage.qml</file>
         <file>components/InfoPopup.qml</file>
         <file>components/DelDialog.qml</file>
+        <file>components/ErrorPopup.qml</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 ﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickWindow>
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "until/imageprovider.h"
@@ -8,7 +9,7 @@
 #include "XMediaManager.h"
 #include<QDebug>
 #include "OpenglItem/myitem.h"
-#include <QQuickWindow>
+#include "controller.h"
 
 
 int main(int argc, char *argv[])
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
 //    XDemuxThread *thread = new XDemuxThread();
 //    engine.rootContext()->setContextProperty("MyImage", thread->vt->showImage);
 //    engine.addImageProvider(QLatin1String("Imgs"), thread->vt->showImage->m_pImgProvider);
+    Controller controller(engine);
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
 
