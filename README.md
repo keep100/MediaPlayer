@@ -1,35 +1,3 @@
-├─.gitignore
-├─CMakeLists.txt
-├─controller.cpp
-├─controller.h
-├─image.qrc
-├─IVideoCall.h
-├─main.cpp
-├─main.qml
-├─OverloadSlider.cpp
-├─OverloadSlider.h
-├─PlayMode.h
-├─qml.qrc
-├─XAudioPlay.cpp
-├─XAudioPlay.h
-├─XAudioThread.cpp
-├─XAudioThread.h
-├─XDecode.cpp
-├─XDecode.h
-├─XDecodeThread.cpp
-├─XDecodeThread.h
-├─XDemux.cpp
-├─XDemux.h
-├─XDemuxThread.cpp
-├─XDemuxThread.h
-├─XMediaManager.cpp
-├─XMediaManager.h
-├─XResample.cpp
-├─XResample.h
-├─XVideoThread.cpp
-├─XVideoThread.h
-├─XVideoWidget.cpp
-├─XVideoWidget.h
 ├─until
 |   ├─cursorposprovider.h
 |   ├─imageprovider.cpp
