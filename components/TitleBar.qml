@@ -8,11 +8,10 @@ Rectangle{
     anchors.right: parent.right
     height: 35
     color: "transparent"
-    visible: footer.isFullSreen?false:true
+    visible: !isFullSreen
 
     property bool isDoubleClicked: false //判断标题栏是否被双击，当isDoubleClicked为true时最大化窗口，反之正常化窗口
     property bool isMaximized: false //判断当前是否最大化
-    property point clickPos: "0,0" //鼠标点击标题栏时的坐标
 
     Connections{
         target: mainWindow
@@ -39,7 +38,7 @@ Rectangle{
                 width: parent.width*0.5
                 height: parent.height*0.5
                 anchors.centerIn: parent
-                source: "../images/关闭.png"
+                source: "qrc:/images/关闭.png"
             }
         }
         onClicked: {
@@ -64,8 +63,8 @@ Rectangle{
                 height: parent.height * 0.4
                 anchors.centerIn: parent
                 source: isMaximized?
-                            "../images/正常化.png":
-                            "../images/最大化.png"
+                            "qrc:/images/正常化.png":
+                            "qrc:/images/最大化.png"
             }
         }
         onClicked:{
@@ -108,6 +107,8 @@ Rectangle{
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton //只处理鼠标左键
 
+        property point clickPos: "0,0" //鼠标点击标题栏时的坐标
+
         //鼠标按下的回调函数
         onPressed: function(mouse) {
             clickPos = Qt.point(mouse.x,mouse.y)
@@ -117,9 +118,8 @@ Rectangle{
         onPositionChanged:function (mouse) {
             //判断当前窗口是否在正常化状态，是就直接移动窗口位置
             if(pressed && mainWindow.visibility !== Window.Maximized && mainWindow.visibility !== Window.FullScreen) {
-                var delta = Qt.point(mouse.x-clickPos.x, mouse.y-clickPos.y)
-                mainWindow.x += delta.x
-                mainWindow.y += delta.y
+                mainWindow.setX(mousePosition.cursorPos().x-clickPos.x);
+                mainWindow.setY(mousePosition.cursorPos().y-clickPos.y);
             }
             //当当前窗口在最大化状态下，退出最大化
             if(mainWindow.visibility === Window.Maximized && pressed)
