@@ -29,6 +29,7 @@ public:
     long long pts = 0;
     long long totalMs = 0;
     void SetPause(bool isPause);
+    void SetVolume(double volume);
     bool isPause = false;
     bool isFirst = false;
 protected:

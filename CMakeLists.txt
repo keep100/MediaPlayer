@@ -51,6 +51,8 @@ set(PROJECT_SOURCES
         OpenglItem/myitem.h OpenglItem/myitem.cpp
         OpenglItem/myrender.h OpenglItem/myrender.cpp
         DataManager/data.h DataManager/data.cpp
+        DataManager/datamanager.h DataManager/datamanager.cpp
+        DataManager/randomlist.h DataManager/randomlist.cpp
 )
 
 

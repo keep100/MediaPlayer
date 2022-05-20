@@ -14,7 +14,24 @@ extern "C" {
 #include <iostream>
 #include <QThread>
 #include <QDebug>
+#include "controller.h"
+
 using namespace std;
+
+
+void XMediaManager::bind(QObject* obj){
+    Controller* ctrl = dynamic_cast<Controller*>(obj);
+    if(ctrl!=nullptr){
+        QObject::connect(ctrl,&Controller::playMedia,this,&XMediaManager::playMedia);
+        QObject::connect(ctrl,&Controller::pause,this,&XMediaManager::pause);
+        QObject::connect(ctrl,&Controller::exitPlay,this,&XMediaManager::end);
+        QObject::connect(ctrl,&Controller::voiceChanged,this,&XMediaManager::setVolume);
+//        QObject::connect(ctrl,&Controller::playMedia,this,&XMediaManager::getBriefInfo);
+    }
+}
+
+
+
 
 BriefInfo XMediaManager::getBriefInfo(const char* url){
 
@@ -143,19 +160,21 @@ XMediaManager::XMediaManager(){
     demuxThread->Clear();
 }
 
+void XMediaManager::playMedia(QString url){
+    if(open(url.toLocal8Bit())){
+        qDebug()<<"open succeed";
+        play();
+    }
+
+}
+
 bool XMediaManager::open(const char *url){
-    if(_curState==INITIAL){
+    if(_curState==INITIAL||_curState==END){
         _curState = READY;
         if(!demuxThread)
             demuxThread = new XDemuxThread();
         return demuxThread->Open(url, NULL);
 
-    }
-    else if(_curState==END){
-        _curState = READY;
-        if(!demuxThread)
-            demuxThread = new XDemuxThread();
-        return demuxThread->Open(url, NULL);
     }
     else{
         _curState = INITIAL;
@@ -208,6 +227,15 @@ void XMediaManager::pause(){
         return;
     }
 
+}
+
+void XMediaManager::setVolume(float v){
+    if(!demuxThread){
+        _curState = END;
+        qDebug()<<"error at XMediaManager::setVolume()";
+        return;
+    }
+    demuxThread->SetVolume(v);
 }
 
 void XMediaManager::seek(double pos){

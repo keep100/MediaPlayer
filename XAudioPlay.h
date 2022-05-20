@@ -14,6 +14,7 @@ public:
     virtual void Close() = 0;
     virtual void Clear() = 0;
     virtual void SetPause(bool isPause) = 0;
+    virtual void SetVolume(double volume) = 0;
 
     //返回缓冲中还没有播放的时间（毫秒）
     virtual long long GetNoPlayMs() = 0;
