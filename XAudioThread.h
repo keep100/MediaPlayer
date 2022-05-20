@@ -21,6 +21,7 @@ public:
     virtual ~XAudioThread();
 
     void SetPause(bool isPause);
+    void SetVolume(double volume);
     bool isPause = false;
 
     bool interupt = false;

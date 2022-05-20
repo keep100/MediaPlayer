@@ -2,6 +2,7 @@
 #include <QAudioFormat>
 #include <QAudioSink>
 #include <iostream>
+#include <QDebug>
 #include <mutex>
 class CXAudioPlay :public XAudioPlay
 {
@@ -69,6 +70,7 @@ public:
         fmt.setSampleFormat((QAudioFormat::SampleFormat)sampleFormat);
         mux.lock();
         output = new QAudioSink(fmt);
+
         //output->setBufferSize(1024 * 10);
         io = output->start(); //开始播放
         mux.unlock();
@@ -95,6 +97,22 @@ public:
         }
         mux.unlock();
     }
+
+    void SetVolume(double volume){
+        mux.lock();
+        qDebug() << "set volume to " << volume;
+        if (!output)
+        {
+            mux.unlock();
+            return;
+        }
+        else
+        {
+            output->setVolume(volume);
+        }
+        mux.unlock();
+    }
+
     virtual bool Write(const unsigned char *data, int datasize)
     {
         if (!data || datasize <= 0)return false;

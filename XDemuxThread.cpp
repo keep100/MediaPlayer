@@ -19,6 +19,17 @@ void XDemuxThread::SetPause(bool isPause)
     if (vt) vt->SetPause(isPause);
     mux.unlock();
 }
+void XDemuxThread::SetVolume(double volume)
+{
+    if(!(volume>=0&&volume<=1)){
+        qDebug()<<"XDemuxThread::SetVolume(double volume) illegal parameter";
+        return;
+    }
+    mux.lock();
+    qDebug()<<"XDemuxThread SetVolume";
+    if (at) at->SetVolume(volume);
+    mux.unlock();
+}
 void XDemuxThread::Seek(double pos)
 {
     Clear();
