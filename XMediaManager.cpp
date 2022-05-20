@@ -14,7 +14,19 @@ extern "C" {
 #include <iostream>
 #include <QThread>
 #include <QDebug>
+#include "controller.h"
+
 using namespace std;
+
+
+void XMediaManager::bind(QObject* obj){
+    Controller* ctrl = dynamic_cast<Controller*>(obj);
+    if(ctrl!=nullptr){
+        QObject::connect(ctrl,&Controller::playMedia,this,&XMediaManager::getBriefInfo);
+
+    }
+}
+
 
 BriefInfo XMediaManager::getBriefInfo(const char* url){
 

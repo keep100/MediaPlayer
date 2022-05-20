@@ -8,6 +8,7 @@
 #include "XDecode.h"
 #include "IVideoCall.h"
 #include <mutex>
+
 class XDemux;
 struct AVPacket;
 struct AVFrame;
@@ -27,7 +28,8 @@ struct BriefInfo{
 };
 
 
-class XMediaManager{
+class XMediaManager:public QObject{
+    Q_OBJECT
 private:
 //    FSMItem fsmItem;
 public:
@@ -44,6 +46,7 @@ public:
     void end();
     void seek(double);
     States getCurState();
+    void bind(QObject*);
 protected:
     States  _curState;      //现态
     XDemuxThread *demuxThread = 0;
