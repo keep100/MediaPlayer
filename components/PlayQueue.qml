@@ -86,8 +86,8 @@ Rectangle{
             highlight: Rectangle { color: setColor(23, 66, 102)}
             //列表数据改变
             onModelChanged: isAudioPlay||isVideoPlay?
-                                (isAudioPlay?queue.currentIndex=dataMgr.curAudio.index
-                                            :queue.currentIndex=dataMgr.curVideo.index)
+                                (isAudioPlay?queue.currentIndex=dataMgr?.curAudio.index ?? 0
+                                            :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
                               :reset()
         }
 

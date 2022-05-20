@@ -85,28 +85,6 @@ Window {
                 rightPadding: 40
                 color: "white"
             }
-//            Rectangle{
-//                id:closeBtn
-//                color: isEnter?setColor(247, 68, 68):"transparent"
-//                width: 18
-//                height: 18
-//                anchors.verticalCenter: parent.verticalCenter
-//                property bool isEnter: false
-
-//                Image {
-//                    source: "qrc:/images/关闭.png"
-//                    width: 13
-//                    height: 13
-//                    anchors.centerIn: parent
-//                    MouseArea{
-//                        anchors.fill: parent
-//                        hoverEnabled: true
-//                        onEntered: closeBtn.isEnter=true
-//                        onExited: closeBtn.isEnter=false
-//                        onClicked: delDialog.close()
-//                    }
-//                }
-//            }
         }
 
         footer: Row{//对话框底部按钮区域

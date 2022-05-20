@@ -37,7 +37,7 @@ Rectangle {
                         hoverEnabled: true
 
                         Image {//视频第一帧图片
-                            source: modelData.imgPath
+                            source: "file:///"+modelData.imgPath
                             width: parent.width-2
                             height: parent.height-2
                             anchors.centerIn: parent

@@ -188,7 +188,7 @@ Rectangle{
                 delegate:musicDelegate
                 visible: dataMgr?.audioList.length>0
                 //音频数据列表改变
-                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr.curAudio.index:reset()
+                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr?.curAudio.index ?? 0 :reset()
             }
         }
     }
