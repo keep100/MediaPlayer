@@ -1,25 +1,15 @@
-<<<<<<< HEAD
 ﻿#include "OpenglItem/myitem.h"
-=======
-﻿#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QQuickWindow>
 #include "XVideoThread.h"
->>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
 #include "XDemuxThread.h"
 #include "XMediaManager.h"
-<<<<<<< HEAD
 #include "XVideoThread.h"
 #include "until/cursorposprovider.h"
 #include "until/imageprovider.h"
 #include "XDemuxThread.h"
 #include "widget.h"
-=======
 #include<QDebug>
 #include "OpenglItem/myitem.h"
 #include "controller.h"
->>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
 
 int main(int argc, char *argv[]) {
 
@@ -31,16 +21,8 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
-<<<<<<< HEAD
-=======
-//    ShowImage *myImage = new ShowImage();
-//    engine.rootContext()->setContextProperty("MyImage", myImage);
-//    engine.addImageProvider(QLatin1String("Imgs"), myImage->m_pImgProvider);
-//    XDemuxThread *thread = new XDemuxThread();
-//    engine.rootContext()->setContextProperty("MyImage", thread->vt->showImage);
-//    engine.addImageProvider(QLatin1String("Imgs"), thread->vt->showImage->m_pImgProvider);
+
     Controller controller(engine);
->>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
     const QUrl url(QStringLiteral("qrc:/main.qml"));

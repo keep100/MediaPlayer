@@ -41,11 +41,7 @@ signals:
     void fileError(Data path);                  //文件错误(md5对不上，或者解析失败）
     void fileImportFail(const QString &path);   //文件导入失败
     void fileFinish();                          //当前文件播放结束
-<<<<<<< HEAD
     void update(std::shared_ptr<YUVData>);                      //通知渲染组件进行更新
-=======
-    void update(YUVData *);                     //通知渲染组件进行更新
->>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
 
     //需要后端连接（控制器--》后端）
     void playSpeedChanged(float);           //播放速度改变
@@ -83,11 +79,7 @@ public:
     void setVoice(float v);
 
     //需要与其他部分进行连接
-<<<<<<< HEAD
     void onUpdate(std::shared_ptr<YUVData> data,int time);       //连接后端传来的信号
-=======
-    void onUpdate(YUVData *, int time);     //连接后端传来的信号
->>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
 
 private:
 
@@ -96,7 +88,7 @@ private:
     DataManager manager;
     PlayMode::mode _mode = PlayMode::Loop;
     float _playSpeed = 1.0f;
-    float _voice = 0.15;
+    float _voice = 0.15f;
     int _time = 0;
 };
 

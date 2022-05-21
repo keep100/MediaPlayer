@@ -1,4 +1,5 @@
-﻿///解码和显示视频
+﻿#pragma once
+///解码和显示视频
 struct AVPacket;
 struct AVCodecParameters;
 class XDecode;
@@ -29,7 +30,6 @@ public:
     ShowImage *showImage;
     QImage frameToImage(AVFrame *frame);
     std::shared_ptr<YUVData> getYUVData();
-
 
 protected:
     std::mutex vmux;
