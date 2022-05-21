@@ -1,4 +1,3 @@
-﻿#include "OpenglItem/myitem.h"
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "XMediaManager.h"
