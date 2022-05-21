@@ -40,7 +40,7 @@ void MyRender::init(){
                                               "yuv.y = texture2D(tex_u, texCoordOut).r - 0.5;"
                                               "yuv.z = texture2D(tex_v, texCoordOut).r - 0.5;"
                                               "rgb = mat3( 1,       1,         1,"
-                                              "0,       -0.39465,  2.03211,"
+                                              "0,       -0.39465,  2.0321,"
                                               "1.13983, -0.58060,  0) * yuv;"
                                               "gl_FragColor = vec4(rgb, 1);}");
     mProgram.bindAttributeLocation("vertex", ver);
@@ -52,7 +52,7 @@ void MyRender::init(){
         glBindTexture(GL_TEXTURE_2D, texArray[i]);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLfloat)GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLfloat)GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
@@ -70,11 +70,14 @@ void MyRender::render(){
     if(data==nullptr)
         return;
 
+    //qDebug()<<data->yWidth<<' '<<data->yHeight<<' '<< data->uWidth<<' '<< data->uHeight<<data->vWidth<<' '<<data->vHeight;
+
     //调整glViewport的大小使其比例不变
     float scale = (windowWidth/data->yWidth<windowHeight/data->yHeight)?(windowWidth/data->yWidth):(windowHeight/data->yHeight);
     float offsetX = (windowWidth-scale*data->yWidth>0)?(windowWidth-scale*data->yWidth):0;
     float offsetY = (windowHeight-scale*data->yHeight>0)?(windowHeight-scale*data->yHeight):0;
     glViewport(offsetX/2,offsetY/2,data->yWidth*scale,data->yHeight*scale);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 
     //导入顶点坐标数据
@@ -88,17 +91,17 @@ void MyRender::render(){
     //设置着色器中的贴图
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D,texArray[0]);
-    glTexImage2D ( GL_TEXTURE_2D, 0, GL_LUMINANCE, data->yWidth, data->yHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data->Y);
+    glTexImage2D ( GL_TEXTURE_2D, 0, GL_RED, data->yWidth, data->yHeight, 0, GL_RED, GL_UNSIGNED_BYTE , data->Y);
     mProgram.setUniformValue("tex_y", 0);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D,texArray[1]);
-    glTexImage2D ( GL_TEXTURE_2D, 0, GL_LUMINANCE, data->uWidth, data->uHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data->U);
+    glTexImage2D ( GL_TEXTURE_2D, 0, GL_RED, data->uWidth, data->uHeight, 0, GL_RED, GL_UNSIGNED_BYTE, data->U);
     mProgram.setUniformValue("tex_u", 1);
 
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D,texArray[2]);
-    glTexImage2D ( GL_TEXTURE_2D, 0, GL_LUMINANCE, data->vWidth, data->vHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data->V);
+    glTexImage2D ( GL_TEXTURE_2D, 0, GL_RED, data->vWidth, data->vHeight, 0, GL_RED, GL_UNSIGNED_BYTE, data->V);
     mProgram.setUniformValue("tex_v", 2);
 
 

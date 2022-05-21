@@ -5,7 +5,7 @@
 MyItem::MyItem()
 {
     setFlag(QQuickItem::ItemHasContents,true);
-    //startTimer(1000 / 24);
+    startTimer(1000 / 24);
 }
 
 QQuickFramebufferObject::Renderer* MyItem::createRenderer()const{
@@ -20,7 +20,15 @@ void MyItem::timerEvent(QTimerEvent* event)
 }
 
 void MyItem::bind(Controller* obj){
+    if(obj==nullptr){
+        return;
+    }
     connect(obj,&Controller::update,this,&MyItem::onUpdate);
 }
 
+
+void MyItem::onUpdate(std::shared_ptr<YUVData> data){
+    this->data = data;
+    update();
+}
 

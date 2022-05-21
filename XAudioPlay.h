@@ -1,6 +1,5 @@
-#ifndef XAUDIOPLAY_H
+﻿#ifndef XAUDIOPLAY_H
 #define XAUDIOPLAY_H
-
 
 class XAudioPlay
 {

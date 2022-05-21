@@ -15,7 +15,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
 
 #提供位置定位.cmake文件
-set(Qt6_DIR D:/development/qt/6.3.0/msvc2019_64/lib/cmake/Qt6)
+set(Qt6_DIR C:/Qt/6.3.0/msvc2019_64/lib/cmake/Qt6)
 
 find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 find_package(Qt6 REQUIRED COMPONENTS OpenGL)
@@ -51,6 +51,12 @@ set(PROJECT_SOURCES
         OpenglItem/myitem.h OpenglItem/myitem.cpp
         OpenglItem/myrender.h OpenglItem/myrender.cpp
         DataManager/data.h DataManager/data.cpp
+        DataManager/datamanager.h DataManager/datamanager.cpp
+        DataManager/randomlist.h DataManager/randomlist.cpp
+        XAudioResample.cpp XAudioResample.h
+        until/bufferqueue.h  until/semaphore.h
+        until/yuvdata.h stdafx.h
+
 )
 
 
@@ -78,6 +84,13 @@ else()
     endif()
 endif()
 
+
+target_precompile_headers(
+    MediaPlayer
+    PUBLIC stdafx.h
+
+)
+
 target_compile_definitions(MediaPlayer
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(MediaPlayer
@@ -85,6 +98,7 @@ target_link_libraries(MediaPlayer
 
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGLWidgets)
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGL)
+
 
 target_link_libraries(MediaPlayer PRIVATE Qt6::Multimedia)
 target_link_libraries(MediaPlayer PRIVATE Qt6::MultimediaWidgets)

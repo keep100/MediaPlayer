@@ -6,17 +6,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
-
-const static int cBufferSize = 1024 * 768;
-struct YUVData
-{
-    unsigned char Y[cBufferSize];
-    unsigned char U[cBufferSize];
-    unsigned char V[cBufferSize];
-    int yHeight=0,yWidth=0;
-    int uWidth=0,uHeight=0;
-    int vHeight=0,vWidth=0;
-};
+#include "until/yuvdata.h"
 
 class MyRender :public QQuickFramebufferObject::Renderer,protected QOpenGLFunctions
 {
@@ -36,7 +26,7 @@ private:
     QVector<QVector2D> mVertices;   //顶点数组
     QVector<QVector2D> mTexcoords;  //纹理坐标数组
     unsigned int texArray[3] = {0}; //贴图数组，每一项对应一个贴图
-    YUVData* data;                  //存放YUV数据
+    std::shared_ptr<YUVData> data = nullptr;          //存放YUV数据
     float windowHeight,windowWidth; //存放窗口大小（用float是为了除法运算）
     FILE* fp = nullptr;
 private:

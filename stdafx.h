@@ -1,0 +1,22 @@
+﻿#ifndef STDAFX_H
+#define STDAFX_H
+#include <QTimer>
+#include <QApplication>
+#include <QDebug>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QQuickWindow>
+#include <QAudioFormat>
+#include <QAudioSink>
+#include <QIODevice>
+#include <iostream>
+extern "C" {
+#include "libavformat/avformat.h"
+#include <libavcodec/avcodec.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/frame.h>
+#include <libavutil/opt.h>
+#include <libswresample/swresample.h>
+}
+#endif // STDAFX_H

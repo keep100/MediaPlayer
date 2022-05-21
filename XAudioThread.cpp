@@ -1,8 +1,9 @@
-#include "XAudioThread.h"
+﻿#include "XAudioThread.h"
 #include "XDecode.h"
 #include "XAudioPlay.h"
 #include "XResample.h"
 #include <iostream>
+#include "XAudioResample.h"
 using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()

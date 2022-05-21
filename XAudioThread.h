@@ -1,9 +1,10 @@
-#include <QThread>
+﻿#include <QThread>
 #include <mutex>
 #include <list>
 struct AVCodecParameters;
 class XAudioPlay;
 class XResample;
+class XAudioResample;
 #include "XDecodeThread.h"
 class XAudioThread:public XDecodeThread
 {
@@ -29,5 +30,5 @@ protected:
     std::mutex amux;
     XAudioPlay *ap = 0;
     XResample *res = 0;
-
+//    XAudioResample* res = 0;
 };

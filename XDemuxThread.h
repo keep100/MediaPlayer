@@ -1,10 +1,11 @@
-#ifndef XDEMUXTHREAD_H
+﻿#ifndef XDEMUXTHREAD_H
 #define XDEMUXTHREAD_H
 
 
 #include <QThread>
 #include "IVideoCall.h"
 #include <mutex>
+struct YUVData;
 class XDemux;
 class XVideoThread;
 class XAudioThread;
@@ -31,6 +32,10 @@ public:
     void SetPause(bool isPause);
     bool isPause = false;
     bool isFirst = false;
+
+    std::shared_ptr<YUVData> resendYUV();
+
+
 protected:
     std::mutex mux;
     XDemux *demux = 0;

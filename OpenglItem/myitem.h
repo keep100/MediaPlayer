@@ -16,11 +16,10 @@ public:
     Renderer* createRenderer() const override;
     bool isPlay(){return _isPlay;}
     void setIsPlay(bool state){_isPlay = state;emit isPlayChanged();}
-    void bind(Controller* obj);
-    void onUpdate(YUVData* data){this->data = data;}
-
+    Q_INVOKABLE void bind(Controller* obj);
+    void onUpdate(std::shared_ptr<YUVData> data);
 public:
-    YUVData* data;
+    std::shared_ptr<YUVData> data = nullptr;
 
 private:
     bool _isPlay = true;

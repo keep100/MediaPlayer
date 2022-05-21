@@ -1,4 +1,4 @@
-#include "XDemuxThread.h"
+﻿#include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XVideoThread.h"
 #include "XAudioThread.h"
@@ -175,6 +175,11 @@ void XDemuxThread::Start()
     if (at)at->start();
     mux.unlock();
 }
+
+std::shared_ptr<YUVData> XDemuxThread::resendYUV() {
+    return vt->getYUVData();
+}
+
 XDemuxThread::XDemuxThread()
 {
 }
