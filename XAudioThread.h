@@ -2,10 +2,9 @@
 #include <mutex>
 #include <list>
 struct AVCodecParameters;
-class XAudioPlay;
-class XResample;
-class XAudioResample;
 #include "XDecodeThread.h"
+#include "audioPlay2.h"
+#include "XAudioResample.h"
 class XAudioThread:public XDecodeThread
 {
 public:
@@ -29,7 +28,8 @@ public:
 
 protected:
     std::mutex amux;
-    XAudioPlay *ap = 0;
-    XResample *res = 0;
-//    XAudioResample* res = 0;
+//    XAudioPlay *ap = 0;
+//    XResample *res = 0;
+    audioPlay2 *ap2 = 0;
+    XAudioResample *rsmp = 0;
 };

@@ -55,6 +55,8 @@ set(PROJECT_SOURCES
         DataManager/randomlist.h DataManager/randomlist.cpp
         until/bufferqueue.h  until/semaphore.h
         until/yuvdata.h stdafx.h
+        XAudioResample.h XAudioResample.cpp
+        audioPlay2.h audioPlay2.cpp
 )
 
 
