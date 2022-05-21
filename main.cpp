@@ -1,25 +1,48 @@
+<<<<<<< HEAD
 ﻿
+=======
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QQuickWindow>
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
-#include "XMediaManager.h"
-#include "XVideoThread.h"
-#include "until/cursorposprovider.h"
 #include "until/imageprovider.h"
-#include "XDemuxThread.h"
-#include "widget.h"
-#include<QDebug>
+#include "until/cursorposprovider.h"
+#include "XMediaManager.h"
+#include <QDebug>
 #include "OpenglItem/myitem.h"
 #include "controller.h"
 
-int main(int argc, char *argv[]) {
 
+<<<<<<< HEAD
     QGuiApplication app(argc, argv);
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
+=======
+int main(int argc, char *argv[])
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    QGuiApplication app(argc, argv);
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    QQmlApplicationEngine engine;
+//    ShowImage *myImage = new ShowImage();
+//    engine.rootContext()->setContextProperty("MyImage", myImage);
+//    engine.addImageProvider(QLatin1String("Imgs"), myImage->m_pImgProvider);
+//    XDemuxThread *thread = new XDemuxThread();
+//    engine.rootContext()->setContextProperty("MyImage", thread->vt->showImage);
+//    engine.addImageProvider(QLatin1String("Imgs"), thread->vt->showImage->m_pImgProvider);
+    Controller controller(engine);
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+<<<<<<< HEAD
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
@@ -29,10 +52,19 @@ int main(int argc, char *argv[]) {
 
 
 
+=======
+                     &app, [url](QObject * obj, const QUrl & objUrl)
+    {
+        if (!obj && url == objUrl)
+        {
+            QCoreApplication::exit(-1);
+        }
+    }, Qt::QueuedConnection);
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 
-    Controller ctrl(engine);
     qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
     engine.load(url);
+<<<<<<< HEAD
 
     // 打开文件
     QString name = "D:/迅雷下载/Young.Sheldon.S01.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[rartv]/Young.Sheldon.S01E01.Pilot.1080p.AMZN.WEB-DL.DDP5.1.H.264-NTb.mkv";
@@ -57,9 +89,19 @@ int main(int argc, char *argv[]) {
     });
     timer->start(1000 / 24.0);
 
+=======
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 
-    ctrl.onUpdate(nullptr, 12);
+//    QImage image;
+//    bool flag = image.load("C:/Users/16321/Pictures/Saved Pictures/15.jpg");
+//    qDebug() << flag;
+//    myImage->sendimage(image);
+//    thread->Open("C:/Users/16321/Documents/Tencent Files/1632195270/FileRecv/Packet Tracer的基本使用.mp4",
+//                 nullptr);
 
     return app.exec();
+<<<<<<< HEAD
 
+=======
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 }

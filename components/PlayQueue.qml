@@ -10,8 +10,8 @@ Rectangle{
     width: parent.width*0.22
     color: setColor(0,0,0,0.7)
 
-    function reset(){
-        queue.currentIndex=-1;
+    function setIdx(idx){
+        queue.currentIndex=idx;
     }
 
     Column{
@@ -70,7 +70,14 @@ Rectangle{
                     hoverEnabled: true
                     onEntered: queueItem.isEnter=true
                     onExited: queueItem.isEnter=false
-                    onClicked: queue.currentIndex=index
+                    onClicked:{
+                        if(curMediaIdx!==modelData.index){
+                            curMediaIdx=modelData.index;
+                            controller.startPlay(modelData.index,true);
+                            curIdx?isAudioPlay=true:isVideoPlay=true;
+                            isPlaying=true;
+                        }
+                    }
                 }
             }
         }
@@ -87,8 +94,8 @@ Rectangle{
             //列表数据改变
             onModelChanged: isAudioPlay||isVideoPlay?
                                 (isAudioPlay?queue.currentIndex=dataMgr?.curAudio.index ?? 0
-                                            :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
-                              :reset()
+                                                                                         :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
+                              :setIdx(-1)
         }
 
         //队列空状态

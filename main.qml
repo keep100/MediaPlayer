@@ -22,6 +22,7 @@ Window {
     property int playMode: 2              //播放模式，默认循环播放
     property int voice: 15                //播放音量
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
+    property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度
 
     //设置color
@@ -37,8 +38,14 @@ Window {
     //实现窗口正常化
     function showInitial(){
         showNormal();
+        if(isCoverShow){
+            coverPage.y=0;
+        }
         windowWidth=Screen.desktopAvailableWidth*0.65;
         windowHeight=Screen.desktopAvailableHeight*0.8;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
         if(videoPage.visible){
             mainWindow.visible=false;
             videoPage.x=Screen.width*0.5-videoPage.width*0.5;
@@ -49,8 +56,14 @@ Window {
     //实现窗口全屏
     function showFull(){
         showFullScreen();
+        if(isCoverShow){
+            coverPage.y=0;
+        }
         windowWidth=Screen.width;
         windowHeight=Screen.height;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
         if(videoPage.visible){
             mainWindow.visible=false;
             videoPage.x=0;
@@ -82,8 +95,8 @@ Window {
     //监听是否有音频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
-            musicView.reset();
-            playQueue.reset();
+            musicView.setIdx(-1);
+            playQueue.setIdx(-1);
             controller.exit();
         }
     }
@@ -91,7 +104,7 @@ Window {
     //监听是否有视频在播放
     onIsVideoPlayChanged: {
         if(!isVideoPlay){
-            playQueue.reset();
+            playQueue.setIdx(-1);
             controller.exit();
         }
     }
@@ -104,6 +117,12 @@ Window {
 
     //监听音量改变
     onVoiceChanged: controller.voice=voice
+
+    //监听当前播放文件变化
+    onCurMediaIdxChanged: {
+        playQueue.setIdx(curMediaIdx);
+        curIdx?musicView.setIdx(curMediaIdx):videoPage.setIdx(curMediaIdx);
+    }
 
     //监听controller信号
     Connections{

@@ -12,6 +12,10 @@ Window {
     property bool isEnabled: false    //是否启用底部栏动画
     property bool isShowQueue: false  //是否展示了视频播放列表
 
+    function setIdx(idx){
+        videoQueue.setIdx(idx);
+    }
+
     //定时器，时间到隐藏顶部和底部栏
     Timer {
         id:timer

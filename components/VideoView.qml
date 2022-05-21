@@ -89,6 +89,8 @@ Rectangle {
                         onClicked: {
                             videoPage.visible=true;
                             mainWindow.visible=false;
+                            curMediaIdx=modelData.index;
+                            controller.startPlay(modelData.index,false);
                             isVideoPlay=true;
                             isPlaying=true;
                         }

@@ -3,7 +3,6 @@
 #include "XAudioPlay.h"
 #include "XResample.h"
 #include <iostream>
-#include "XAudioResample.h"
 using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()
@@ -35,9 +34,12 @@ void XAudioThread::Clear()
     }
     mux.unlock();
 }
-bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels)
+bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels)
 {
-    if (!para)return false;
+    if (!para)
+    {
+        return false;
+    }
     Clear();
 
     amux.lock();
@@ -70,7 +72,9 @@ void XAudioThread::SetPause(bool isPause)
     cout << "XAudioThread Pause\n";
     this->isPause = isPause;
     if (ap)
+    {
         ap->SetPause(isPause);
+    }
     //amux.unlock();
 }
 
@@ -79,7 +83,9 @@ void XAudioThread::SetVolume(double volume)
     //amux.lock();
     cout << "XAudioThread SetVolume\n";
     if (ap)
+    {
         ap->SetVolume(volume);
+    }
     //amux.unlock();
 }
 
@@ -124,8 +130,11 @@ void XAudioThread::run()
             {
                 break;
             }
-            AVFrame * frame = decode->Recv();
-            if (!frame) break;
+            AVFrame *frame = decode->Recv();
+            if (!frame)
+            {
+                break;
+            }
 
             //减去缓冲中未播放的时间
             cout << "ap->GetNoPlayMs() " << ap->GetNoPlayMs() << endl;
@@ -140,7 +149,10 @@ void XAudioThread::run()
             while (!isExit)
             {
 
-                if (size <= 0)break;
+                if (size <= 0)
+                {
+                    break;
+                }
                 //缓冲未播完，空间不够
                 if (ap->GetFree() < size || isPause)
                 {
@@ -159,8 +171,14 @@ void XAudioThread::run()
 
 XAudioThread::XAudioThread()
 {
-    if (!res) res = new XResample();
-    if (!ap) ap = XAudioPlay::Get();
+    if (!res)
+    {
+        res = new XResample();
+    }
+    if (!ap)
+    {
+        ap = XAudioPlay::Get();
+    }
 }
 
 
