@@ -45,7 +45,6 @@ void XVideoThread::SetPause(bool isPause) {
 void XVideoThread::run() {
     while (!isExit) {
         vmux.lock();
-        // cout << "synpts = " << synpts << " dpts =" << decode->pts << endl;
         if (this->isPause) {
             vmux.unlock();
             msleep(5);
@@ -77,7 +76,6 @@ void XVideoThread::run() {
             yuvQueue.enqueue(yuvFrame);
             //            if (call)
             //                call->Repaint(frame);
-            qDebug() << "send--------------------------";
             //            showImage->sendimage(frameToImage(frame));
             av_frame_free(&frame);
             msleep(1);
@@ -170,6 +168,7 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {
     vmux.unlock();
     return false;
 }
+
 XVideoThread::XVideoThread() {
     showImage = new ShowImage();
 }

@@ -1,4 +1,4 @@
-﻿#include "OpenglItem/myitem.h"
+﻿
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "XMediaManager.h"
@@ -13,35 +13,30 @@
 
 int main(int argc, char *argv[]) {
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
-
-#if 1
     QGuiApplication app(argc, argv);
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
-
-    Controller controller(engine);
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
     const QUrl url(QStringLiteral("qrc:/main.qml"));
-    QObject::connect(
-                &engine, &QQmlApplicationEngine::objectCreated, &app,
-                [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl) {
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                     &app, [url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
-        }
-    },
-    Qt::QueuedConnection);
+    }, Qt::QueuedConnection);
+
+
+
+
+
 
     Controller ctrl(engine);
     qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
-
+    engine.load(url);
 
     // 打开文件
-//    QString name = "D:/迅雷下载/Young.Sheldon.S01.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[rartv]/Young.Sheldon.S01E01.Pilot.1080p.AMZN.WEB-DL.DDP5.1.H.264-NTb.mkv";
-    QString name = "C:/Users/13007/Downloads/test.mpeg";
+    QString name = "D:/迅雷下载/Young.Sheldon.S01.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[rartv]/Young.Sheldon.S01E01.Pilot.1080p.AMZN.WEB-DL.DDP5.1.H.264-NTb.mkv";
+//    QString name = "C:/Users/13007/Downloads/test.mpeg";
 
     XDemuxThread dt;
     dt.Start();
@@ -62,18 +57,9 @@ int main(int argc, char *argv[]) {
     });
     timer->start(1000 / 24.0);
 
-    engine.load(url);
 
     ctrl.onUpdate(nullptr, 12);
 
     return app.exec();
-#endif
 
-
-#if 0
-    QApplication app(argc, argv);
-    Widget w;
-    w.show();
-    return app.exec();
-#endif
 }

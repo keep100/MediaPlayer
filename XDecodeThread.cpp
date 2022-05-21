@@ -1,4 +1,4 @@
-#include "XDecodeThread.h"
+﻿#include "XDecodeThread.h"
 #include "XDecode.h"
 void XDecodeThread::Close()
 {
@@ -9,7 +9,6 @@ void XDecodeThread::Close()
     isExit = true;
     wait();
     decode->Close();
-
 
     delete decode;
     decode = NULL;
