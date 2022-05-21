@@ -63,11 +63,11 @@ Rectangle{
                         showInitial();
                     }
                     break;
-                case Qt.Key_F:         //处理Ctrl+F，全屏或小屏
+                case Qt.Key_F:         //处理Ctrl+F，全屏
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl F');
-                        isFullSreen=!isFullSreen;
-                        isFullSreen?showFull():showInitial();
+                        isFullSreen=true;
+                        showFull();
                     }
                     break;
                 case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
@@ -182,13 +182,11 @@ Rectangle{
                         isAudioPlay=false;
                         isPlaying=false;
                     }
-                    if(isVideoPlay){
-                        isVideoPlay=false;
-                        isPlaying=false;
-                    }
                     if(videoPage.visible){
                         mainWindow.visible=true;
                         videoPage.isShowQueue=false;
+                        isVideoPlay=false;
+                        isPlaying=false;
                         videoPage.close();
                     }
                 }
@@ -204,6 +202,10 @@ Rectangle{
             x:exitBtn.x+windowWidth*0.08
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
+            MouseArea{
+                anchors.fill: parent
+                onClicked: controller.playPre(mediaType==='音频')
+            }
         }
         
         //播放与暂停按钮
@@ -235,6 +237,10 @@ Rectangle{
             x:playBtn.x+windowWidth*0.06
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
+            MouseArea{
+                anchors.fill: parent
+                onClicked: controller.playNext(mediaType==='音频')
+            }
         }
         
         //音量图标
@@ -251,8 +257,11 @@ Rectangle{
         //音量控制条
         Slider {
             id: soundSlider
-            value: 0.5
+            from: 0
+            value: mainWindow.voice
+            to:100
             x:soundIcon.x+windowWidth*0.02
+            pressed: false
             anchors.verticalCenter: parent.verticalCenter
             
             background: Rectangle {//控制条背景
@@ -280,6 +289,11 @@ Rectangle{
                 radius: 100
                 color: soundSlider.pressed ? "#f0f0f0" : "#f6f6f6"
                 border.color: "#bdbebf"
+            }
+            onPressedChanged: {//监听最后释放位置
+                if(!pressed){
+                    mainWindow.voice=Math.floor(value);
+                }
             }
         }
         
@@ -337,6 +351,7 @@ Rectangle{
                             color:setColor(0,0,0,0.8)
                         }
                         onClicked: {
+                            controller.playSpeed=parseFloat(modelData.substring(0,modelData.length-1),10);
                             mainWindow.playSpeed=modelData;
                             playSpeed.isClicked=false;
                         }
@@ -376,9 +391,9 @@ Rectangle{
                 ListView{//播放模式列表
                     id:playModeList
                     width: parent.width
-                    height: 84
+                    height: 112
                     anchors.bottom: parent.top
-                    model:['顺序播放','随机播放','循环播放']
+                    model:['随机播放','顺序播放','循环播放','单曲模式']
                     delegate: ItemDelegate{//播放模式列表子项
                         id:modeItem
                         width: parent.width

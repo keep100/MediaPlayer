@@ -8,7 +8,6 @@ Rectangle{
     anchors.top: parent.top
     height: parent.height-footer.height
     width: parent.width*0.22
-//    x:footer.isShowQueue?windowWidth-width:windowWidth
     color: setColor(0,0,0,0.7)
 
     function reset(){
@@ -48,7 +47,10 @@ Rectangle{
 
                     Text{
                         leftPadding: 10
-                        text:videoName
+                        text:modelData.fileName
+                        width: queue.width*0.6
+                        clip: true
+                        elide: Text.ElideRight
                         font.pixelSize: 14
                         color: "white"
                         anchors.verticalCenter: parent.verticalCenter
@@ -56,7 +58,7 @@ Rectangle{
                     Text{
                         rightPadding: 10
                         anchors.right: parent.right
-                        text:duration
+                        text: formatTime(modelData.duration)
                         font.pixelSize: 14
                         color: "white"
                         anchors.verticalCenter: parent.verticalCenter
@@ -79,27 +81,14 @@ Rectangle{
             height: parent.height*0.8
             visible: true
             clip:true
-            model: ListModel{
-                ListElement{
-                    videoName:'视频1.mp4'
-                    duration:'00:46:05'
-                }
-                ListElement{
-                    videoName:'视频1.mp4'
-                    duration:'00:46:05'
-                }
-                ListElement{
-                    videoName:'视频1.mp4'
-                    duration:'00:46:05'
-                }
-                ListElement{
-                    videoName:'视频1.mp4'
-                    duration:'00:46:05'
-                }
-            }
-            delegate: queueDelegate
+            model: mainWindow.curIdx? dataMgr?.audioList: dataMgr?.videoList
+                                                                   delegate: queueDelegate
             highlight: Rectangle { color: setColor(23, 66, 102)}
-            Component.onCompleted: queue.currentIndex=-1
+            //列表数据改变
+            onModelChanged: isAudioPlay||isVideoPlay?
+                                (isAudioPlay?queue.currentIndex=dataMgr?.curAudio.index ?? 0
+                                            :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
+                              :reset()
         }
 
         //队列空状态

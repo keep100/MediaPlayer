@@ -53,10 +53,13 @@ set(PROJECT_SOURCES
         DataManager/data.h DataManager/data.cpp
         DataManager/datamanager.h DataManager/datamanager.cpp
         DataManager/randomlist.h DataManager/randomlist.cpp
+<<<<<<< HEAD
         XAudioResample.cpp XAudioResample.h
         until/bufferqueue.h  until/semaphore.h
         until/yuvdata.h stdafx.h
 
+=======
+>>>>>>> dca78bc7f7685ce285194cce25b527962b37a947
 )
 
 

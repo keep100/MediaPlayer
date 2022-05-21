@@ -38,5 +38,7 @@
         <file>images/正常化.png</file>
         <file>images/最大化.png</file>
         <file>images/最小化.png</file>
+        <file>images/视频播放.png</file>
+        <file>images/单曲模式.png</file>
     </qresource>
 </RCC>

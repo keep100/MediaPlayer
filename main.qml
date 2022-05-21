@@ -8,22 +8,21 @@ Window {
     id:mainWindow
     width: windowWidth
     height: windowHeight
-//    minimumWidth: 800
-//    minimumHeight: 500
     visible: true
     flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
-    property int windowWidth: Screen.desktopAvailableWidth*0.65  //窗口宽度，跟随电脑屏幕变化
+    property int windowWidth: Screen.desktopAvailableWidth*0.65    //窗口宽度，跟随电脑屏幕变化
     property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
-    property bool isFullSreen: false  //是否已经全屏
-    property bool isAudioPlay: false  //是否有音频播放
-    property bool isVideoPlay: false     //是否有视频播放
-    property bool isPlaying: false    //音视频是否正在播放
-    property bool isCoverShow: false  //音频封面页是否已经展示
-    property bool isShowQueue: false  //是否展示了播放列表
-    property int playMode: 0          //播放模式
-    property int curIdx: 0            //当前页面，0代表视频页面，1代表音频页面
-    property string playSpeed: '1.0x'      //当前视频播放速度
+    property bool isFullSreen: false      //是否已经全屏
+    property bool isAudioPlay: false      //是否有音频播放
+    property bool isVideoPlay: false      //是否有视频播放
+    property bool isPlaying: false        //音视频是否正在播放
+    property bool isCoverShow: false      //音频封面页是否已经展示
+    property bool isShowQueue: false      //是否展示了播放列表
+    property int playMode: 2              //播放模式，默认循环播放
+    property int voice: 15                //播放音量
+    property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
+    property string playSpeed: '1.0x'     //当前视频播放速度
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -58,12 +57,34 @@ Window {
             videoPage.y=0;
         }
     }
+    //格式化时间戳
+    function formatTime(time){
+        if(typeof time !=='number' ||time<0){
+            return;
+        }
+        let hour=Math.floor(time/3600000);
+        time=time%3600000;
+        let minute=Math.floor(time/60000);
+        time=time%60000;
+        let second=Math.floor(time/1000);
+
+        return hour?
+                    ([hour,minute,second].map(function(num){
+                        num=num.toString();
+                        return num[1]?num:'0'+num;
+                    })).join(':'):
+                    ([minute,second].map(function(num){
+                        num=num.toString();
+                        return num[1]?num:'0'+num;
+                    })).join(':')
+    }
 
     //监听是否有音频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
             musicView.reset();
             playQueue.reset();
+            controller.exit();
         }
     }
 
@@ -71,13 +92,55 @@ Window {
     onIsVideoPlayChanged: {
         if(!isVideoPlay){
             playQueue.reset();
+            controller.exit();
         }
     }
 
     //监听是否正在播放音视频
-    onIsPlayingChanged: {
-//        isPlaying?until.setPause(false):until.setPause(true);
+    onIsPlayingChanged: controller.stop()
+
+    //监听播放模式改变
+    onPlayModeChanged: controller.mode=playMode
+
+    //监听音量改变
+    onVoiceChanged: controller.voice=voice
+
+    //监听controller信号
+    Connections{
+        target: controller
+        function onFileImportFail(path){     //文件导入失败
+            errorPopup.close();
+            errorPopup.errorInfo=
+                    path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'))+" 导入失败";
+            errorPopup.open();
+        }
+        function onFileMiss(file){           //文件缺失
+            console.log(file);
+            delDialog.fileMiss=true;
+            delDialog.delIdx=file.index;
+            delDialog.mediaType=file.isAudio?'音频':'视频';
+            delDialog.open();
+        }
+        function onFileError(file){          //文件解析失败或者md5不一致
+            console.log(file);
+
+        }
+        function onFileFinish(){             //文件播放结束
+            console.log('fileFinish');
+        }
+        function onPlayMedia(){              //准备播放视频
+            console.log('begin play');
+        }
+        function onUpdate(yuv){
+            console.log('update');
+        }
     }
+
+    //文件缺失提示框
+    DelDialog{id:delDialog}
+
+    //错误信息弹窗
+    ErrorPopup{id:errorPopup}
 
     //视频播放界面
     VideoPage{id:videoPage}
@@ -158,11 +221,17 @@ Window {
     //本地文件选择框
     FileDialog {
         id: fileDialog
-        //        currentFile: document.source
         fileMode:FileDialog.OpenFiles  //支持文件多选
-        folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]  //打开默认文件夹
+        title:curIdx===0?"选择视频":"选择音频"
         nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
                                :["audio files (*.mp3 *.flac *.wav *rm)"]
+        onAccepted:{
+            const urlList=[];
+            for(let url of files){
+                urlList.push(url.toString().split('file:///')[1]);
+            }
+            controller.importData(urlList,curIdx===1)
+        }
     }
 
     //标题栏

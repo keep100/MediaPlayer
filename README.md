@@ -3,15 +3,38 @@
 
 ## 目录结构
 ```markdown
-├─.gitignore
-├─CMakeLists.txt
-├─CMakeLists.txt.user
-├─main.cpp     //程序入口文件
-├─main.qml     //主窗口界面文件
-├─qml.qrc      //前端页面文件与静态资源
-├─images       //图片文件夹
-├─components   //自定义组件文件夹
-|     ├─ListData.qml    //自定义列表
-|     └TitleBar.qml     //自定义窗口标题栏
+├─until
+|   ├─cursorposprovider.h
+|   ├─imageprovider.cpp
+|   └imageprovider.h
+├─OpenglItem
+|     ├─myitem.cpp
+|     ├─myitem.h
+|     ├─myrender.cpp
+|     └myrender.h
+├─images
+├─ffmpeg
+|   ├─bin.zip
+|   ├─lib
+|   ├─include
+├─DataManager
+|      ├─data.cpp
+|      ├─data.h
+|      ├─datamanager.cpp
+|      ├─datamanager.h
+|      ├─randomlist.cpp
+|      └randomlist.h
+├─components
+|     ├─CoverPage.qml
+|     ├─DelDialog.qml
+|     ├─ErrorPopup.qml
+|     ├─Footer.qml
+|     ├─InfoPopup.qml
+|     ├─LeftMenu.qml
+|     ├─MusicView.qml
+|     ├─PlayQueue.qml
+|     ├─SearchBox.qml
+|     ├─TitleBar.qml
+|     ├─VideoPage.qml
+|     └VideoView.qml
 ```
-

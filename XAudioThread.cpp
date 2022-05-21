@@ -73,6 +73,17 @@ void XAudioThread::SetPause(bool isPause)
         ap->SetPause(isPause);
     //amux.unlock();
 }
+
+void XAudioThread::SetVolume(double volume)
+{
+    //amux.lock();
+    cout << "XAudioThread SetVolume\n";
+    if (ap)
+        ap->SetVolume(volume);
+    //amux.unlock();
+}
+
+
 void XAudioThread::run()
 {
     unsigned char *pcm = new unsigned char[1024 * 1024];
