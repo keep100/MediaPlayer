@@ -9,11 +9,10 @@ extern "C"
 #include <libavformat/avformat.h>
 }
 #include "XDecode.h"
-using namespace std;
 void XDemuxThread::SetPause(bool isPause)
 {
     mux.lock();
-    cout << "XDemuxThread Pause\n";
+     std::cout << "XDemuxThread Pause\n";
     this->isPause = isPause;
     if (at) at->SetPause(isPause);
     if (vt) vt->SetPause(isPause);
@@ -139,26 +138,25 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     if (!vt) vt = new XVideoThread();
     if (!at) at = new XAudioThread();
 
-    cout << "vt->GetPacksNum() : " << vt->GetPacksNum() << " at->GetPacksNum() : " << at->GetPacksNum() << endl;
     //打开解封装
     bool re = demux->Open(url);
     if (!re)
     {
-        cout << "demux->Open(url) failed!" << endl;
+        std::cout << "demux->Open(url) failed!" << std::endl;
         return false;
     }
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height))
     {
         re = false;
-        cout << "vt->Open failed!" << endl;
+        std::cout << "vt->Open failed!" << std::endl;
     }
     //打开音频解码器和处理线程
-    cout << "demux->sampleFormat : " << demux->sampleFormat << endl;
+    std::cout << "demux->sampleFormat : " << demux->sampleFormat << std::endl;
     if (!at->Open(demux->CopyAPara(), demux->sampleRate, demux->channels))
     {
         re = false;
-        cout << "at->Open failed!" << endl;
+        std::cout << "at->Open failed!" << std::endl;
     }
     if (isFirst)
     {
@@ -170,7 +168,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     }
     totalMs = demux->totalMs;
     mux.unlock();
-    cout << "XDemuxThread::Open " << re << endl;
+    std::cout << "XDemuxThread::Open " << re <<  std::endl;
     return re;
 }
 //启动所有线程
@@ -195,10 +193,9 @@ XDemuxThread::XDemuxThread()
 {
 }
 
-
 XDemuxThread::~XDemuxThread()
 {
-    cout << "XDemuxThread::~XDemuxThread()\n";
+     std::cout << "XDemuxThread::~XDemuxThread()\n";
     isExit = true;
     wait();
 }

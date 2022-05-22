@@ -1,7 +1,11 @@
+<<<<<<< HEAD
+﻿
+=======
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickWindow>
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 #include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "until/imageprovider.h"
@@ -12,6 +16,11 @@
 #include "controller.h"
 
 
+<<<<<<< HEAD
+    QGuiApplication app(argc, argv);
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    QQmlApplicationEngine engine;
+=======
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -27,11 +36,23 @@ int main(int argc, char *argv[])
 //    engine.rootContext()->setContextProperty("MyImage", thread->vt->showImage);
 //    engine.addImageProvider(QLatin1String("Imgs"), thread->vt->showImage->m_pImgProvider);
     Controller controller(engine);
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+<<<<<<< HEAD
+                     &app, [url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
+
+
+
+
+
+=======
                      &app, [url](QObject * obj, const QUrl & objUrl)
     {
         if (!obj && url == objUrl)
@@ -39,9 +60,37 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
         }
     }, Qt::QueuedConnection);
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 
     qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
     engine.load(url);
+<<<<<<< HEAD
+
+    // 打开文件
+    QString name = "D:/迅雷下载/Young.Sheldon.S01.1080p.AMZN.WEBRip.DDP5.1.x264-NTb[rartv]/Young.Sheldon.S01E01.Pilot.1080p.AMZN.WEB-DL.DDP5.1.H.264-NTb.mkv";
+//    QString name = "C:/Users/13007/Downloads/test.mpeg";
+
+    XDemuxThread dt;
+    dt.Start();
+    if (!dt.Open(name.toLocal8Bit(), nullptr))
+    {
+        qDebug() << "dt open fail\n";
+        return -1;
+    }
+
+    QTimer *timer = new QTimer();
+    QObject::connect(timer, &QTimer::timeout, [&ctrl, &dt](){
+        std::shared_ptr<YUVData> data = dt.resendYUV();
+        if (data != nullptr) {
+            ctrl.onUpdate(data, 0);
+            qDebug() << "ll\n";
+        }
+
+    });
+    timer->start(1000 / 24.0);
+
+=======
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 
 //    QImage image;
 //    bool flag = image.load("C:/Users/16321/Pictures/Saved Pictures/15.jpg");
@@ -51,4 +100,8 @@ int main(int argc, char *argv[])
 //                 nullptr);
 
     return app.exec();
+<<<<<<< HEAD
+
+=======
+>>>>>>> bf4890f9c684d3e1478a7f46e84e43b1d5a24e37
 }

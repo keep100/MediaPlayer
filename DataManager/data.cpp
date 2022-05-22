@@ -49,7 +49,7 @@ Data::Data(const BriefInfo& info,const QFileInfo& f){
     if(!info.img.isNull()){
         QCryptographicHash hash(QCryptographicHash::Md5);
         hash.addData(_filePath.toLocal8Bit());
-        _imgPath = dir.filePath(info.mediaType+"/"+hash.result().toHex()+".jpg");
+        _imgPath = dir.absoluteFilePath(info.mediaType+"/"+hash.result().toHex()+".jpg");
         info.img.save(_imgPath);
     }
 
