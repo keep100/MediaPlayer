@@ -189,6 +189,12 @@ Rectangle{
                         isPlaying=false;
                         videoPage.close();
                     }
+                    if(isCoverShow){
+                        isCoverShow=false;
+                        coverAnimation.from=0;
+                        coverAnimation.to=windowHeight;
+                        coverAnimation.running=true;
+                    }
                 }
             }
         }
