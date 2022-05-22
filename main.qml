@@ -285,7 +285,9 @@ Window {
     //音频播放进度条
     Slider {
         id: audioSlider
-        value: 0.2
+        from: 0
+        value: controller?.time ?? 0
+        to:100
         y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay

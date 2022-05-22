@@ -87,6 +87,11 @@ Rectangle {
                         onEntered: videoCell.isEnter=true
                         onExited: videoCell.isEnter=false
                         onClicked: {
+                            if(isAudioPlay){
+                                isAudioPlay=false;
+                                isPlaying=false;
+                                controller.exit();
+                            }
                             videoPage.visible=true;
                             mainWindow.visible=false;
                             curMediaIdx=modelData.index;
