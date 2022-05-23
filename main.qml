@@ -26,7 +26,7 @@ Window {
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度
     property int blur: 0                  //播放器背景模糊度
-    property string bgPath: "qrc:/images/bg.jpg"            //背景图片路径
+    property string bgPath: ""            //背景图片路径
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -79,7 +79,7 @@ Window {
     //格式化时间戳
     function formatTime(time){
         if(typeof time !=='number' ||time<0){
-            return;
+            return "";
         }
         let hour=Math.floor(time/3600000);
         time=time%3600000;
@@ -96,6 +96,12 @@ Window {
                         num=num.toString();
                         return num[1]?num:'0'+num;
                     })).join(':')
+    }
+
+    //组件加载完毕
+    Component.onCompleted: {
+        bgPath=dataMgr.userInfo.bckPath?dataMgr.userInfo.bckPath:"qrc:/images/bg.jpg";
+        blur=dataMgr.userInfo.blurRatio;
     }
 
     //监听是否有音频在播放

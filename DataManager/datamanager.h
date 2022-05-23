@@ -5,7 +5,7 @@
 #include "data.h"
 #include <QMap>
 #include "randomlist.h"
-#include "playMode.h"
+#include "PlayMode.h"
 
 
 
@@ -23,7 +23,10 @@ public:
     QVariantList audioList();
     Data curVideo();
     Data curAudio();
-    UserInfo userInfo(){return _userInfo;}
+    UserInfo userInfo()
+    {
+        return _userInfo;
+    }
 
 signals:
     void videoListChanged();
@@ -46,7 +49,7 @@ public:
     void writeData();                               //将数据写回文件中
     ~DataManager();                                 //析构函数
     void reset();                                   //重置，当退出播放时调用
-    void setUserInfo(QString,float);                //设置用户数据
+    void setUserInfo(QString, float);               //设置用户数据
 
 private:
     bool _isAudio = false;

@@ -217,6 +217,7 @@ Popup{
                         configDialog.close();
                         mainWindow.bgPath=pathInput.text?pathInput.text:mainWindow.bgPath;
                         mainWindow.blur=blurSlider.value;
+                        controller.setUserInfo(bgPath,blur);
                     }
                 }
             }

@@ -20,6 +20,7 @@ Popup{
     contentItem: Column {
         anchors.fill: parent
         leftPadding: 15
+        //信息区域分割线
         Component{
             id:divider
             Row{
@@ -32,7 +33,7 @@ Popup{
                 }
             }
         }
-
+        //弹窗标题栏
         Row{
             topPadding: 5
             bottomPadding: 5
@@ -73,7 +74,7 @@ Popup{
                 }
             }
         }
-
+        //文件名称
         Row{
             topPadding: 10
             bottomPadding: 10
@@ -85,13 +86,18 @@ Popup{
             }
             Label{
                 text: file?.fileName ?? "-"
+                width: 170
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
                 font.pixelSize: 13
                 color: "white"
             }
         }
 
         Loader{sourceComponent: divider}
-
+        //文件类型
         Row{
             topPadding: 10
             bottomPadding: 10
@@ -102,12 +108,12 @@ Popup{
                 color: "white"
             }
             Label{
-                text: file?.filePath.split('.')[1] ?? "-"
+                text: file?.filePath.substring(file?.filePath.lastIndexOf('.')+1) ?? "-"
                 font.pixelSize: 13
                 color: "white"
             }
         }
-
+        //文件位置
         Row{
             topPadding: 10
             bottomPadding: 10
@@ -119,22 +125,71 @@ Popup{
             }
             Label{
                 text: file?.filePath.substring(0,file?.filePath.lastIndexOf('/')) ?? "-"
+                width: 180
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
                 font.pixelSize: 13
                 color: "white"
             }
         }
-
+        //文件时长
         Row{
             topPadding: 10
             bottomPadding: 10
             Label{
-                text: '文件大小:'
+                text: '时长:'
                 width: 110
                 font.pixelSize: 13
                 color: "white"
             }
             Label{
-                text:"536 MB"
+                text: formatTime(file?.duration)
+                font.pixelSize: 13
+                color: "white"
+            }
+        }
+
+        Loader{sourceComponent: divider}
+        //音频专辑信息或视频帧宽度信息
+        Row{
+            topPadding: 10
+            bottomPadding: 10
+            Label{
+                text: mediaType==='音频'?'专辑:':'帧宽度:'
+                width: 110
+                font.pixelSize: 13
+                color: "white"
+            }
+            Label{
+                text: file?.isAudio? (file?.album? file?.album : "-"):(file?.width? file?.width:"-")
+                width: 170
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
+                font.pixelSize: 13
+                color: "white"
+            }
+        }
+        //音频歌手信息或视频帧高度信息
+        Row{
+            topPadding: 10
+            bottomPadding: 10
+            Label{
+                text: mediaType==='音频'?'歌手: ':'帧高度: '
+                width:110
+                font.pixelSize: 13
+                color: "white"
+            }
+            Label{
+                text: file?.isAudio? (file?.artist? file?.artist:"-"):(file?.height? file?.height:"-")
+                width: 170
+                clip: true
+                wrapMode: Text.WrapAnywhere
+                lineHeightMode:Text.FixedHeight
+                lineHeight: 22
                 font.pixelSize: 13
                 color: "white"
             }
@@ -142,43 +197,50 @@ Popup{
 
         Loader{sourceComponent: divider}
 
+        //比特率
         Row{
             topPadding: 10
             bottomPadding: 10
             Label{
-                text: mediaType==='音频'?'专辑:':'视频帧率:'
-                width: 110
-                font.pixelSize: 13
-                color: "white"
-            }
-            Label{
-                text: file?.isAudio? (file?.album? file?.album : "-"):"-"
-                width: 170
-                clip: true
-                wrapMode: Text.WrapAnywhere
-                lineHeightMode:Text.FixedHeight
-                lineHeight: 22
-                font.pixelSize: 13
-                color: "white"
-            }
-        }
-
-        Row{
-            topPadding: 10
-            bottomPadding: 30
-            Label{
-                text: mediaType==='音频'?'歌手: ':'分辨率: '
+                text: '比特率: '
                 width:110
                 font.pixelSize: 13
                 color: "white"
             }
             Label{
-                text: file?.isAudio? (file?.artist? file?.artist:"-"):"-"
-                width: 170
-                clip: true
-                wrapMode: Text.WrapAnywhere
-                lineHeightMode:Text.FixedHeight
-                lineHeight: 22
+                text: file?.bitRate? file?.bitRate+" bps" : "-"
+                font.pixelSize: 13
+                color: "white"
+            }
+        }
+        //声道
+        Row{
+            topPadding: 10
+            bottomPadding: 10
+            Label{
+                text: '声道: '
+                width:110
+                font.pixelSize: 13
+                color: "white"
+            }
+            Label{
+                text: file?.channels? (file?.channels===2?file?.channels+" (立体音)":file?.channels) : "-"
+                font.pixelSize: 13
+                color: "white"
+            }
+        }
+        //编码格式
+        Row{
+            topPadding: 10
+            bottomPadding: 10
+            Label{
+                text: '编码格式: '
+                width:110
+                font.pixelSize: 13
+                color: "white"
+            }
+            Label{
+                text: file?.codecId? file?.codecId : "-"
                 font.pixelSize: 13
                 color: "white"
             }

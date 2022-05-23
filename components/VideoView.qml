@@ -81,7 +81,10 @@ Rectangle {
                                 }
                                 MouseArea{
                                     anchors.fill: parent
-                                    onClicked: morePopup.open()
+                                    onClicked: {
+                                        morePopup.file=modelData;
+                                        morePopup.open();
+                                    }
                                 }
                             }
                         }

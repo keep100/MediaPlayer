@@ -18,26 +18,31 @@ extern "C" {
 
 using namespace std;
 
-void XMediaManager::bind(QObject *obj) {
+void XMediaManager::bind(QObject *obj)
+{
     Controller *ctrl = dynamic_cast<Controller *>(obj);
-    if (ctrl != nullptr) {
+    if (ctrl != nullptr)
+    {
         QObject::connect(ctrl, &Controller::playMedia, this,
                          &XMediaManager::playMedia);
         QObject::connect(ctrl, &Controller::pause, this, &XMediaManager::pause);
         QObject::connect(ctrl, &Controller::exitPlay, this, &XMediaManager::end);
         QObject::connect(ctrl, &Controller::voiceChanged, this,
                          &XMediaManager::setVolume);
-        QObject::connect(demuxThread->syn, &SynModule::transmitYUV, ctrl,
-                         &Controller::onUpdate);
+//        QObject::connect(demuxThread->syn, &SynModule::transmitYUV, ctrl,
+//                         &Controller::onUpdate);
         //        QObject::connect(ctrl,&Controller::playMedia,this,&XMediaManager::getBriefInfo);
     }
 }
 
-BriefInfo XMediaManager::getBriefInfo(const char *url) {
+BriefInfo XMediaManager::getBriefInfo(const char *url)
+{
 
     BriefInfo briefInfo;
     if (url == 0 || url[0] == '\0')
+    {
         return briefInfo;
+    }
     XDemux *demux = new XDemux();
     XDecode *decode = new XDecode();
     demux->Open(url);
@@ -49,7 +54,8 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
 
     QString suffix = QString(url).split(".").last();
     //    qDebug()<<briefInfo.mediaType;
-    if (QString("mp4, flv, avi, mkv").contains(suffix)) { //是视频就提取缩略图
+    if (QString("mp4, flv, avi, mkv").contains(suffix))   //是视频就提取缩略图
+    {
 
         briefInfo.mediaType = "video";
         briefInfo.codecId = avcodec_get_name(demux->CopyVPara()->codec_id);
@@ -59,12 +65,15 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         AVFrame *pFrame = av_frame_alloc();
         demux->Seek(0.5);
         //先recv，后send
-        while (true) {
+        while (true)
+        {
             pFrame = decode->Recv();
-            if (pFrame && pFrame->key_frame) { // receive
+            if (pFrame && pFrame->key_frame)   // receive
+            {
                 //                qDebug()<<"receive";
                 QImage temp = getQImageFromFrame(pFrame, demux->CopyVPara());
-                if (!temp.isNull() && temp.bits()) {
+                if (!temp.isNull() && temp.bits())
+                {
                     int w = temp.width(), h = temp.height();
                     int rgbValue = (((temp.pixel(0.25 * w, 0.25 * h) +
                                       temp.pixel(0.75 * w, 0.75 * h) +
@@ -73,7 +82,8 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
                                      4));
                     int means = (qRed(rgbValue) + qGreen(rgbValue) + qBlue(rgbValue)) / 3;
                     //                    qDebug()<<qRed(rgbValue)<<qGreen(rgbValue)<<qBlue(rgbValue)<<means;
-                    if (means > 150) {
+                    if (means > 150)
+                    {
                         qDebug() << "有东西的图";
                         break;
                     }
@@ -87,8 +97,10 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         briefInfo.img = getQImageFromFrame(pFrame, demux->CopyVPara());
 
         //        briefInfo.img.save("C:\\Users\\16409\\Desktop\\thumbnail.jpg");
-    } else if (QString("mp3, flac, wav, rm")
-               .contains(suffix)) { //是音频就提取音频的相关信息
+    }
+    else if (QString("mp3, flac, wav, rm")
+             .contains(suffix))   //是音频就提取音频的相关信息
+    {
 
         briefInfo.mediaType = "audio";
         briefInfo.codecId = avcodec_get_name(demux->CopyAPara()->codec_id);
@@ -96,14 +108,16 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
 
         AVFormatContext *m_AVFormatContext = NULL;
         int result = avformat_open_input(&m_AVFormatContext, url, nullptr, nullptr);
-        if (result != 0 || m_AVFormatContext == nullptr) {
+        if (result != 0 || m_AVFormatContext == nullptr)
+        {
             qDebug() << "fffff";
             return briefInfo;
         }
 
         // 查找流信息，把它存入AVFormatContext中
         result = avformat_find_stream_info(m_AVFormatContext, nullptr);
-        if (result) {
+        if (result)
+        {
             qDebug() << "fffff1";
             return briefInfo;
         }
@@ -116,7 +130,8 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         QImage mInfoImage;
         AVDictionaryEntry *tag = nullptr;
         while (tag = av_dict_get(m_AVFormatContext->metadata, "", tag,
-                                 AV_DICT_IGNORE_SUFFIX)) {
+                                 AV_DICT_IGNORE_SUFFIX))
+        {
             QString keyString = tag->key;
             QString valueString = QString::fromUtf8(tag->value);
             mInfoMap.insert(keyString.toLower(), valueString);
@@ -125,9 +140,11 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         briefInfo.artist = mInfoMap["artist"];
         briefInfo.title = mInfoMap["title"];
 
-        for (int i = 0; i < streamsCount; ++i) {
+        for (int i = 0; i < streamsCount; ++i)
+        {
             if (m_AVFormatContext->streams[i]->disposition &
-                    AV_DISPOSITION_ATTACHED_PIC) {
+                    AV_DISPOSITION_ATTACHED_PIC)
+            {
                 qDebug() << "-----" << i;
                 AVPacket pkt = m_AVFormatContext->streams[i]->attached_pic;
                 mInfoImage = QImage::fromData((uchar *)pkt.data, pkt.size);
@@ -140,7 +157,8 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
 }
 
 QImage XMediaManager::getQImageFromFrame(const AVFrame *frame,
-                                         AVCodecParameters *para) {
+        AVCodecParameters *para)
+{
 
     //    qDebug() << "frameToImage";
     QImage output(frame->width, frame->height,
@@ -151,8 +169,8 @@ QImage XMediaManager::getQImageFromFrame(const AVFrame *frame,
     uint8_t *outputDst[] = {output.bits()};
     //构造一个格式转换上下文
     SwsContext *imgConvertContext = sws_getContext(
-                para->width, para->height, (AVPixelFormat)para->format, para->width,
-                para->height, AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
+                                        para->width, para->height, (AVPixelFormat)para->format, para->width,
+                                        para->height, AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
 
     //把解码得到的损坏的像素数据剔除
     sws_scale(imgConvertContext, frame->data, frame->linesize, 0, para->height,
@@ -163,28 +181,39 @@ QImage XMediaManager::getQImageFromFrame(const AVFrame *frame,
     return output;
 }
 
-XMediaManager::XMediaManager() {
+XMediaManager::XMediaManager()
+{
     _curState = INITIAL;
     if (!demuxThread)
+    {
         demuxThread = new XDemuxThread();
+    }
     demuxThread->Clear();
 }
 
-void XMediaManager::playMedia(QString url) {
-    if (open(url.toLocal8Bit())) {
+void XMediaManager::playMedia(QString url)
+{
+    if (open(url.toLocal8Bit()))
+    {
         qDebug() << "open succeed";
         play();
     }
 }
 
-bool XMediaManager::open(const char *url) {
-    if (_curState == INITIAL || _curState == END) {
+bool XMediaManager::open(const char *url)
+{
+    if (_curState == INITIAL || _curState == END)
+    {
         _curState = READY;
         if (!demuxThread)
+        {
             demuxThread = new XDemuxThread();
+        }
         return demuxThread->Open(url, NULL);
 
-    } else {
+    }
+    else
+    {
         _curState = INITIAL;
         qDebug() << "error at XMediaManager::open()";
         return false;
@@ -192,48 +221,63 @@ bool XMediaManager::open(const char *url) {
     return false;
 }
 
-void XMediaManager::play() {
-    if (_curState == READY) {
+void XMediaManager::play()
+{
+    if (_curState == READY)
+    {
         _curState = PLAYING;
-        if (!demuxThread) {
+        if (!demuxThread)
+        {
             _curState = END;
             qDebug() << "error at XMediaManager::play()1";
             return;
         }
         demuxThread->Start();
-    } else if (_curState == PAUSED) {
+    }
+    else if (_curState == PAUSED)
+    {
         _curState = PLAYING;
-        if (!demuxThread) {
+        if (!demuxThread)
+        {
             _curState = END;
             qDebug() << "error at XMediaManager::play()2";
             return;
         }
         demuxThread->SetPause(false);
-    } else {
+    }
+    else
+    {
         _curState = INITIAL;
         qDebug() << "error at XMediaManager::play()3";
         return;
     }
 }
 
-void XMediaManager::pause() {
-    if (_curState == PLAYING) {
+void XMediaManager::pause()
+{
+    if (_curState == PLAYING)
+    {
         _curState = PAUSED;
-        if (!demuxThread) {
+        if (!demuxThread)
+        {
             _curState = END;
             qDebug() << "error at XMediaManager::pause()1";
             return;
         }
         demuxThread->SetPause(true);
-    } else {
+    }
+    else
+    {
         _curState = INITIAL;
         qDebug() << "error at XMediaManager::pause()2";
         return;
     }
 }
 
-void XMediaManager::setVolume(float v) {
-    if (!demuxThread) {
+void XMediaManager::setVolume(float v)
+{
+    if (!demuxThread)
+    {
         _curState = END;
         qDebug() << "error at XMediaManager::setVolume()";
         return;
@@ -241,25 +285,32 @@ void XMediaManager::setVolume(float v) {
     demuxThread->SetVolume(v);
 }
 
-void XMediaManager::seek(double pos) {
-    if (_curState == PLAYING || _curState == PAUSED) {
-        if (!demuxThread) {
+void XMediaManager::seek(double pos)
+{
+    if (_curState == PLAYING || _curState == PAUSED)
+    {
+        if (!demuxThread)
+        {
             _curState = END;
             qDebug() << "error at XMediaManager::seek()1";
             return;
         }
         demuxThread->Seek(pos);
 
-    } else {
+    }
+    else
+    {
         _curState = INITIAL;
         qDebug() << "error at XMediaManager::seek()2";
         return;
     }
 }
 
-void XMediaManager::end() {
+void XMediaManager::end()
+{
     _curState = END;
-    if (demuxThread) {
+    if (demuxThread)
+    {
         demuxThread->Clear();
         demuxThread->Close();
     }
