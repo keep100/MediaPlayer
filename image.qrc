@@ -1,12 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>images/bg.jpg</file>
-        <file>images/cover.png</file>
         <file>images/logo.png</file>
         <file>images/more.png</file>
         <file>images/pause.png</file>
         <file>images/shipinfengmian.png</file>
-        <file>images/small-cover.png</file>
         <file>images/播放.png</file>
         <file>images/播放-禁用.png</file>
         <file>images/打钩.png</file>
@@ -40,5 +38,8 @@
         <file>images/最小化.png</file>
         <file>images/视频播放.png</file>
         <file>images/单曲模式.png</file>
+        <file>images/coverBg.jpg</file>
+        <file>images/唱片.png</file>
+        <file>images/设置.png</file>
     </qresource>
 </RCC>

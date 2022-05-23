@@ -23,85 +23,110 @@ Rectangle{
     }
 
     //关闭窗口按钮
-    Button{
+    Rectangle{
         id:closeBtn
         anchors.right: parent.right
         width: parent.height
         height: parent.height
-        hoverEnabled : true
+        color: "transparent"
+        radius: 10
         z:1
-
-        //自定义按钮背景
-        background: Rectangle{
-            color: closeBtn.hovered ? "red" : "transparent"
-            Image{
-                width: parent.width*0.5
-                height: parent.height*0.5
-                anchors.centerIn: parent
-                source: "qrc:/images/关闭.png"
-            }
+        Image{
+            width: parent.width*0.5
+            height: parent.height*0.5
+            anchors.centerIn: parent
+            source: "qrc:/images/关闭.png"
         }
-        onClicked: {
-            mainWindow.close();
+        MouseArea{
+            anchors.fill: parent
+            hoverEnabled: true
+            onEntered: closeBtn.color=setColor(255,0,0,0.6)
+            onExited: closeBtn.color="transparent"
+            onClicked: mainWindow.close()
         }
     }
 
     //最大化或正常化按钮
-    Button{
+    Rectangle{
         id: normalBtn
         anchors.right: closeBtn.left
         width: parent.height
         height: parent.height
-        hoverEnabled : true
+        color: "transparent"
+        radius: 10
         z:1
-
-        //自定义按钮背景
-        background: Rectangle{
-            color: normalBtn.hovered ? (normalBtn.pressed ? "#4E4E4E" : "#666666") : "transparent"
-            Image{
-                width: parent.height * 0.4
-                height: parent.height * 0.4
-                anchors.centerIn: parent
-                source: isMaximized?
-                            "qrc:/images/正常化.png":
-                            "qrc:/images/最大化.png"
-            }
+        Image{
+            width: parent.height * 0.4
+            height: parent.height * 0.4
+            anchors.centerIn: parent
+            source: isMaximized?
+                        "qrc:/images/正常化.png":
+                        "qrc:/images/最大化.png"
         }
-        onClicked:{
-            if(isMaximized){
-                isMaximized = false;
-                mainWindow.showInitial();
-            }else{
-                isMaximized = true;
-                mainWindow.showMax();
+        MouseArea{
+            anchors.fill: parent
+            hoverEnabled: true
+            onEntered: normalBtn.color=setColor(255,255,255,0.2)
+            onExited: normalBtn.color="transparent"
+            onClicked: {
+                if(isMaximized){
+                    isMaximized = false;
+                    mainWindow.showInitial();
+                }else{
+                    isMaximized = true;
+                    mainWindow.showMax();
+                }
             }
         }
     }
 
     //最小化按钮
-    Button{
+    Rectangle{
         id: miniBtn
         anchors.right: normalBtn.left
         width: parent.height
         height: parent.height
-        hoverEnabled : true
+        color: "transparent"
+        radius: 10
         z:1
-
-        //自定义按钮背景
-        background: Rectangle{
-            color: miniBtn.hovered ? (miniBtn.pressed ? "#4E4E4E" : "#666666") : "transparent"
-            Image{
-                width: parent.height * 0.5
-                height: parent.height * 0.5
-                anchors.centerIn: parent
-                source: "../images/最小化.png"
-            }
+        Image {//最小化图标
+            width: parent.width*0.5
+            height: parent.height*0.5
+            anchors.centerIn: parent
+            source: "qrc:/images/最小化.png"
         }
-        onClicked:{
-            mainWindow.showMinimized();
+        MouseArea{
+            anchors.fill: parent
+            hoverEnabled: true
+            onEntered: miniBtn.color=setColor(255,255,255,0.2)
+            onExited: miniBtn.color="transparent"
+            onClicked: mainWindow.showMinimized()
         }
     }
 
+    //设置按钮
+    Rectangle{
+        id:configBtn
+        anchors.right: miniBtn.left
+        width: parent.height
+        height: parent.height
+        color: "transparent"
+        radius: 10
+        z:1
+        Image {//设置图标
+            width: parent.width*0.5
+            height: parent.height*0.5
+            anchors.centerIn: parent
+            source: "qrc:/images/设置.png"
+        }
+        MouseArea{
+            anchors.fill: parent
+            hoverEnabled: true
+            onEntered: configBtn.color=setColor(255,255,255,0.2)
+            onExited: configBtn.color="transparent"
+            onClicked: configDialog.open()
+        }
+    }
 
     MouseArea{
         anchors.fill: parent

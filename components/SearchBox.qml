@@ -11,6 +11,11 @@ Rectangle{
     color: setColor(54, 56, 61)
     radius: 20
 
+    //根据搜索关键词筛选音视频
+    function getSearchList(keyword,list){
+        return list.filter(item=>item.fileName.toLocaleLowerCase().includes(keyword))
+    }
+
     //搜索图标
     Image {
         id:searchIcon
@@ -38,7 +43,13 @@ Rectangle{
         }
 
         onAccepted: {//按下enter回车键触发，进行搜索
-            console.log(text)
+            if(curIdx){
+                musicView.searchList=getSearchList(text,dataMgr.audioList);
+                musicView.isSearched=true;
+            }else{
+                videoView.searchList=getSearchList(text,dataMgr.videoList);
+                videoView.isSearched=true;
+            }
             focus=false;
         }
     }
@@ -55,7 +66,11 @@ Rectangle{
         MouseArea{
             anchors.fill: parent
 
-            onClicked: searchInput.clear()
+            onClicked:{//清空关键词，展示列表全部数据
+                searchInput.clear();
+                searchInput.focus=false;
+                curIdx?musicView.isSearched=false:videoView.isSearched=false;
+            }
         }
     }
 }

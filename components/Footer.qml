@@ -13,6 +13,11 @@ Rectangle{
     
     property variant pressedKeys: new Set()  //存储按下还未释放的按键
     required property string mediaType       //判断是否是视频底部栏
+
+    //获取音频略缩图
+    function getCover(path){
+        return path? "file:///"+path : "qrc:/images/音乐封面.png"
+    }
     
     Keys.onPressed:function(e) {
         //将键值加入set
@@ -116,7 +121,7 @@ Rectangle{
             //音频略缩图
             Image {
                 id: smallCover
-                source: "qrc:/images/small-cover.png"
+                source: getCover(dataMgr?.curAudio.imgPath)
                 width: parent.height*0.8
                 height: width
                 fillMode: Image.PreserveAspectFit
@@ -152,18 +157,34 @@ Rectangle{
                 height: parent.height
                 leftPadding: 8
                 Text {
-                    text: qsTr("是你的声音啊")
+                    text: dataMgr?.curAudio.fileName ?? "歌名"
                     topPadding: 2
+                    width: 150
+                    clip: true
+                    elide: Text.ElideRight
                     font.pixelSize: 13
                     color: "white"
                 }
                 Text {
-                    text: qsTr("七爷")
+                    text: dataMgr?.curAudio.artist ?? "歌手"
                     topPadding: 5
+                    width: 150
+                    clip: true
+                    elide: Text.ElideRight
                     font.pixelSize: 11
                     color: "white"
                 }
             }
+        }
+
+        //视频的已播放时长与总时长
+        Text {
+            leftPadding: -200
+            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
+            font.pixelSize: 14
+            color: "white"
+            anchors.verticalCenter: parent.verticalCenter
+            opacity: isVideoPlay? 1:0
         }
         
         //退出播放音视频的按钮
@@ -177,7 +198,9 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
+                    controller.exit();
                     if(isAudioPlay){
                         isAudioPlay=false;
                         isPlaying=false;
@@ -188,6 +211,12 @@ Rectangle{
                         isVideoPlay=false;
                         isPlaying=false;
                         videoPage.close();
+                    }
+                    if(isCoverShow){
+                        isCoverShow=false;
+                        coverAnimation.from=0;
+                        coverAnimation.to=windowHeight;
+                        coverAnimation.running=true;
                     }
                 }
             }
@@ -204,7 +233,11 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
-                onClicked: controller.playPre(mediaType==='音频')
+                enabled: isAudioPlay||isVideoPlay
+                onClicked: {
+                    controller.playPre(mediaType==='audio');
+                    curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                }
             }
         }
         
@@ -220,6 +253,7 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
                     if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
@@ -239,7 +273,11 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
-                onClicked: controller.playNext(mediaType==='音频')
+                enabled: isAudioPlay||isVideoPlay
+                onClicked: {
+                    controller.playNext(mediaType==='audio');
+                    curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                }
             }
         }
         
@@ -296,7 +334,18 @@ Rectangle{
                 }
             }
         }
-        
+
+        //音频的已播放时长与总时长
+        Text {
+            id:audioTime
+            x:playMode.x-width-windowWidth*0.02
+            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curAudio.duration)
+            font.pixelSize: 14
+            color: "white"
+            anchors.verticalCenter: parent.verticalCenter
+            opacity: isAudioPlay?1:0
+        }
+
         //倍速，当且仅当视频播放时展示
         Rectangle{
             id:playSpeed

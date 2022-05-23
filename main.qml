@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 import Qt.labs.platform 1.1
+import Qt5Compat.GraphicalEffects
 import "./components/"
 
 Window {
@@ -24,6 +25,8 @@ Window {
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度
+    property int blur: 0                  //播放器背景模糊度
+    property string bgPath: "qrc:/images/bg.jpg"            //背景图片路径
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -34,6 +37,9 @@ Window {
         showMaximized();
         windowWidth=Screen.desktopAvailableWidth;
         windowHeight=Screen.desktopAvailableHeight;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
     }
     //实现窗口正常化
     function showInitial(){
@@ -134,7 +140,6 @@ Window {
             errorPopup.open();
         }
         function onFileMiss(file){           //文件缺失
-            console.log(file);
             delDialog.fileMiss=true;
             delDialog.delIdx=file.index;
             delDialog.mediaType=file.isAudio?'音频':'视频';
@@ -150,10 +155,13 @@ Window {
         function onPlayMedia(){              //准备播放视频
             console.log('begin play');
         }
-        function onUpdate(yuv){
+        function onUpdate(yuv){              //渲染组件进行更新
             console.log('update');
         }
     }
+
+    //背景设置对话框
+    ConfigDialog{id:configDialog}
 
     //文件缺失提示框
     DelDialog{id:delDialog}
@@ -167,10 +175,17 @@ Window {
     //窗口背景
     Image {
         id: bg
-        source: "qrc:/images/bg.jpg"
+        source: bgPath
         width: windowWidth
         height: windowHeight
         smooth: true
+    }
+
+    //毛玻璃效果
+    FastBlur {
+        anchors.fill: bg
+        source: bg
+        radius: blur
     }
 
     //左侧导航栏
@@ -285,7 +300,10 @@ Window {
     //音频播放进度条
     Slider {
         id: audioSlider
-        value: 0.2
+        from: 0
+        value: controller?.time ?? 0
+        to: dataMgr?.curAudio.duration ?? 100
+        stepSize: 1
         y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay
@@ -331,6 +349,11 @@ Window {
             color: audioSlider.pressed ? "#f0f0f0" : "#f6f6f6"
             border.color: "#bdbebf"
             visible: false
+        }
+        onPressedChanged: {//监听最后释放位置
+            if(!pressed){
+                controller.setTime(value);
+            }
         }
     }
 

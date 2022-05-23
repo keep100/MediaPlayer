@@ -13,5 +13,6 @@
         <file>components/InfoPopup.qml</file>
         <file>components/DelDialog.qml</file>
         <file>components/ErrorPopup.qml</file>
+        <file>components/ConfigDialog.qml</file>
     </qresource>
 </RCC>

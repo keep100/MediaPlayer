@@ -13,7 +13,7 @@ Popup{
 
     background: Rectangle {
         implicitWidth: 270
-        color: setColor(46, 47, 48)
+        color: setColor(29, 34, 36)
         border.color: "#444"
         border.width: 2
     }

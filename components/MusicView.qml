@@ -10,6 +10,8 @@ Rectangle{
     y:uploadBtn.y+uploadBtn.height+20
     color: "transparent"
     visible: curIdx===1
+    property bool isSearched: false                //是否在搜索状态
+    property variant searchList: []                //搜索结果列表
 
     function setIdx(idx){
         musicList.currentIndex=idx;
@@ -185,12 +187,12 @@ Rectangle{
                 id:musicList
                 width: parent.width
                 height:titleBar.isMaximized||isFullSreen?windowHeight*0.48:windowHeight*0.35
-                model:dataMgr?.audioList
-                               clip: true
+                model: isSearched?searchList:dataMgr?.audioList
+                clip: true
                 delegate:musicDelegate
-                visible: dataMgr?.audioList.length>0
-                                  //音频数据列表改变
-                                  onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr?.curAudio.index ?? 0 :setIdx(-1)
+                visible: model?.length>0
+                //音频数据列表改变
+                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr?.curAudio.index ?? 0 :setIdx(-1)
             }
         }
     }
@@ -204,13 +206,13 @@ Rectangle{
     //无音频的空状态展示区
     Column{
         anchors.centerIn: parent
-        visible: dataMgr?.audioList.length===0
+        visible: musicList.model?.length===0
 
-                          Image {
-                              width: 100
-                              height: 100
-                              source: "qrc:/images/无音乐.png"
-                          }
+        Image {
+            width: 100
+            height: 100
+            source: "qrc:/images/无音乐.png"
+        }
         Text {
             topPadding: 10
             text: qsTr("暂无音频")
@@ -220,4 +222,3 @@ Rectangle{
         }
     }
 }
-

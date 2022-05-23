@@ -10,10 +10,19 @@ Item{
     y:windowHeight
     height: windowHeight-footer.height
 
+    //获取音频专辑封面
+    function getCover(path){
+        return path? "file:///"+path : "qrc:/images/唱片.png"
+    }
+    //获取背景大图
+    function getBg(path){
+        return path? "file:///"+path : "qrc:/images/coverBg.jpg"
+    }
+
     //音乐专辑封面大图
     Image {
         id:coverImg
-        source: "file:///D:/Qtcode/build-MediaPlayer-Desktop_Qt_6_3_0_MSVC2019_64bit-Debug/Data/thumpnail/audio/0ac357471139b5f32b496d4d7e2b72b2.jpg"
+        source: getBg(dataMgr?.curAudio.imgPath)
         width: parent.width
         height: parent.height
         smooth: true
@@ -31,7 +40,7 @@ Item{
         anchors.centerIn: parent
         //音乐略缩图
         Image {
-            source: "file:///D:/Qtcode/build-MediaPlayer-Desktop_Qt_6_3_0_MSVC2019_64bit-Debug/Data/thumpnail/audio/0ac357471139b5f32b496d4d7e2b72b2.jpg"
+            source: getCover(dataMgr?.curAudio.imgPath)
             width: 300
             height: 300
             smooth: true
@@ -41,23 +50,29 @@ Item{
             leftPadding: 100
             anchors.verticalCenter: parent.verticalCenter
             Text {//歌名
-                text: qsTr("记忆停留")
+                text: dataMgr?.curAudio.fileName ?? "歌名"
                 font.pixelSize: 22
                 font.letterSpacing: 1
                 color: "white"
                 bottomPadding: 20
             }
             Text {//艺人
-                text: qsTr("艺人:  蓝心羽")
+                text: "艺人: "+dataMgr?.curAudio.artist ?? "艺人"
                 font.pixelSize: 13
                 font.letterSpacing: 1
+                width: 200
+                clip: true
+                elide: Text.ElideRight
                 color: "white"
                 bottomPadding: 10
             }
             Text {//专辑
-                text: qsTr("专辑:  记忆停留")
+                text: "专辑: "+dataMgr?.curAudio.album ?? "专辑"
                 font.pixelSize: 13
                 font.letterSpacing: 1
+                width: 200
+                clip: true
+                elide: Text.ElideRight
                 color: "white"
             }
         }
