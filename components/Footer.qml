@@ -198,6 +198,7 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
                     controller.exit();
                     if(isAudioPlay){
@@ -232,8 +233,9 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
-                    controller.playPre(mediaType==='音频');
+                    controller.playPre(mediaType==='audio');
                     curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
                 }
             }
@@ -251,6 +253,7 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
                     if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
@@ -270,8 +273,9 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
+                enabled: isAudioPlay||isVideoPlay
                 onClicked: {
-                    controller.playNext(mediaType==='音频');
+                    controller.playNext(mediaType==='audio');
                     curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
                 }
             }
