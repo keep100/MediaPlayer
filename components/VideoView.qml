@@ -10,6 +10,8 @@ Rectangle {
     height: parent.height-y
     color: "transparent"
     visible: curIdx===0
+    property bool isSearched: false                //是否在搜索状态
+    property variant searchList: []                //搜索结果列表
 
     Component {//视频列表子项
         id: videoDelegate
@@ -129,15 +131,15 @@ Rectangle {
         cellWidth:  titleBar.isMaximized||isFullSreen?240:180
         cellHeight: cellWidth*0.7
         clip: true
-        visible: dataMgr?.videoList.length>0
+        visible: model?.length>0
 
-        model:dataMgr?.videoList
+        model: isSearched?searchList:dataMgr?.videoList
         delegate: videoDelegate
     }
 
     Column{
         anchors.centerIn: parent
-        visible: dataMgr?.videoList.length===0
+        visible: grid.model?.length===0
 
         Image {
             width: 110
