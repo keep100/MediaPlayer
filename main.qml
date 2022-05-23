@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 import Qt.labs.platform 1.1
@@ -26,7 +26,7 @@ Window {
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度
     property int blur: 0                  //播放器背景模糊度
-    property string bgPath: ""            //背景图片路径
+    property string bgPath: "qrc:/images/bg.jpg"            //背景图片路径
 
     //设置color
     function setColor(r,g,b,a=1){
