@@ -13,7 +13,7 @@ Popup {
 
     background: Rectangle{
         anchors.fill: parent
-        color:setColor(64, 65, 66)
+        color:setColor(29, 34, 36)
         radius: 10
     }
     contentItem: Text {

@@ -40,5 +40,6 @@
         <file>images/单曲模式.png</file>
         <file>images/coverBg.jpg</file>
         <file>images/唱片.png</file>
+        <file>images/设置.png</file>
     </qresource>
 </RCC>
