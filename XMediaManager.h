@@ -8,23 +8,27 @@
 #include "XDecode.h"
 #include "IVideoCall.h"
 #include <mutex>
+#include "until/yuvdata.h"
 
 class XDemux;
 struct AVPacket;
 struct AVFrame;
 struct AVCodecParameters;
 struct BriefInfo{
-    QString mediaType = "";     //媒体类型 "video"/"audio"/""
-    int totalMs = 0;            //总时长（毫秒）
-    //视频信息
+    QString mediaType = "";     //媒体类型 （"video", "audio", ""）
+    QString codecId = "";       //编码格式
+    int totalMs = 0;            //总时长（ms）
+    int bitRate = 0;            //比特率（bps）
+    int channels = 0;           //声道数
+    QImage img;                 //歌曲的封面或视频的缩略图
+    //视频特有信息
     int width = 0;
     int height = 0;
-    //歌曲信息
+    //歌曲特有信息
     QString album = "";         //唱片集
     QString artist = "";        //参与创作的艺人
     QString title = "";         //标题
-    //歌曲的封面或视频的缩略图
-    QImage img;
+
 };
 
 
@@ -50,6 +54,8 @@ public:
     States getCurState();
 
     void bind(QObject*);
+signals:
+   void transmit_yuv(std::shared_ptr<YUVData> t, int64_t time);
 
 protected:
     States  _curState;      //现态
