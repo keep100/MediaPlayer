@@ -5,7 +5,8 @@
 #include "data.h"
 #include <QMap>
 #include "randomlist.h"
-#include "PlayMode.h"
+#include "playMode.h"
+
 
 
 class DataManager : public QObject
@@ -15,18 +16,21 @@ class DataManager : public QObject
     Q_PROPERTY(QVariantList audioList READ audioList NOTIFY audioListChanged)
     Q_PROPERTY(Data curVideo READ curVideo NOTIFY curVideoChanged)
     Q_PROPERTY(Data curAudio READ curAudio NOTIFY curAudioChanged)
+    Q_PROPERTY(UserInfo userInfo READ userInfo NOTIFY userInfoChanged)
 public:
     explicit DataManager(QObject *parent = nullptr);
     QVariantList videoList();
     QVariantList audioList();
     Data curVideo();
     Data curAudio();
+    UserInfo userInfo(){return _userInfo;}
 
 signals:
     void videoListChanged();
     void audioListChanged();
     void curVideoChanged();
     void curAudioChanged();
+    void userInfoChanged();
 
 public:
     State importData(const QString &, bool isAudio); //导入视频
@@ -42,6 +46,7 @@ public:
     void writeData();                               //将数据写回文件中
     ~DataManager();                                 //析构函数
     void reset();                                   //重置，当退出播放时调用
+    void setUserInfo(QString,float);                //设置用户数据
 
 private:
     bool _isAudio = false;
@@ -49,6 +54,7 @@ private:
     RandomList _videoOrder, _audioOrder;            //播放顺序（随机播放）
     PlayMode::mode mode = PlayMode::Order;
     int curIndex = -1;                               //当前对应着数据列表中的哪一项
+    UserInfo _userInfo;
     QDir dir;
 };
 

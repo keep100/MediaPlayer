@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include "PlayMode.h"
+#include "playMode.h"
 #include "DataManager/datamanager.h"
 #include <QQmlApplicationEngine>
 #include "until/yuvdata.h"
@@ -30,6 +30,7 @@ public:
     Q_INVOKABLE void playPre(bool isAudio);                                 //上一个
     Q_INVOKABLE void exit();                                                //退出播放
     Q_INVOKABLE void setTime(int t);             //设置播放时间（当前端拖动完进度条之后就调用）
+    Q_INVOKABLE void setUserInfo(QString,float);                            //设置用户数据
 
 signals:
     //不需要主动连接（控制器--》前端）

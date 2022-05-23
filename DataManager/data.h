@@ -13,6 +13,43 @@ enum State{
     Error
 };
 
+class UserInfo{
+    Q_GADGET
+    Q_PROPERTY(QString bckPath READ bckPath)            //背景图片路径
+    Q_PROPERTY(float blurRatio READ blurRatio)          //模糊度
+public:
+
+    inline QString bckPath(){return _bckPath;}
+    inline float blurRatio(){return _blurRatio;}
+
+    void setBckPath(QString path){
+        _bckPath = path;
+    }
+
+    void setBlurRatio(float r){
+        _blurRatio = r;
+    }
+
+    UserInfo(){
+
+    }
+    void init(const QJsonObject& json){
+        _bckPath = json["bckPath"].toString();
+        _blurRatio = json["blurRatio"].toDouble();
+    }
+    QJsonObject toJson(){
+        QJsonObject json;
+        json.insert("bckPath",_bckPath);
+        json.insert("blurRatio",_blurRatio);
+        return json;
+    }
+
+private:
+    QString _bckPath = "";
+    float _blurRatio = 0.5;
+
+};
+
 class Data
 {
     Q_GADGET
@@ -25,6 +62,11 @@ class Data
     Q_PROPERTY(int index READ index )               //索引
     Q_PROPERTY(bool isAudio READ isAudio )          //是否是音频
     Q_PROPERTY(QString imgPath READ imgPath)        //图片地址（可以通过图片地址是否为空来判断有无图片）
+    Q_PROPERTY(QString codecId READ codecId)        //编码格式
+    Q_PROPERTY(int bitRate READ bitRate)            //比特率
+    Q_PROPERTY(int channels READ channels)          //声道数
+    Q_PROPERTY(int width READ width)                //视频的宽
+    Q_PROPERTY(int height READ height)              //视频的高
 
 public:
     inline QString fileName(){return _fileName;}
@@ -36,6 +78,11 @@ public:
     inline QString imgPath(){return _imgPath;}
     inline QString album(){return _album;}
     inline QString artist(){return _artist;}
+    inline QString codecId(){return _codecId;}
+    inline int width(){return _width;}
+    inline int height(){return _height;}
+    inline int channels(){return _channels;}
+    inline int bitRate(){return _bitRate;}
 
     State verify();                      //验证文件是否出错：1）判断文件是否存在 2）计算md5码
     void setLastTime(qint64 time);      //设置文件上次的播放时间
@@ -59,6 +106,11 @@ private:
     QString _artist = "";
     bool _isAudio = false;
     int _index = 0;
+    QString _codecId;
+    int _width = 0;
+    int _height = 0;
+    int _bitRate = 0;
+    int _channels = 0;
 
 };
 

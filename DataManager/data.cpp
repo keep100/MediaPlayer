@@ -45,6 +45,11 @@ Data::Data(const BriefInfo& info,const QFileInfo& f){
     _lastTime = 0;
     _album = info.album;
     _artist = info.artist;
+    _bitRate = info.bitRate;
+    _channels = info.channels;
+    _codecId = info.codecId;
+    _width = info.width;
+    _height = info.height;
     dir.mkpath(info.mediaType);
     if(!info.img.isNull()){
         QCryptographicHash hash(QCryptographicHash::Md5);
@@ -70,6 +75,11 @@ QJsonObject Data::toJson(){
     json.insert("imgPath",_imgPath);
     json.insert("album",_album);
     json.insert("artist",_artist);
+    json.insert("codecId",_codecId);
+    json.insert("bitRate",_bitRate);
+    json.insert("channels",_channels);
+    json.insert("width",_width);
+    json.insert("height",_height);
     return json;
 }
 
@@ -84,6 +94,11 @@ Data::Data(const QJsonObject& json)
     _imgPath = json["imgPath"].toString();
     _album = json["album"].toString();
     _artist = json["artist"].toString();
+    _channels = json["channels"].toInt();
+    _codecId = json["codecId"].toString();
+    _bitRate = json["bitRate"].toInt();
+    _width = json["width"].toInt();
+    _height = json["height"].toInt();
 }
 
 

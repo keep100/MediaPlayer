@@ -95,4 +95,8 @@ void Controller::onUpdate(std::shared_ptr<YUVData> data,int time){
     emit timeChanged();
 }
 
+void Controller::setUserInfo(QString path,float ratio){
+    manager.setUserInfo(path,ratio);
+}
+
 

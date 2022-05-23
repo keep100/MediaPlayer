@@ -103,6 +103,23 @@ void DataManager::readData(){
         }
     }
 
+    //导入用户数据
+    info.setFile(dir.filePath("userInfo.json"));
+    if(info.isFile()){
+        QFile file(info.filePath());
+        if(file.open(QFile::ReadOnly)){
+            QJsonParseError parseJsonErr;
+            QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseJsonErr);
+            file.close();
+            if (!(parseJsonErr.error == QJsonParseError::NoError)) {
+                //文件出错则进行删除
+                QFile::remove(info.filePath());
+            }
+            else{
+                _userInfo.init(document.object());
+            }
+        }
+    }
 }
 
 void DataManager::writeData(){
@@ -138,6 +155,14 @@ void DataManager::writeData(){
         videoFile.close();
     }
 
+    //写入用户数据
+    QFile userFile(dir.filePath("userInfo.json"));
+    if(videoFile.open(QFile::WriteOnly)){
+        QJsonObject json = _userInfo.toJson();
+        QJsonDocument doc(json);
+        userFile.write(doc.toJson());
+        userFile.close();
+    }
 }
 
 DataManager::~DataManager(){
@@ -250,6 +275,7 @@ int DataManager::next(){
             return 0;
         }
         return curIndex+1;
+
     }
     else{
         return order.next();
@@ -296,6 +322,12 @@ void DataManager::reset(){
     _videoOrder.reset();
     emit curAudioChanged();
     emit curVideoChanged();
+}
+
+void DataManager::setUserInfo(QString path,float ratio){
+    _userInfo.setBckPath(path);
+    _userInfo.setBlurRatio(ratio);
+    emit userInfoChanged();
 }
 
 
