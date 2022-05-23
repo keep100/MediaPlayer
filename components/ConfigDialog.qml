@@ -9,11 +9,20 @@ Popup{
     dim: true
     anchors.centerIn: parent
     closePolicy: Popup.NoAutoClose
+    property int tempBlur: 0                 //存储上次确定的模糊度
 
     //重置背景图与模糊度
     function reset(){
         pathInput.text=mainWindow.bgPath==="qrc:/images/bg.jpg"?"":mainWindow.bgPath;
-        blurSlider.value=mainWindow.blur;
+        mainWindow.blur=tempBlur;
+
+    }
+
+    //窗口弹出记录模糊度
+    onVisibleChanged: {
+        if(visible){
+            tempBlur=mainWindow.blur;
+        }
     }
 
     background: Rectangle {
@@ -142,7 +151,7 @@ Popup{
             Slider {
                 id: blurSlider
                 from: 0
-                value: 0
+                value: blur
                 to:60
                 stepSize: 1
                 pressed: false
@@ -172,6 +181,7 @@ Popup{
                     implicitHeight: 15
                     color: "white"
                 }
+                onMoved: blur=value
             }
         }
         //按钮操作区
@@ -206,7 +216,7 @@ Popup{
                     onExited: parent.isHover=false
                     onClicked: {
                         configDialog.close();
-                        mainWindow.bgPath=pathInput.text;
+                        mainWindow.bgPath=pathInput.text?pathInput.text:mainWindow.bgPath;
                         mainWindow.blur=blurSlider.value;
                     }
                 }

@@ -232,7 +232,10 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
-                onClicked: controller.playPre(mediaType==='音频')
+                onClicked: {
+                    controller.playPre(mediaType==='音频');
+                    curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                }
             }
         }
         
@@ -267,7 +270,10 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
             MouseArea{
                 anchors.fill: parent
-                onClicked: controller.playNext(mediaType==='音频')
+                onClicked: {
+                    controller.playNext(mediaType==='音频');
+                    curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                }
             }
         }
         

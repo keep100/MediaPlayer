@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
+import MyItem 1.0
 
 Window {
     id:videoPage
@@ -36,6 +37,9 @@ Window {
     }
 
     //视频流展示区域
+    MyItem{
+
+    }
 //    Image {
 //        id:img
 //        anchors.fill: parent
@@ -278,7 +282,8 @@ Window {
             id: videoSlider
             from: 0
             value: controller?.time ?? 0
-            to:100
+            to: dataMgr?.curVideo.duration ?? 100
+            stepSize: 1
             y:footer.y-videoSlider.availableHeight / 2
             z:1
             visible: footer.y!==windowHeight
@@ -323,6 +328,11 @@ Window {
                 color: videoSlider.pressed ? "#f0f0f0" : "#f6f6f6"
                 border.color: "#bdbebf"
                 visible: false
+            }
+            onPressedChanged: {
+                if(!pressed){
+                    controller.setTime(value);
+                }
             }
         }
 

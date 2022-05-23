@@ -66,7 +66,7 @@ Rectangle{
         MouseArea{
             anchors.fill: parent
 
-            onClicked:{
+            onClicked:{//清空关键词，展示列表全部数据
                 searchInput.clear();
                 searchInput.focus=false;
                 curIdx?musicView.isSearched=false:videoView.isSearched=false;

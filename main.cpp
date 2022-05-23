@@ -65,13 +65,5 @@ int main(int argc, char *argv[])
 //    });
 //    timer->start(1000 / 24.0);
 
-
-//    QImage image;
-//    bool flag = image.load("C:/Users/16321/Pictures/Saved Pictures/15.jpg");
-//    qDebug() << flag;
-//    myImage->sendimage(image);
-//    thread->Open("C:/Users/16321/Documents/Tencent Files/1632195270/FileRecv/Packet Tracer的基本使用.mp4",
-//                 nullptr);
-
     return app.exec();
 }

@@ -140,7 +140,6 @@ Window {
             errorPopup.open();
         }
         function onFileMiss(file){           //文件缺失
-            console.log(file);
             delDialog.fileMiss=true;
             delDialog.delIdx=file.index;
             delDialog.mediaType=file.isAudio?'音频':'视频';
@@ -156,7 +155,7 @@ Window {
         function onPlayMedia(){              //准备播放视频
             console.log('begin play');
         }
-        function onUpdate(yuv){
+        function onUpdate(yuv){              //渲染组件进行更新
             console.log('update');
         }
     }
@@ -303,7 +302,8 @@ Window {
         id: audioSlider
         from: 0
         value: controller?.time ?? 0
-        to:100
+        to: dataMgr?.curAudio.duration ?? 100
+        stepSize: 1
         y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay
@@ -349,6 +349,11 @@ Window {
             color: audioSlider.pressed ? "#f0f0f0" : "#f6f6f6"
             border.color: "#bdbebf"
             visible: false
+        }
+        onPressedChanged: {//监听最后释放位置
+            if(!pressed){
+                controller.setTime(value);
+            }
         }
     }
 
