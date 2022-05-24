@@ -248,7 +248,7 @@ State DataManager::importData(const QString &path, bool isAudio)
         QList<Data> &list = isAudio ? _audioList : _videoList;
         RandomList &order = isAudio ? _audioOrder : _videoOrder;
         //对文件进行解析
-        auto info = XMediaManager::getBriefInfo(path.toLocal8Bit());
+        auto info = XMediaManager::getBriefInfo(path);
         if(info.mediaType != type)
         {
             return State::Error;

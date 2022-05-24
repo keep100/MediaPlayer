@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include "playMode.h"
+#include "PlayMode.h"
 #include "DataManager/datamanager.h"
 #include <QQmlApplicationEngine>
 #include "util/yuvdata.h"
@@ -49,7 +49,7 @@ signals:
     void voiceChanged(int);                 //音量改变
     void exitPlay();                        //退出播放
     void pause();                           //暂停
-    void skipTime(int time);                //时间跳转（前端拖动进度条导致）
+    void skipTime(double time);                //时间跳转（前端拖动进度条导致）
 
     //前后端都连接（通知前端开始准备播放，后端开始解码）
     void playMedia(const QString &path);    //播放

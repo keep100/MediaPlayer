@@ -27,17 +27,20 @@ void XMediaManager::bind(QObject *obj) {
         QObject::connect(ctrl, &Controller::exitPlay, this, &XMediaManager::end);
         QObject::connect(ctrl, &Controller::voiceChanged, this,
                          &XMediaManager::setVolume);
+        QObject::connect(ctrl, &Controller::skipTime, this,&XMediaManager::seek);
         QObject::connect(demuxThread->getSyn(), &SynModule::transmitYUV, ctrl, &Controller::onUpdate);
     }
 }
 
-BriefInfo XMediaManager::getBriefInfo(const char *url) {
+BriefInfo XMediaManager::getBriefInfo(const QString& url) {
     BriefInfo briefInfo;
-    if (url == 0 || url[0] == '\0')
+    if (url.isNull()||url.isEmpty())
         return briefInfo;
+    qDebug()<<url;
     XDemux *demux = new XDemux();
     XDecode *decode = new XDecode();
-    demux->Open(url);
+    auto temp = url.toLocal8Bit();
+    demux->Open(temp.data());
 
     briefInfo.totalMs = demux->totalMs;
     briefInfo.channels = demux->channels;
@@ -51,12 +54,12 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         briefInfo.mediaType = "video";
         briefInfo.codecId = avcodec_get_name(demux->CopyVPara()->codec_id);
         briefInfo.vBitRate = demux->CopyVPara()->bit_rate;
-
         decode->Open(demux->CopyVPara());
         AVFrame *pFrame = av_frame_alloc();
         demux->Seek(0.5);
         //先recv，后send
-        for(int i=0;i<10;i++) {
+        for(int i=0;;i++)
+        {
             pFrame = decode->Recv();
             if (pFrame && pFrame->key_frame) { // receive
                 QImage temp = getQImageFromFrame(pFrame, demux->CopyVPara());
@@ -71,6 +74,7 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
                         qDebug() << "有东西的图";
                         break;
                     }
+                    if(i>=10)break;
                 }
             }
             AVPacket *pkt = demux->ReadVideo(); // send
@@ -84,7 +88,7 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         briefInfo.codecId = avcodec_get_name(demux->CopyAPara()->codec_id);
 
         AVFormatContext *m_AVFormatContext = NULL;
-        int result = avformat_open_input(&m_AVFormatContext, url, nullptr, nullptr);
+        int result = avformat_open_input(&m_AVFormatContext, url.toLocal8Bit(), nullptr, nullptr);
         if (result != 0 || m_AVFormatContext == nullptr) {
 //            qDebug() << "fffff";
             return briefInfo;
@@ -125,8 +129,10 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
     return briefInfo;
 }
 QImage XMediaManager::getQImageFromFrame(const AVFrame *frame, AVCodecParameters *para) {
+
     QImage output(frame->width, frame->height,
                   QImage::Format_RGB32); //构造一个QImage用作输出
+    qDebug()<<45;
     int outputLineSize[4]; //构造AVFrame到QImage所需要的数据
     av_image_fill_linesizes(outputLineSize, AV_PIX_FMT_RGB32, para->width);
     uint8_t *outputDst[] = {output.bits()};
@@ -134,7 +140,7 @@ QImage XMediaManager::getQImageFromFrame(const AVFrame *frame, AVCodecParameters
     SwsContext *imgConvertContext = sws_getContext(
                 para->width, para->height, (AVPixelFormat)para->format, para->width,
                 para->height, AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
-
+qDebug()<<"briefInfo.vBitRate"<<455;
     //把解码得到的损坏的像素数据剔除
     sws_scale(imgConvertContext, frame->data, frame->linesize, 0, para->height, outputDst, outputLineSize);
     sws_freeContext(imgConvertContext);
@@ -227,6 +233,7 @@ void XMediaManager::seek(double pos) {
             qDebug() << "error at XMediaManager::seek()1";
             return;
         }
+
         demuxThread->Seek(pos);
 
     } else {
