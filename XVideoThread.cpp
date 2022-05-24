@@ -6,35 +6,26 @@
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 }
-
+#include "SynModule.h"
 #include "XDecode.h"
 #include "XVideoThread.h"
 #include <iostream>
 //打开，不管成功与否都清理
 bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width,
-                        int height) {
+                        int height, SynModule *syn) {
     if (!para) {
         return false;
     }
     Clear();
     vmux.lock();
     synpts = 0;
-    //初始化显示窗口
-    //    this->call = call;
-    //    if (call)
-    //    {
-    //        call->Init(width, height);
-    //    }
     codecParam = para;
     vmux.unlock();
     int re = true;
-    yuvQueue.init();
     if (!decode->Open(para)) {
-        std::cout << "video XDecode open failed!" << std::endl;
         re = false;
     }
-
-    std::cout << "XVideoThread::Open :" << re << std::endl;
+    this->syn = syn;
     return re;
 }
 void XVideoThread::SetPause(bool isPause) {
@@ -42,7 +33,9 @@ void XVideoThread::SetPause(bool isPause) {
     this->isPause = isPause;
     vmux.unlock();
 }
+
 void XVideoThread::run() {
+
     while (!isExit) {
         vmux.lock();
         if (this->isPause) {
@@ -50,11 +43,9 @@ void XVideoThread::run() {
             msleep(5);
             continue;
         }
-        std::cout << "Video...\n";
         //音视频同步
         if (synpts > 0 && synpts < decode->pts) {
             vmux.unlock();
-            std::cout << "syn\n";
             msleep(1);
             continue;
         }
@@ -65,17 +56,19 @@ void XVideoThread::run() {
             msleep(1);
             continue;
         }
+
         //一次send 多次recv
         while (!isExit) {
             AVFrame *frame = decode->Recv();
             if (!frame) {
                 break;
             }
-            // 显示视频
-            std::shared_ptr<YUVData> yuvFrame = convertToYUV420P(frame);
-            yuvQueue.enqueue(yuvFrame);
-            //            if (call)
-            //                call->Repaint(frame);
+            std::shared_ptr<YUVData> t = convertToYUV420P(frame);
+            if ((t->pts = frame->pts) == AV_NOPTS_VALUE)
+                t->pts = 0;
+            // 缓冲区满了则睡眠等待
+            while (!syn->pushYuv(t))
+                msleep(1);
             //            showImage->sendimage(frameToImage(frame));
             av_frame_free(&frame);
             msleep(1);
@@ -138,10 +131,6 @@ std::shared_ptr<YUVData> XVideoThread::convertToYUV420P(AVFrame *videoFrame) {
 
     av_freep(dst_data);
     return yuvVideo;
-}
-
-std::shared_ptr<YUVData> XVideoThread::getYUVData() {
-    return yuvQueue.tryDequeue();
 }
 
 bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {

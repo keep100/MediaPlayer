@@ -1,4 +1,4 @@
-
+﻿
 #include "audioPlay2.h"
 #include <QAudioDevice>
 #include <QAudioSink>
@@ -10,9 +10,8 @@
 
 
 
-audioPlay2::audioPlay2(): m_devices(new QMediaDevices(this))
+audioPlay2::audioPlay2()
 {
-    qDebug()<<"audioPlay::audioPlay()";
 
 }
 
@@ -21,20 +20,19 @@ audioPlay2::~audioPlay2()
 
 }
 
-bool audioPlay2::Open(){
-    const QAudioDevice &deviceInfo = m_devices->defaultAudioOutput();
+bool audioPlay2::Open(const QAudioDevice &deviceInfo){
+
     format = deviceInfo.preferredFormat();
+    if(!format.isValid())return false;
     m_audioOutput.reset(new QAudioSink(deviceInfo, format));
     qreal initialVolume = QAudio::convertVolume(m_audioOutput->volume(),
                                                 QAudio::LinearVolumeScale,
                                                 QAudio::LogarithmicVolumeScale);
-    qDebug()<<"format: "<<format;
-    qDebug()<<"initialVolume: "<<initialVolume;
-//    m_audioOutput->stop();
-//    m_audioOutput->resume();
+//    qDebug()<<"format: "<<format;
+//    qDebug()<<"initialVolume: "<<initialVolume;
     io = m_audioOutput->start();
-    if(io)return true;
-    else return false;
+    if(!io)return false;
+    return true;
 }
 
 void audioPlay2::Close(){
@@ -82,7 +80,7 @@ long long audioPlay2::GetNoPlayMs(){
 bool audioPlay2::Write(char* data, int datasize){
     if(!data||datasize<=0)return false;
     mux.lock();
-    if(!m_audioOutput||!io){
+    if(!m_audioOutput || !io){
         mux.unlock();
         return false;
     }

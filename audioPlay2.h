@@ -17,16 +17,15 @@
 #include <QMediaDevices>
 #include <mutex>
 
-class audioPlay2 :QObject
+class audioPlay2
 {
-    Q_OBJECT
 public:
     QScopedPointer<QAudioSink> m_audioOutput;
 
     audioPlay2();
     ~audioPlay2();
 
-    bool Open();
+    bool Open(const QAudioDevice &deviceInfo);
     void Close();
     void Clear();
     void SetPause(bool isPause);
@@ -37,7 +36,6 @@ public:
     QAudioFormat GetFormat();
 private:
     void volumeChanged(double);
-    QMediaDevices *m_devices = nullptr;
     QIODevice *io = nullptr;
     QAudioFormat format;
     std::mutex mux;

@@ -6,7 +6,7 @@
 #include "playMode.h"
 #include "DataManager/datamanager.h"
 #include <QQmlApplicationEngine>
-#include "until/yuvdata.h"
+#include "util/yuvdata.h"
 
 
 //提供方法给qml调用，并根据情况发出对应的信号

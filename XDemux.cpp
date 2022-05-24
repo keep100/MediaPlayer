@@ -1,4 +1,4 @@
-#include "XDemux.h"
+﻿#include "XDemux.h"
 #include <iostream>
 using namespace std;
 extern "C"
@@ -140,12 +140,6 @@ bool XDemux::Open(const char *url)
     totalMs = ic->duration / (AV_TIME_BASE / 1000);
     cout << "total " << totalMs << endl;
 
-
-    //获取视频详细信息
-    //av_dump_format(ic, 0, url, 0);
-
-
-
     //获取音视频流信息
     //方法二
     videoStream = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
@@ -157,8 +151,6 @@ bool XDemux::Open(const char *url)
         width = ic->streams[videoStream]->codecpar->width;
         height = ic->streams[videoStream]->codecpar->height;
     }
-
-
     //获取音频采样率和通道数
     if (audioStream >= 0)
     {
@@ -166,7 +158,7 @@ bool XDemux::Open(const char *url)
         channels = ic->streams[audioStream]->codecpar->channels;
         sampleFormat = ic->streams[audioStream]->codecpar->format;
     }
-
+    //获取音频采样率和通道数
     mtx.unlock();
     return true;
 }
@@ -214,10 +206,8 @@ AVPacket *XDemux::Read()
         return 0;
     }
     //pts转换为毫秒
-    pkt->pts = pkt->pts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
-    pkt->dts = pkt->dts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
+//    pkt->pts = pkt->pts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
+//    pkt->dts = pkt->dts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
     mtx.unlock();
-    //cout << pkt->pts << " "<<flush;
     return pkt;
-
 }

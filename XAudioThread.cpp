@@ -1,27 +1,13 @@
 ﻿#include "XAudioThread.h"
 #include "XDecode.h"
-
+#include "util/pcmdata.h"
 #include <iostream>
 using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()
 {
     XDecodeThread::Close();
-//    if (res)
-//    {
-//        res->Close();
-//        amux.lock();
-//        delete res;
-//        res = NULL;
-//        amux.unlock();
-//    }
-//    if (ap)
-//    {
-//        ap->Close();
-//        amux.lock();
-//        ap = NULL;
-//        amux.unlock();
-//    }
+
     if(rsmp){
         rsmp->Close();
         delete rsmp;
@@ -35,17 +21,12 @@ void XAudioThread::Close()
 void XAudioThread::Clear()
 {
     XDecodeThread::Clear();
-//    mux.lock();
-//    if (ap)
-//    {
-//        ap->Clear();
-//    }
-//    mux.unlock();
+
     if(ap2){
         ap2->Clear();
     }
 }
-bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels)
+bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels, SynModule *syn)
 {
     if (!para)return false;
     Clear();
@@ -54,20 +35,11 @@ bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels)
     pts = 0;
     bool re = true;
 
-//    if (!res->Open(para, false))
-//    {
-//        qDebug() << "XResample open failed!" ;
-//        re = false;
-//    }
-//    ap->sampleRate = sampleRate;
-//    ap->channels = channels;
-//    if (!ap->Open())
-//    {
-//        re = false;
-//        qDebug() << "XAudioPlay open failed!" ;
-//    }
+    this->syn = syn;
 
-    if(!ap2->Open()){
+    QMediaDevices media(this);
+    QAudioDevice deviceInfo = media.defaultAudioOutput();
+    if(!ap2->Open(deviceInfo)){
         re = false;
         qDebug()<<"!ap2->Open()";
     }
@@ -121,6 +93,7 @@ void XAudioThread::run()
         }
 
         AVPacket *pkt = Pop();
+
         bool re = decode->Send(pkt);
         if (!re)
         {
@@ -130,53 +103,25 @@ void XAudioThread::run()
         }
 
         //一次send 多次recv
-        qDebug() << "Audio...\n";
         while (!isExit)
         {
             if (isPause)
             {
                 break;
             }
+            int64_t pts;
             AVFrame * frame = decode->Recv();
             if (!frame) break;
-
-//            //减去缓冲中未播放的时间
-//            qDebug() << "ap->GetNoPlayMs() " << ap->GetNoPlayMs() ;
-//            pts = decode->pts - ap->GetNoPlayMs();
-//            //重采样
-//            int size = res->Resample(frame, pcm);
-//            //播放音频
-//            while (!isExit)
-//            {
-
-//                if (size <= 0)break;
-//                //缓冲未播完，空间不够
-//                if (ap->GetFree() < size || isPause)
-//                {
-//                    msleep(1);
-//                    continue;
-//                }
-//                ap->Write(pcm, size);
-//                break;
-//            }
-
-            pts = decode->pts - ap2->GetNoPlayMs();
             int size = rsmp->Resample(frame, resample_data);
-            while(!isExit){
-                if(size<=0)break;
-                if(ap2->GetFree() < size || isPause){
-                    msleep(5);
-                    continue;
-                }
-                ap2->Write(resample_data, size);
-                break;
-            }
-
+            if ((pts = frame->pts) == AV_NOPTS_VALUE)
+                pts = 0;
+            std::shared_ptr<PCMData> t = std::make_shared<PCMData>(resample_data, size, pts);
+            while (!syn->pushPcm(t))
+                msleep(1);
         }
         amux.unlock();
     }
     qDebug() << "audioTread exit \n";
-//    delete[] pcm;
 }
 
 XAudioThread::XAudioThread()

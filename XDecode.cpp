@@ -1,4 +1,4 @@
-#include "XDecode.h"
+﻿#include "XDecode.h"
 extern "C"
 {
 #include<libavcodec/avcodec.h>
@@ -56,6 +56,7 @@ bool XDecode::Open(AVCodecParameters *para)
     //解码器打开
     //找到解码器
     const AVCodec *vcodec = avcodec_find_decoder(para->codec_id);
+
     if (!vcodec)
     {
         avcodec_parameters_free(&para);
@@ -89,6 +90,7 @@ bool XDecode::Open(AVCodecParameters *para)
     //cout << " avcodec_open2 success!" << endl;
     return true;
 }
+
 bool XDecode::Send(AVPacket *pkt)
 {
     //容错处理

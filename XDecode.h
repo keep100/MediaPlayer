@@ -1,4 +1,4 @@
-#ifndef XDECODE_H
+﻿#ifndef XDECODE_H
 #define XDECODE_H
 
 
@@ -27,6 +27,13 @@ public:
 
     virtual void Close();
     virtual void Clear();
+    AVRational getTimebase()const {
+        AVRational res;
+        if (codec)
+            return codec->time_base;
+        else
+            return res;
+    }
 
     XDecode();
     virtual ~XDecode();

@@ -4,6 +4,7 @@
 #include "XAudioThread.h"
 #include <iostream>
 #include <QDebug>
+#include <QMediaDevices>
 extern "C"
 {
 #include <libavformat/avformat.h>
@@ -91,11 +92,9 @@ void XDemuxThread::run()
         {
             if(at)at->Push(pkt);
             mux.unlock();
-            //msleep(1);
         }
         else //视频
         {
-
             if (vt)vt->Push(pkt);
             mux.unlock();
             usleep(1);
@@ -111,11 +110,14 @@ void XDemuxThread::Close()
     wait();
     if (vt) vt->Close();
     if (at) at->Close();
+    if (syn) syn->clear();
     mux.lock();
     delete vt;
     delete at;
+    delete syn;
     vt = NULL;
     at = NULL;
+    syn = NULL;
     mux.unlock();
 }
 void XDemuxThread::Clear()
@@ -124,6 +126,7 @@ void XDemuxThread::Clear()
     if (demux) demux->Clear();
     if (vt) vt->Clear();
     if (at) at->Clear();
+    if (syn) syn->clear();
     mux.unlock();
 }
 
@@ -133,11 +136,10 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         return false;
 
     mux.lock();
-
     if (!demux) demux = new XDemux();
     if (!vt) vt = new XVideoThread();
     if (!at) at = new XAudioThread();
-
+    if (!syn) syn = new SynModule();
     //打开解封装
     bool re = demux->Open(url);
     if (!re)
@@ -145,15 +147,16 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         std::cout << "demux->Open(url) failed!" << std::endl;
         return false;
     }
+
     //打开视频解码器和处理线程
-    if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height))
+    if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {
         re = false;
         std::cout << "vt->Open failed!" << std::endl;
     }
     //打开音频解码器和处理线程
     std::cout << "demux->sampleFormat : " << demux->sampleFormat << std::endl;
-    if (!at->Open(demux->CopyAPara(), demux->sampleRate, demux->channels))
+    if (!at->Open(demux->CopyAPara(), demux->sampleRate, demux->channels, syn))
     {
         re = false;
         std::cout << "at->Open failed!" << std::endl;
@@ -167,6 +170,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         isFirst = 1;
     }
     totalMs = demux->totalMs;
+    demux->getTimebase(syn);
     mux.unlock();
     std::cout << "XDemuxThread::Open " << re <<  std::endl;
     return re;
@@ -179,14 +183,12 @@ void XDemuxThread::Start()
     if (!demux) demux = new XDemux();
     if (!vt) vt = new XVideoThread();
     if (!at) at = new XAudioThread();
+    if (!syn) syn = new SynModule();
     QThread::start();
     if (vt)vt->start();
     if (at)at->start();
+    if (syn) syn->doTask();
     mux.unlock();
-}
-
-std::shared_ptr<YUVData> XDemuxThread::resendYUV() {
-    return vt->getYUVData();
 }
 
 XDemuxThread::XDemuxThread()

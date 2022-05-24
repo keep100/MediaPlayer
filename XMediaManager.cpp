@@ -1,4 +1,4 @@
-#include "XMediaManager.h"
+﻿#include "XMediaManager.h"
 #include "XAudioThread.h"
 #include "XDemux.h"
 #include "XDemuxThread.h"
@@ -27,11 +27,11 @@ void XMediaManager::bind(QObject *obj) {
         QObject::connect(ctrl, &Controller::exitPlay, this, &XMediaManager::end);
         QObject::connect(ctrl, &Controller::voiceChanged, this,
                          &XMediaManager::setVolume);
+        QObject::connect(demuxThread->getSyn(), &SynModule::transmitYUV, ctrl, &Controller::onUpdate);
     }
 }
 
 BriefInfo XMediaManager::getBriefInfo(const char *url) {
-
     BriefInfo briefInfo;
     if (url == 0 || url[0] == '\0')
         return briefInfo;
@@ -86,14 +86,14 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
         AVFormatContext *m_AVFormatContext = NULL;
         int result = avformat_open_input(&m_AVFormatContext, url, nullptr, nullptr);
         if (result != 0 || m_AVFormatContext == nullptr) {
-            //            qDebug() << "fffff";
+//            qDebug() << "fffff";
             return briefInfo;
         }
 
         // 查找流信息，把它存入AVFormatContext中
         result = avformat_find_stream_info(m_AVFormatContext, nullptr);
         if (result) {
-            //            qDebug() << "fffff1";
+//            qDebug() << "fffff1";
             return briefInfo;
         }
 
@@ -124,7 +124,6 @@ BriefInfo XMediaManager::getBriefInfo(const char *url) {
 
     return briefInfo;
 }
-
 QImage XMediaManager::getQImageFromFrame(const AVFrame *frame, AVCodecParameters *para) {
     QImage output(frame->width, frame->height,
                   QImage::Format_RGB32); //构造一个QImage用作输出

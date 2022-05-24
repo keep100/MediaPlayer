@@ -4,11 +4,14 @@
 
 #include <QThread>
 #include "IVideoCall.h"
+#include "SynModule.h"
 #include <mutex>
 struct YUVData;
+struct PCMData;
 class XDemux;
 class XVideoThread;
 class XAudioThread;
+class SynModule;
 class XDemuxThread:public QThread
 {
 public:
@@ -33,15 +36,18 @@ public:
     void SetVolume(double volume);
     bool isPause = false;
     bool isFirst = false;
-
-    std::shared_ptr<YUVData> resendYUV();
-
+    const SynModule* getSyn() {
+        if (syn == nullptr)
+            syn = new SynModule();
+        return syn;
+    }
 
 protected:
     std::mutex mux;
     XDemux *demux = 0;
     XVideoThread *vt = 0;
     XAudioThread *at = 0;
+    SynModule *syn=nullptr;
 };
 
 #endif // XDEMUXTHREAD_H

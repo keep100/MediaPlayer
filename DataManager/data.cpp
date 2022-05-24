@@ -45,7 +45,7 @@ Data::Data(const BriefInfo& info,const QFileInfo& f){
     _lastTime = 0;
     _album = info.album;
     _artist = info.artist;
-    _bitRate = info.bitRate;
+//    _bitRate = info.bitRate;
     _channels = info.channels;
     _codecId = info.codecId;
     _width = info.width;

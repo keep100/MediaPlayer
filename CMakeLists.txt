@@ -34,14 +34,15 @@ set(PROJECT_SOURCES
         XDemux.h XDemux.cpp
         XDecode.h XDecode.cpp
         XVideoWidget.h XVideoWidget.cpp
-        XResample.h XResample.cpp
-        XAudioPlay.h XAudioPlay.cpp
         XAudioThread.h XAudioThread.cpp
         XVideoThread.h XVideoThread.cpp
         IVideoCall.h
         XDemuxThread.h XDemuxThread.cpp
-        until/cursorposprovider.h
-        until/imageprovider.h until/imageprovider.cpp
+        util/cursorposprovider.h
+        util/imageprovider.h util/imageprovider.cpp
+        util/bufferqueue.h
+        util/yuvdata.h
+        util/pcmdata.h
         XDecodeThread.h XDecodeThread.cpp
         OverloadSlider.h OverloadSlider.cpp
         widget.h widget.cpp widget.ui
@@ -53,10 +54,10 @@ set(PROJECT_SOURCES
         DataManager/data.h DataManager/data.cpp
         DataManager/datamanager.h DataManager/datamanager.cpp
         DataManager/randomlist.h DataManager/randomlist.cpp
-        until/bufferqueue.h  until/semaphore.h
-        until/yuvdata.h stdafx.h
+        stdafx.h
         XAudioResample.h XAudioResample.cpp
         audioPlay2.h audioPlay2.cpp
+        SynModule.h SynModule.cpp
 )
 
 

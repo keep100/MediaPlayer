@@ -1,10 +1,11 @@
-#ifndef XDEMUX_H
+﻿#ifndef XDEMUX_H
 #define XDEMUX_H
 
 struct AVFormatContext;
 struct AVPacket;
 struct AVCodecParameters;
 #include <mutex>
+#include "SynModule.h"
 class XDemux
 {
 public:
@@ -29,6 +30,14 @@ public:
 
     virtual AVPacket *ReadVideo();
 
+    void getTimebase(SynModule *syn) {
+        if (ic != nullptr) {
+            if (videoStream != -1)
+                syn->setVTimeBase(ic->streams[videoStream]->time_base);
+            if (audioStream != -1)
+                syn->setATimeBase(ic->streams[audioStream]->time_base);
+        }
+    }
 
     //总时长 毫秒
     int totalMs = 0;
@@ -42,7 +51,6 @@ public:
 
 protected:
     std::mutex mtx;
-
     AVFormatContext *ic = NULL;
     int videoStream = -1;
     int audioStream = -1;

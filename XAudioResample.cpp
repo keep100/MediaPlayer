@@ -22,7 +22,6 @@ void XAudioResample::init_out_frame(AVFrame *&out_frame, int64_t dst_nb_samples)
     // 分配buffer
     av_frame_get_buffer(out_frame,0);
     av_frame_make_writable(out_frame);
-    qDebug()<<"XAudioResample::init_out_frame";
 }
 
 bool XAudioResample::Open(QAudioFormat fmt){
@@ -54,9 +53,11 @@ bool XAudioResample::Open(QAudioFormat fmt){
 }
 
 int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
-    qDebug()<<"XAudioResample::Resample()";
     if(swrContext==nullptr){
         qDebug()<<"swrContext==nullptr";
+        qDebug()<<"in_frame->sample_rate"<<in_frame->sample_rate;
+        qDebug()<<"in_frame->format"<<in_frame->format;
+        qDebug()<<"in_frame->channel_layout"<<in_frame->channel_layout;
         qDebug()<<"target_sample_rate"<<target_sample_rate;
         qDebug()<<"target_sample_format"<<target_sample_format;
         qDebug()<<"target_channel_layout"<<target_channel_layout;
@@ -70,7 +71,6 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
             return -1;
         }
     }
-    qDebug()<<"XAudioResample::Resample()1";
     // 进行音频重采样
     int src_nb_sample = in_frame->nb_samples;
     // 为了保持从采样后 dst_nb_samples / dest_sample = src_nb_sample / src_sample_rate
@@ -82,20 +82,17 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
     AVFrame *out_frame = nullptr;
     if(nullptr == out_frame){
         init_out_frame(out_frame, dst_nb_samples);
-        qDebug()<<"ddddd";
     }
-    qDebug()<<"XAudioResample::Resample()2";
     if (dst_nb_samples > max_dst_nb_samples) {
         // 需要重新分配buffer
-        qDebug() << "需要重新分配buffer" ;
+//        qDebug() << "需要重新分配buffer" ;
         init_out_frame(out_frame, dst_nb_samples);
         max_dst_nb_samples = dst_nb_samples;
     }
-    qDebug()<<"XAudioResample::Resample()3";
     // 重采样
     int ret = swr_convert(swrContext, out_frame->data, dst_nb_samples,
                           const_cast<const uint8_t **>(in_frame->data), in_frame->nb_samples);
-    qDebug()<<"XAudioResample::Resample() ret:"<<ret;
+//    qDebug()<<"XAudioResample::Resample() ret:"<<ret;
 
     if(ret <= 0){
         qDebug() << "resample failed" ;
@@ -104,7 +101,7 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
         // 每帧音频数据量的大小
         int data_size = av_get_bytes_per_sample(static_cast<AVSampleFormat>(out_frame->format));
         int out_size = ret*out_frame->channels*data_size;
-        qDebug() << "resample succeed:" << ret << "----dst_nb_samples:" << dst_nb_samples  << "---data_size:" << data_size ;
+//        qDebug() << "resample succeed:" << ret << "----dst_nb_samples:" << dst_nb_samples  << "---data_size:" << data_size ;
         // 交错模式保持写入
         // 注意不要用 i < out_frame->nb_samples，因为重采样出来的点数不一定就是out_frame->nb_samples
         for (int i = 0; i < ret; i++) {

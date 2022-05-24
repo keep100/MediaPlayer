@@ -1,4 +1,4 @@
-#ifndef XMEDIAMANAGER_H
+﻿#ifndef XMEDIAMANAGER_H
 #define XMEDIAMANAGER_H
 #include <QThread>
 #include <QImage>
@@ -8,7 +8,7 @@
 #include "XDecode.h"
 #include "IVideoCall.h"
 #include <mutex>
-#include "until/yuvdata.h"
+#include "util/yuvdata.h"
 
 class XDemux;
 struct AVPacket;
