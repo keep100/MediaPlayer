@@ -21,12 +21,10 @@ using namespace std;
 void XMediaManager::bind(QObject *obj) {
     Controller *ctrl = dynamic_cast<Controller *>(obj);
     if (ctrl != nullptr) {
-        QObject::connect(ctrl, &Controller::playMedia, this,
-                         &XMediaManager::playMedia);
-        QObject::connect(ctrl, &Controller::pause, this, &XMediaManager::pause);
+        QObject::connect(ctrl, &Controller::playMedia, this, &XMediaManager::playMedia);
+        QObject::connect(ctrl, &Controller::pause, this, &XMediaManager::toggle);
         QObject::connect(ctrl, &Controller::exitPlay, this, &XMediaManager::end);
-        QObject::connect(ctrl, &Controller::voiceChanged, this,
-                         &XMediaManager::setVolume);
+        QObject::connect(ctrl, &Controller::voiceChanged, this, &XMediaManager::setVolume);
         QObject::connect(ctrl, &Controller::skipTime, this,&XMediaManager::seek);
         QObject::connect(demuxThread->getSyn(), &SynModule::transmitYUV, ctrl, &Controller::onUpdate);
     }
@@ -186,33 +184,33 @@ void XMediaManager::play() {
             return;
         }
         demuxThread->Start();
-    } else if (_curState == PAUSED) {
-        _curState = PLAYING;
-        if (!demuxThread) {
-            _curState = END;
-            qDebug() << "error at XMediaManager::play()2";
-            return;
-        }
-        demuxThread->SetPause(false);
-    } else {
+    }  else {
         _curState = INITIAL;
-        qDebug() << "error at XMediaManager::play()3";
+        qDebug() << "error at XMediaManager::play()2";
         return;
     }
 }
 
-void XMediaManager::pause() {
+void XMediaManager::toggle() {
     if (_curState == PLAYING) {
         _curState = PAUSED;
         if (!demuxThread) {
             _curState = END;
-            qDebug() << "error at XMediaManager::pause()1";
+            qDebug() << "error at XMediaManager::toggle()1";
             return;
         }
         demuxThread->SetPause(true);
-    } else {
+    } else if (_curState == PAUSED) {
+        _curState = PLAYING;
+        if (!demuxThread) {
+            _curState = END;
+            qDebug() << "error at XMediaManager::toggle()2";
+            return;
+        }
+        demuxThread->SetPause(false);
+    }else {
         _curState = INITIAL;
-        qDebug() << "error at XMediaManager::pause()2";
+        qDebug() << "error at XMediaManager::toggle()3";
         return;
     }
 }
