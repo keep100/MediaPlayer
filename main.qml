@@ -122,7 +122,11 @@ Window {
     }
 
     //监听是否正在播放音视频
-    onIsPlayingChanged: controller.stop()
+    onIsPlayingChanged: {
+        if((isAudioPlay||isVideoPlay)&&!isPlaying){
+            controller.stop();
+        }
+    }
 
     //监听播放模式改变
     onPlayModeChanged: controller.mode=playMode
