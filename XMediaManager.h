@@ -47,7 +47,7 @@ public:
     void playMedia(QString url);
     bool open(const char *url);
     void play();
-    void pause();
+    void toggle();
     void setVolume(float v);
     void end();
     void seek(double);
