@@ -17,6 +17,15 @@ Window {
         videoQueue.setIdx(idx);
     }
 
+    //监听controller信号
+    Connections{
+        target: controller
+        function onFileError(file){          //文件解析失败或者md5不一致
+            console.log(file);
+            messageDialog.open();
+        }
+    }
+
     //定时器，时间到隐藏顶部和底部栏
     Timer {
         id:timer
@@ -126,6 +135,7 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
+                        controller.exit();
                         if(isVideoPlay){
                             isVideoPlay=false;
                             isPlaying=false;
@@ -163,7 +173,9 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        messageDialog.close();
                     }
                 }
             }
@@ -193,7 +205,11 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        let delIdx=dataMgr.curVideo.index;
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        controller.deleteData(delIdx,false);
+                        messageDialog.close();
                     }
                 }
             }
@@ -213,7 +229,6 @@ Window {
             timer.start();
         }
 
-        onClicked: messageDialog.open()
         //顶部栏
         Rectangle{
             id:topBar
