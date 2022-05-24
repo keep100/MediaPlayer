@@ -59,6 +59,9 @@ Rectangle{
                     console.log('sapce');
                     if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
+                        if(isPlaying){
+                            controller.stop();
+                        }
                     }
                     break;
                 case Qt.Key_Escape:     //处理esc键，退出全屏
