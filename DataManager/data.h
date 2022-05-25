@@ -63,7 +63,8 @@ class Data
     Q_PROPERTY(bool isAudio READ isAudio )          //是否是音频
     Q_PROPERTY(QString imgPath READ imgPath)        //图片地址（可以通过图片地址是否为空来判断有无图片）
     Q_PROPERTY(QString codecId READ codecId)        //编码格式
-    Q_PROPERTY(int bitRate READ bitRate)            //比特率
+    Q_PROPERTY(int aBitRate READ aBitRate)          //音频比特率
+    Q_PROPERTY(int vBitRate READ vBitRate)          //视频比特率
     Q_PROPERTY(int channels READ channels)          //声道数
     Q_PROPERTY(int width READ width)                //视频的宽
     Q_PROPERTY(int height READ height)              //视频的高
@@ -82,7 +83,8 @@ public:
     inline int width(){return _width;}
     inline int height(){return _height;}
     inline int channels(){return _channels;}
-    inline int bitRate(){return _bitRate;}
+    inline int aBitRate(){return _aBitRate;}
+    inline int vBitRate(){return _vBitRate;}
 
     State verify();                      //验证文件是否出错：1）判断文件是否存在 2）计算md5码
     void setLastTime(qint64 time);      //设置文件上次的播放时间
@@ -109,7 +111,8 @@ private:
     QString _codecId;
     int _width = 0;
     int _height = 0;
-    int _bitRate = 0;
+    int _aBitRate = 0;
+    int _vBitRate = 0;
     int _channels = 0;
 
 };

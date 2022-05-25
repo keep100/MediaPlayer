@@ -138,7 +138,7 @@ bool XDemux::Open(const char *url)
     }
     //获取总时长 毫秒
     totalMs = ic->duration / (AV_TIME_BASE / 1000);
-    cout << "total " << totalMs << endl;
+    qDebug() << "total " << totalMs;
 
     //获取音视频流信息
     //方法二

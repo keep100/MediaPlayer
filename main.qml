@@ -13,7 +13,7 @@ Window {
     flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
     property int windowWidth: Screen.desktopAvailableWidth*0.65    //窗口宽度，跟随电脑屏幕变化
-    property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
+    property int windowHeight: Screen.desktopAvailableHeight*0.75  //窗口高度，跟随电脑屏幕变化
     property bool isFullSreen: false      //是否已经全屏
     property bool isAudioPlay: false      //是否有音频播放
     property bool isVideoPlay: false      //是否有视频播放
@@ -121,9 +121,6 @@ Window {
         }
     }
 
-    //监听是否正在播放音视频
-    onIsPlayingChanged: controller.stop()
-
     //监听播放模式改变
     onPlayModeChanged: controller.mode=playMode
 
@@ -153,13 +150,6 @@ Window {
         }
         function onFileError(file){          //文件解析失败或者md5不一致
             console.log(file);
-
-        }
-        function onFileFinish(){             //文件播放结束
-            console.log('fileFinish');
-        }
-        function onPlayMedia(){              //准备播放视频
-            console.log('begin play');
         }
         function onUpdate(yuv){              //渲染组件进行更新
             console.log('update');

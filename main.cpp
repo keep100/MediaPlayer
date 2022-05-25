@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
         }
     }, Qt::QueuedConnection);
 
+    XMediaManager mm;
+    mm.bind(&controller);
     qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
     engine.load(url);
     return app.exec();

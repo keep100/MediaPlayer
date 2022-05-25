@@ -45,7 +45,8 @@ Data::Data(const BriefInfo& info,const QFileInfo& f){
     _lastTime = 0;
     _album = info.album;
     _artist = info.artist;
-//    _bitRate = info.bitRate;
+    _aBitRate = info.aBitRate;
+    _vBitRate = info.vBitRate;
     _channels = info.channels;
     _codecId = info.codecId;
     _width = info.width;
@@ -76,7 +77,8 @@ QJsonObject Data::toJson(){
     json.insert("album",_album);
     json.insert("artist",_artist);
     json.insert("codecId",_codecId);
-    json.insert("bitRate",_bitRate);
+    json.insert("aBitRate",_aBitRate);
+    json.insert("vBitRate",_vBitRate);
     json.insert("channels",_channels);
     json.insert("width",_width);
     json.insert("height",_height);
@@ -96,7 +98,8 @@ Data::Data(const QJsonObject& json)
     _artist = json["artist"].toString();
     _channels = json["channels"].toInt();
     _codecId = json["codecId"].toString();
-    _bitRate = json["bitRate"].toInt();
+    _aBitRate = json["aBitRate"].toInt();
+    _vBitRate = json["vBitRate"].toInt();
     _width = json["width"].toInt();
     _height = json["height"].toInt();
 }

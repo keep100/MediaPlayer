@@ -59,6 +59,7 @@ Rectangle{
                     console.log('sapce');
                     if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
+                        controller.stop();
                     }
                     break;
                 case Qt.Key_Escape:     //处理esc键，退出全屏
@@ -86,21 +87,27 @@ Rectangle{
                 case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl left');
+                        controller.playPre(mediaType==='audio');
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
                     }
                     break;
                 case Qt.Key_Right:      //处理Ctrl+ → ，下一首
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl right');
+                        controller.playNext(mediaType==='audio');
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
                     }
                     break;
                 case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl up');
+                        mainWindow.voice++;
                     }
                     break;
                 case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
                     if(pressedKeys.has(Qt.Key_Control)){
                         console.log('ctrl down');
+                        mainWindow.voice--;
                     }
                     break;
                 }
@@ -257,6 +264,7 @@ Rectangle{
                 onClicked: {
                     if(isAudioPlay||isVideoPlay){
                         isPlaying=!isPlaying;
+                        controller.stop();
                     }
                 }
             }
@@ -298,6 +306,7 @@ Rectangle{
             from: 0
             value: mainWindow.voice
             to:100
+            stepSize: 1
             x:soundIcon.x+windowWidth*0.02
             pressed: false
             anchors.verticalCenter: parent.verticalCenter
@@ -355,7 +364,7 @@ Rectangle{
             color: "transparent"
             radius: 6
             anchors.verticalCenter: parent.verticalCenter
-            visible: mediaType==="video"
+            visible: false
 
             property bool isClicked: false
 

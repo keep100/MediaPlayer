@@ -37,7 +37,7 @@ class XMediaManager:public QObject{
 private:
 //    FSMItem fsmItem;
 public:
-    static BriefInfo getBriefInfo(const char *);
+    static BriefInfo getBriefInfo(const QString&);
     static QImage getQImageFromFrame(const AVFrame* frame, AVCodecParameters *codecParam);
 
     enum States{ INITIAL=0, READY, PLAYING, PAUSED, END};
@@ -47,7 +47,7 @@ public:
     void playMedia(QString url);
     bool open(const char *url);
     void play();
-    void pause();
+    void toggle();
     void setVolume(float v);
     void end();
     void seek(double);

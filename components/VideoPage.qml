@@ -17,6 +17,27 @@ Window {
         videoQueue.setIdx(idx);
     }
 
+    //监听controller信号
+    Connections{
+        target: controller
+        function onFileError(file){          //文件解析失败或者md5不一致
+            console.log(file);
+            messageDialog.open();
+        }
+        function onPlayMedia(){              //准备播放视频
+            console.log('begin play');
+            loadingImg.visible=false;
+        }
+        function onFileFinish(){             //文件播放结束
+            console.log('fileFinish');
+            if(playMode===3){
+                controller.stop();
+            }else{
+                loadingImg.visible=true;
+            }
+        }
+    }
+
     //定时器，时间到隐藏顶部和底部栏
     Timer {
         id:timer
@@ -38,7 +59,8 @@ Window {
 
     //视频流展示区域
     MyItem{
-
+        anchors.fill: parent
+        Component.onCompleted: bind(controller)
     }
 //    Image {
 //        id:img
@@ -60,6 +82,7 @@ Window {
 
     //加载页面
     Rectangle{
+        id:loadingImg
         anchors.fill: parent
         color: setColor(13, 18, 31)
         Label{
@@ -126,6 +149,7 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
+                        controller.exit();
                         if(isVideoPlay){
                             isVideoPlay=false;
                             isPlaying=false;
@@ -163,7 +187,9 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        messageDialog.close();
                     }
                 }
             }
@@ -193,7 +219,11 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        let delIdx=dataMgr.curVideo.index;
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        controller.deleteData(delIdx,false);
+                        messageDialog.close();
                     }
                 }
             }
@@ -213,7 +243,6 @@ Window {
             timer.start();
         }
 
-        onClicked: messageDialog.open()
         //顶部栏
         Rectangle{
             id:topBar

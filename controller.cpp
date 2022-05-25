@@ -39,7 +39,9 @@ void Controller::setVoice(float v){
 
 void Controller::setTime(int t){
     _time = t;
-    emit skipTime(t);
+    double total = manager.curVideo().duration();
+    qDebug()<<"emit skipTime(t/total)";
+    emit skipTime(t/total);
 }
 
 void Controller::startPlay(int index,bool isAudio){
