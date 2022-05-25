@@ -3,6 +3,15 @@ extern "C" {
 #include "libavutil/time.h"
 }
 #include <QDebug>
+void SynModule::clear() {
+    ap2->Clear();
+    yuvQueue.init();
+    pcmQueue.init();
+    timer->stop();
+    v_clock_t = 0;
+    a_clock_t = 0;
+}
+
 void SynModule::doTask() {
     connect(timer, &QTimer::timeout, [this](){
         std::shared_ptr<YUVData> static vtemp = yuvQueue.dequeue();

@@ -42,7 +42,6 @@ public:
         ap2->Close();
         delete timer;
     }
-
     void setVTimeBase(AVRational vtb) {
         v_time_base_d = av_q2d(vtb);
     }
@@ -56,20 +55,13 @@ public:
     bool pushPcm(std::shared_ptr<PCMData> data) {
         return pcmQueue.tryEnqueue(data);
     }
-    // 重置同步模块
-    void clear() {
-        ap2->Clear();
-        yuvQueue.init();
-        pcmQueue.init();
-        timer->stop();
-        v_clock_t = 0;
-        a_clock_t = 0;
-    }
     // 获取播放设备缓冲区中还未播放的音频的时间长度
     int64_t GetNoPlayMs() { return ap2->GetNoPlayMs(); }
     void SetPause(bool isPause) { ap2->SetPause(isPause); }
     void SetVolume(double volume) { ap2->SetVolume(volume); }
     QAudioFormat GetFormat() { return ap2->GetFormat(); }
+    // 重置同步模块
+    void clear();
     // 主要工作函数，同步音视频并将原始帧从缓冲队列发送到设备
     void doTask();
 signals:
