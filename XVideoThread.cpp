@@ -72,7 +72,7 @@ void XVideoThread::run() {
         vmux.unlock();
     }
     avcodec_parameters_free(&codecParam);
-    qDebug() << "videoTread exit \n";
+    qDebug() << "videoTread exit";
 }
 
 QImage XVideoThread::frameToImage(AVFrame *frame) {
@@ -166,7 +166,7 @@ XVideoThread::XVideoThread() {
 }
 
 XVideoThread::~XVideoThread() {
-    std::cout << "XVideoThread::~XVideoThread()\n";
+    qDebug() << "XVideoThread::~XVideoThread()";
     isExit = true;
     wait();
 }

@@ -132,11 +132,12 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
     qDebug()<<888;
     return briefInfo;
 }
+
 QImage XMediaManager::getQImageFromFrame(const AVFrame *frame, AVCodecParameters *para) {
 
     QImage output(frame->width, frame->height+1,
                   QImage::Format_RGB32); //构造一个QImage用作输出
-    qDebug()<<45;
+//    qDebug()<<45;
     int outputLineSize[4]; //构造AVFrame到QImage所需要的数据
     av_image_fill_linesizes(outputLineSize, AV_PIX_FMT_RGB32, para->width);
     uint8_t *outputDst[] = {output.bits()};
@@ -152,6 +153,9 @@ QImage XMediaManager::getQImageFromFrame(const AVFrame *frame, AVCodecParameters
     //    qDebug()<<para->height<<' '<<frame->height<<' '<<para->width<<' '<<frame->width;
     sws_freeContext(imgConvertContext);
     //    av_frame_free(&frame);
+
+    output = output.copy(0,1,output.width(),output.height()-1);
+//    qDebug()<<"output.size()"<<output.size();
     return output;
 }
 
@@ -160,6 +164,7 @@ XMediaManager::XMediaManager() {
     if (!demuxThread)
         demuxThread = new XDemuxThread();
     demuxThread->Clear();
+    bind(Controller::controller);
 }
 
 void XMediaManager::playMedia(QString url) {
@@ -174,6 +179,7 @@ bool XMediaManager::open(const char *url) {
         _curState = READY;
         if (!demuxThread)
             demuxThread = new XDemuxThread();
+        demuxThread->SetPause(false);
         return demuxThread->Open(url, NULL);
 
     } else {
@@ -201,6 +207,7 @@ void XMediaManager::play() {
 }
 
 void XMediaManager::toggle() {
+    qDebug()<<"XMediaManager::toggle()"<<(_curState == PLAYING)<<(_curState == PAUSED);
     if (_curState == PLAYING) {
         _curState = PAUSED;
         if (!demuxThread) {
@@ -230,10 +237,12 @@ void XMediaManager::setVolume(float v) {
         qDebug() << "error at XMediaManager::setVolume()";
         return;
     }
+    qDebug()<<"XMediaManager::setVolume"<<v/100.0;
     demuxThread->SetVolume(v / 100.0);
 }
 
 void XMediaManager::seek(double pos) {
+    qDebug()<<"XMediaManager::seek"<<pos;
     if (_curState == PLAYING || _curState == PAUSED) {
         if (!demuxThread) {
             _curState = END;
@@ -252,8 +261,12 @@ void XMediaManager::seek(double pos) {
 void XMediaManager::end() {
     _curState = END;
     if (demuxThread) {
+        demuxThread->SetPause(true);
         demuxThread->Clear();
-        demuxThread->Close();
+//        demuxThread->Close();
+//        delete demuxThread;
+//        demuxThread = nullptr;
     }
+    qDebug()<<"XMediaManager::end()";
     return;
 }

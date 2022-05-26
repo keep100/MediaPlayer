@@ -6,6 +6,7 @@ using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()
 {
+    qDebug()<<"XAudioThread::Close()";
     XDecodeThread::Close();
 
     if(rsmp){
@@ -61,8 +62,6 @@ void XAudioThread::SetPause(bool isPause)
 {
 
     this->isPause = isPause;
-    //    if (ap)
-    //        ap->SetPause(isPause);
     if(ap2) ap2->SetPause(isPause);
 
 }
@@ -79,7 +78,7 @@ void XAudioThread::SetVolume(double volume)
 
 void XAudioThread::run()
 {
-    //    unsigned char *pcm = new unsigned char[1024 * 1024];
+
     char resample_data[1024*256];
     while (!isExit)
     {
@@ -123,13 +122,12 @@ void XAudioThread::run()
         }
         amux.unlock();
     }
-    qDebug() << "audioTread exit \n";
+    qDebug() << "audioTread exit";
 }
 
 XAudioThread::XAudioThread()
 {
-    //    if (!res) res = new XResample();
-    //    if (!ap) ap = XAudioPlay::Get();
+
     if(!ap2) ap2 = new audioPlay2();
     if(!rsmp) rsmp = new XAudioResample();
 

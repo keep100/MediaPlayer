@@ -39,7 +39,7 @@ public:
     virtual ~XDecode();
 protected:
     AVCodecContext *codec = 0;
-    std::mutex mtx;
+    std::mutex decode_mtx;
 };
 
 #endif // XDECODE_H

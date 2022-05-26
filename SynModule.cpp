@@ -1,5 +1,13 @@
 ﻿#include "SynModule.h"
 #include <QDebug>
+#include "controller.h"
+SynModule::SynModule(): yuvQueue(yuvBuffSize){
+    QObject::connect(this, &SynModule::transmitYUV, Controller::controller, &Controller::onUpdate);
+}
+SynModule::~SynModule() {
+    clear();
+    QObject::disconnect(this, &SynModule::transmitYUV, Controller::controller, &Controller::onUpdate);
+}
 
 void SynModule::run() {
     std::shared_ptr<YUVData> vtemp = yuvQueue.dequeue();

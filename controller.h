@@ -19,7 +19,7 @@ class Controller : public QObject
     Q_PROPERTY(int time READ time NOTIFY timeChanged)         //时间
 
 public:
-    explicit Controller(QQmlApplicationEngine &engine, QObject *parent = nullptr);
+
 
     //供前端调用（前端--》控制器）
     Q_INVOKABLE void stop();                                                //暂停播放
@@ -55,6 +55,9 @@ signals:
     void playMedia(const QString &path);    //播放
 
 public:
+    static Controller* controller;
+    static DataManager manager;
+    static void init(QQmlApplicationEngine& engine);
 
     //get
     inline PlayMode::mode mode()
@@ -83,13 +86,12 @@ public:
     void onUpdate(std::shared_ptr<YUVData> data,int time);       //连接后端传来的信号
 
 private:
-
+    explicit Controller(QObject *parent = nullptr){}
 
 private:
-    DataManager manager;
     PlayMode::mode _mode = PlayMode::Loop;
     float _playSpeed = 1.0f;
-    float _voice = 0.15f;
+    float _voice = 100;
     int _time = 0;
 };
 
