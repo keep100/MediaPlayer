@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 import MyItem 1.0
@@ -259,14 +259,14 @@ Window {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: qsTr("播放器名字")
+                    text: qsTr("易影")
                     leftPadding: 8
                     color: "white"
                     font.pixelSize: 14
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: qsTr("这是视频名字")
+                    text: dataMgr?.curVideo.fileName ?? "这是视频名字"
                     leftPadding: 10
                     color: "white"
                     font.pixelSize: 14

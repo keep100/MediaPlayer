@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 
@@ -185,14 +185,14 @@ Rectangle{
         }
 
         //视频的已播放时长与总时长
-        Text {
-            leftPadding: -200
-            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
-            font.pixelSize: 14
-            color: "white"
-            anchors.verticalCenter: parent.verticalCenter
-            opacity: isVideoPlay? 1:0
-        }
+//        Text {
+//            leftPadding: -200
+//            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
+//            font.pixelSize: 14
+//            color: "white"
+//            anchors.verticalCenter: parent.verticalCenter
+//            opacity: isVideoPlay? 1:0
+//        }
         
         //退出播放音视频的按钮
         Image {
@@ -356,75 +356,75 @@ Rectangle{
         }
 
         //倍速，当且仅当视频播放时展示
-        Rectangle{
-            id:playSpeed
-            x:playMode.x-width-windowWidth*0.02
-            width: 50
-            height: parent.height*0.6
-            color: "transparent"
-            radius: 6
-            anchors.verticalCenter: parent.verticalCenter
-            visible: false
+//        Rectangle{
+//            id:playSpeed
+//            x:playMode.x-width-windowWidth*0.02
+//            width: 50
+//            height: parent.height*0.6
+//            color: "transparent"
+//            radius: 6
+//            anchors.verticalCenter: parent.verticalCenter
+//            visible: true
 
-            property bool isClicked: false
+//            property bool isClicked: false
 
-            Text {
-                text: mainWindow.playSpeed==="1.0x"?"倍速":mainWindow.playSpeed
-                font.pixelSize: 14
-                color: "white"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-            }
+//            Text {
+//                text: mainWindow.playSpeed==="1.0x"?"倍速":mainWindow.playSpeed
+//                font.pixelSize: 14
+//                color: "white"
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                anchors.verticalCenter: parent.verticalCenter
+//            }
 
-            Rectangle{//可选播放模式区域
-                parent: myFooter
-                anchors.bottom: parent.top
-                x:playSpeed.x+playSpeed.width/2-width/2
-                width: 60
-                color:"transparent"
-                visible: playSpeed.isClicked
+//            Rectangle{//可选播放模式区域
+//                parent: myFooter
+//                anchors.bottom: parent.top
+//                x:playSpeed.x+playSpeed.width/2-width/2
+//                width: 60
+//                color:"transparent"
+//                visible: playSpeed.isClicked
 
-                ListView{//播放模式列表
-                    id:playSpeedList
-                    width: parent.width
-                    height: 140
-                    anchors.bottom: parent.top
-                    model:['0.5x','1.0x','1.25x','1.5x','2.0x']
-                    delegate: ItemDelegate{//播放模式列表子项
-                        id:speedItem
-                        width: parent.width
-                        height: 28
-                        hoverEnabled: true
+//                ListView{//播放模式列表
+//                    id:playSpeedList
+//                    width: parent.width
+//                    height: 140
+//                    anchors.bottom: parent.top
+//                    model:['0.5x','1.0x','1.25x','1.5x','2.0x']
+//                    delegate: ItemDelegate{//播放模式列表子项
+//                        id:speedItem
+//                        width: parent.width
+//                        height: 28
+//                        hoverEnabled: true
 
-                        Text {
-                            text: qsTr(modelData)
-                            font.pixelSize: 14
-                            color: modelData===mainWindow.playSpeed?
-                                       setColor(255, 100, 41):
-                                       (speedItem.hovered?setColor(255, 100, 41):"white")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        background:Rectangle{
-                            color:setColor(0,0,0,0.8)
-                        }
-                        onClicked: {
-                            controller.playSpeed=parseFloat(modelData.substring(0,modelData.length-1),10);
-                            mainWindow.playSpeed=modelData;
-                            playSpeed.isClicked=false;
-                        }
-                    }
-                }
-            }
+//                        Text {
+//                            text: qsTr(modelData)
+//                            font.pixelSize: 14
+//                            color: modelData===mainWindow.playSpeed?
+//                                       setColor(255, 100, 41):
+//                                       (speedItem.hovered?setColor(255, 100, 41):"white")
+//                            anchors.verticalCenter: parent.verticalCenter
+//                            anchors.horizontalCenter: parent.horizontalCenter
+//                        }
+//                        background:Rectangle{
+//                            color:setColor(0,0,0,0.8)
+//                        }
+//                        onClicked: {
+//                            controller.playSpeed=parseFloat(modelData.substring(0,modelData.length-1),10);
+//                            mainWindow.playSpeed=modelData;
+//                            playSpeed.isClicked=false;
+//                        }
+//                    }
+//                }
+//            }
 
-            MouseArea{
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: playSpeed.color=setColor(255, 100, 41)
-                onExited: playSpeed.color="transparent"
-                onClicked: playSpeed.isClicked=!playSpeed.isClicked
-            }
-        }
+//            MouseArea{
+//                anchors.fill: parent
+//                hoverEnabled: true
+//                onEntered: playSpeed.color=setColor(255, 100, 41)
+//                onExited: playSpeed.color="transparent"
+//                onClicked: playSpeed.isClicked=!playSpeed.isClicked
+//            }
+//        }
 
         //当前播放模式图标
         Image {
