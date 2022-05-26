@@ -59,10 +59,10 @@ bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels, Sy
 }
 void XAudioThread::SetPause(bool isPause)
 {
-    qDebug() << "XAudioThread Pause\n";
+
     this->isPause = isPause;
-//    if (ap)
-//        ap->SetPause(isPause);
+    //    if (ap)
+    //        ap->SetPause(isPause);
     if(ap2) ap2->SetPause(isPause);
 
 }
@@ -70,7 +70,7 @@ void XAudioThread::SetPause(bool isPause)
 void XAudioThread::SetVolume(double volume)
 {
     //amux.lock();
-    cout << "XAudioThread SetVolume\n";
+    qDebug() << "XAudioThread SetVolume"<<volume;
     if (ap2)
         ap2->SetVolume(volume);
     //amux.unlock();
@@ -79,7 +79,7 @@ void XAudioThread::SetVolume(double volume)
 
 void XAudioThread::run()
 {
-//    unsigned char *pcm = new unsigned char[1024 * 1024];
+    //    unsigned char *pcm = new unsigned char[1024 * 1024];
     char resample_data[1024*256];
     while (!isExit)
     {
@@ -112,12 +112,14 @@ void XAudioThread::run()
             int64_t pts;
             AVFrame * frame = decode->Recv();
             if (!frame) break;
+
             int size = rsmp->Resample(frame, resample_data);
             if ((pts = frame->pts) == AV_NOPTS_VALUE)
                 pts = 0;
-            std::shared_ptr<PCMData> t = std::make_shared<PCMData>(resample_data, size, pts);
-            while (!syn->pushPcm(t))
-                msleep(1);
+            while (ap2->GetFree() < size)
+                msleep(5);
+            syn->setAClock(pts, ap2->GetNoPlayMs());
+            ap2->Write(resample_data, size);
         }
         amux.unlock();
     }
@@ -126,8 +128,8 @@ void XAudioThread::run()
 
 XAudioThread::XAudioThread()
 {
-//    if (!res) res = new XResample();
-//    if (!ap) ap = XAudioPlay::Get();
+    //    if (!res) res = new XResample();
+    //    if (!ap) ap = XAudioPlay::Get();
     if(!ap2) ap2 = new audioPlay2();
     if(!rsmp) rsmp = new XAudioResample();
 

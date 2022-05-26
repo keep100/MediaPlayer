@@ -77,6 +77,7 @@ void Controller::playPre(bool isAudio){
 void Controller::importData(const QList<QString>& list,bool isAudio){
     State s;
     for(auto& item:list){
+        qDebug()<<item;
         s = manager.importData(item,isAudio);
         if(s==State::Error){
             emit fileImportFail(item);

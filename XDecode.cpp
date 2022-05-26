@@ -133,7 +133,6 @@ AVFrame *XDecode::Recv()
         return NULL;
     }
     pts = frame->pts;
-    //cout << "["<<frame->linesize[0] << "] " << flush;
     return frame;
 }
 XDecode::XDecode()

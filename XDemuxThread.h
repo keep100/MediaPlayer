@@ -42,12 +42,14 @@ public:
         return syn;
     }
 
+
 protected:
     std::mutex mux;
     XDemux *demux = 0;
     XVideoThread *vt = 0;
     XAudioThread *at = 0;
     SynModule *syn=nullptr;
+    int i = 0;
 };
 
 #endif // XDEMUXTHREAD_H

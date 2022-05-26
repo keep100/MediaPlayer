@@ -3,7 +3,6 @@
 void XDecodeThread::Close()
 {
     Clear();
-
     //等待线程退出
     mux.lock();
     isExit = true;
@@ -48,35 +47,27 @@ AVPacket *XDecodeThread::Pop()
     mux.unlock();
     return pkt;
 }
-void XDecodeThread::Push(AVPacket *pkt)
+bool XDecodeThread::Push(AVPacket *pkt)
 {
-    if (!pkt)return;
-    //阻塞
-    while (!isExit)
+    if (!pkt)return true;
+    // 阻塞
+
+    mux.lock();
+    if (packs.size() < maxList)
     {
-        mux.lock();
-        if (packs.size() < maxList)
-        {
-            packs.push_back(pkt);
-            mux.unlock();
-            break;
-        }
-//        else
-//        {
-//            packs.pop_front();
-//            packs.push_back(pkt);
-//            mux.unlock();
-//            break;
-//        }
+        packs.push_back(pkt);
         mux.unlock();
-        msleep(1);
+        return true;
+    }
+    else {
+        mux.unlock();
+        return false;
     }
 }
 
-
 XDecodeThread::XDecodeThread()
 {
-    //打开解码器
+    // 打开解码器
     if (!decode) decode = new XDecode();
 }
 
