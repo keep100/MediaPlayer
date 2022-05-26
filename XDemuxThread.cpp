@@ -13,35 +13,41 @@ extern "C"
 void XDemuxThread::SetPause(bool isPause)
 {
     mux.lock();
-     std::cout << "XDemuxThread Pause\n";
     this->isPause = isPause;
     if (at) at->SetPause(isPause);
     if (vt) vt->SetPause(isPause);
+   qDebug() << "XDemuxThread Pause\n";
     mux.unlock();
 }
 void XDemuxThread::SetVolume(double volume)
 {
-    if(!(volume>=0&&volume<=1)){
+
+    if(!(volume>=0 || volume<=1)){
         qDebug()<<"XDemuxThread::SetVolume(double volume) illegal parameter";
         return;
     }
     mux.lock();
-    qDebug()<<"XDemuxThread SetVolume";
-    if (at) at->SetVolume(volume);
+    if (at)
+        at->SetVolume(volume);
     mux.unlock();
 }
 void XDemuxThread::Seek(double pos)
 {
+
     Clear();
     mux.lock();
     bool status = this->isPause;
     mux.unlock();
+
     SetPause(true);
     mux.lock();
+    int re;
     if (demux)
-        demux->Seek(pos);
-
-    long long seekPts = pos*demux->totalMs;
+        re = demux->Seek(pos);
+    if (re == 0)
+        qDebug() << "demux->Seek failed!";
+    AVRational time_base =  demux->getATimebase();
+    long long seekPts = pos * demux->totalMs / 1000.0 / av_q2d(time_base);
     while(!isExit)
     {
         AVPacket *pkt = demux->ReadVideo();
@@ -52,13 +58,14 @@ void XDemuxThread::Seek(double pos)
             break;
         }
     }
-
     mux.unlock();
     if(!status)
         SetPause(false);
 }
 void XDemuxThread::run()
 {
+    bool state = true;
+    AVPacket *pkt = nullptr;
     while (!isExit)
     {
         mux.lock();
@@ -74,13 +81,8 @@ void XDemuxThread::run()
             msleep(1);
             continue;
         }
-        //音视频同步
-        if (vt && at)
-        {
-            pts = at->pts;
-            vt->synpts = at->pts;
-        }
-        AVPacket *pkt = demux->Read();
+        if(state)
+            pkt = demux->Read();
         if (!pkt)
         {
             mux.unlock();
@@ -90,17 +92,17 @@ void XDemuxThread::run()
         //判断数据是音频
         if (demux->IsAudio(pkt))
         {
-            if(at)at->Push(pkt);
+            if(at)
+                state = at->Push(pkt);
             mux.unlock();
         }
         else //视频
         {
-            if (vt)vt->Push(pkt);
+            if (vt)
+                state = vt->Push(pkt);
             mux.unlock();
             usleep(1);
         }
-
-
     }
 }
 //关闭线程清理资源
@@ -120,6 +122,7 @@ void XDemuxThread::Close()
     syn = NULL;
     mux.unlock();
 }
+
 void XDemuxThread::Clear()
 {
     mux.lock();
@@ -147,7 +150,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         std::cout << "demux->Open(url) failed!" << std::endl;
         return false;
     }
-
+    syn->hasAudio =  demux->hasAudio();
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {
@@ -170,9 +173,14 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         isFirst = 1;
     }
     totalMs = demux->totalMs;
-    demux->getTimebase(syn);
+
+    AVRational time_base;
+    time_base = demux->getATimebase();
+    syn->setATimeBase(time_base);
+    time_base = demux->getVTimebase();
+    syn->setVTimeBase(time_base);
+
     mux.unlock();
-    std::cout << "XDemuxThread::Open " << re <<  std::endl;
     return re;
 }
 //启动所有线程
@@ -187,7 +195,7 @@ void XDemuxThread::Start()
     QThread::start();
     if (vt)vt->start();
     if (at)at->start();
-    if (syn) syn->doTask();
+    if (syn) syn->start();
     mux.unlock();
 }
 
@@ -197,7 +205,7 @@ XDemuxThread::XDemuxThread()
 
 XDemuxThread::~XDemuxThread()
 {
-     std::cout << "XDemuxThread::~XDemuxThread()\n";
+    std::cout << "XDemuxThread::~XDemuxThread()\n";
     isExit = true;
     wait();
 }

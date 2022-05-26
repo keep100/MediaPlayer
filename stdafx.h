@@ -18,5 +18,6 @@ extern "C" {
 #include <libavutil/frame.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
+#include "libavutil/time.h"
 }
 #endif // STDAFX_H

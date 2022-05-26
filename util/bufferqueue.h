@@ -58,7 +58,7 @@ private:
 
 template <class T> class BufferQueue {
 public:
-    BufferQueue(size_t bufferSize = 100) { setBufferSize(bufferSize); }
+    BufferQueue(int bufferSize = 100) { setBufferSize(bufferSize); }
 
     ~BufferQueue() {
         init();
@@ -71,14 +71,6 @@ public:
         m_useableSpace.acquire(m_useableSpace.available());
         m_freeSpace.release(m_bufferSize - m_freeSpace.available());
         m_front = m_rear = 0;
-    }
-
-    T topValue() {
-        T element;
-        if (m_rear != m_front)
-            return m_bufferQueue[m_rear % m_bufferSize];
-        else
-            return element;
     }
 
     void enqueue(const T &element) {

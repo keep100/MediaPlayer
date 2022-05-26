@@ -4,6 +4,7 @@
 struct AVFormatContext;
 struct AVPacket;
 struct AVCodecParameters;
+struct AVRational;
 #include <mutex>
 #include "SynModule.h"
 class XDemux
@@ -30,30 +31,39 @@ public:
 
     virtual AVPacket *ReadVideo();
 
-    void getTimebase(SynModule *syn) {
-        if (ic != nullptr) {
-            if (videoStream != -1)
-                syn->setVTimeBase(ic->streams[videoStream]->time_base);
-            if (audioStream != -1)
-                syn->setATimeBase(ic->streams[audioStream]->time_base);
-        }
+    AVRational getVTimebase() {
+        AVRational temp;
+        if (ic != nullptr && videoStream != -1)
+            temp =  ic->streams[videoStream]->time_base;
+        return temp;
     }
 
-    //总时长 毫秒
-    int totalMs = 0;
-    int width = 0;
-    int height = 0;
-    //音频信息
-    int sampleRate = 0;
-    int channels = 0;
-    int sampleFormat = 2;
+    AVRational getATimebase() {
+        AVRational temp;
+        if (ic != nullptr && audioStream != -1)
+            temp = ic->streams[audioStream]->time_base;
+        return temp;
+    }
+
+    bool hasAudio() {
+        return (audioStream != -1);
+    }
+
+//总时长 毫秒
+int totalMs = 0;
+int width = 0;
+int height = 0;
+//音频信息
+int sampleRate = 0;
+int channels = 0;
+int sampleFormat = 2;
 
 
 protected:
-    std::mutex mtx;
-    AVFormatContext *ic = NULL;
-    int videoStream = -1;
-    int audioStream = -1;
+std::mutex mtx;
+AVFormatContext *ic = NULL;
+int videoStream = -1;
+int audioStream = -1;
 
 };
 

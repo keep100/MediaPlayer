@@ -33,7 +33,7 @@ void XDemux::Clear()
     if (!ic)
     {
         mtx.unlock();
-        return ;
+        return;
     }
     //清理读取缓冲
     avformat_flush(ic);
@@ -68,7 +68,8 @@ bool XDemux::Seek(double pos)
     avformat_flush(ic);
 
     long long seekPos = 0;
-    seekPos = ic->streams[audioStream]->duration * pos;
+    AVRational a_time_base = ic->streams[audioStream]->time_base;
+    seekPos = ic->duration * pos / AV_TIME_BASE / av_q2d(a_time_base);
     int re = av_seek_frame(ic, audioStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;
@@ -158,6 +159,7 @@ bool XDemux::Open(const char *url)
         channels = ic->streams[audioStream]->codecpar->channels;
         sampleFormat = ic->streams[audioStream]->codecpar->format;
     }
+//    qDebug() << "duration" << (ic->streams[audioStream]->duration);
     //获取音频采样率和通道数
     mtx.unlock();
     return true;
@@ -191,6 +193,7 @@ AVPacket *XDemux::ReadVideo()
 AVPacket *XDemux::Read()
 {
     mtx.lock();
+
     if (!ic)
     {
         mtx.unlock();
@@ -205,9 +208,6 @@ AVPacket *XDemux::Read()
         av_packet_free(&pkt);
         return 0;
     }
-    //pts转换为毫秒
-//    pkt->pts = pkt->pts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
-//    pkt->dts = pkt->dts*(1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
     mtx.unlock();
     return pkt;
 }

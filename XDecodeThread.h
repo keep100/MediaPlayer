@@ -1,4 +1,4 @@
-#ifndef XDECODETHREAD_H
+﻿#ifndef XDECODETHREAD_H
 #define XDECODETHREAD_H
 
 struct AVPacket;
@@ -11,7 +11,7 @@ class XDecodeThread:public QThread
 public:
     XDecodeThread();
     virtual ~XDecodeThread();
-    virtual void Push(AVPacket *pkt);
+    virtual bool Push(AVPacket *pkt);
     virtual int GetPacksNum();
 
     //清理队列

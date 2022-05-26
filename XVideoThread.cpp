@@ -35,18 +35,11 @@ void XVideoThread::SetPause(bool isPause) {
 }
 
 void XVideoThread::run() {
-
     while (!isExit) {
         vmux.lock();
         if (this->isPause) {
             vmux.unlock();
             msleep(5);
-            continue;
-        }
-        //音视频同步
-        if (synpts > 0 && synpts < decode->pts) {
-            vmux.unlock();
-            msleep(1);
             continue;
         }
         AVPacket *pkt = Pop();
@@ -56,19 +49,22 @@ void XVideoThread::run() {
             msleep(1);
             continue;
         }
-
         //一次send 多次recv
         while (!isExit) {
             AVFrame *frame = decode->Recv();
-            if (!frame) {
+            if (!frame)
                 break;
-            }
+
             std::shared_ptr<YUVData> t = convertToYUV420P(frame);
             if ((t->pts = frame->pts) == AV_NOPTS_VALUE)
                 t->pts = 0;
             // 缓冲区满了则睡眠等待
-            while (!syn->pushYuv(t))
+            int i = 0;
+            while (!syn->pushYuv(t) && i++ < 50) {
+                vmux.unlock();
                 msleep(1);
+                vmux.lock();
+            }
             //            showImage->sendimage(frameToImage(frame));
             av_frame_free(&frame);
             msleep(1);
@@ -76,7 +72,7 @@ void XVideoThread::run() {
         vmux.unlock();
     }
     avcodec_parameters_free(&codecParam);
-    std::cout << "videoTread exit \n";
+    qDebug() << "videoTread exit \n";
 }
 
 QImage XVideoThread::frameToImage(AVFrame *frame) {
@@ -141,14 +137,21 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {
         return 1; //表示结束解码
     }
     AVFrame *frame = decode->Recv();
+
     if (!frame) {
         vmux.unlock();
         return 0;
     }
     //到达位置
     if (decode->pts >= seekPts) {
-        if (call) {
-            call->Repaint(frame);
+        std::shared_ptr<YUVData> t = convertToYUV420P(frame);
+        if ((t->pts = frame->pts) == AV_NOPTS_VALUE)
+            t->pts = 0;
+        // 缓冲区满了则睡眠等待
+        while (!syn->pushYuv(t)) {
+            vmux.unlock();
+            msleep(1);
+            vmux.lock();
         }
         vmux.unlock();
         return 1;
