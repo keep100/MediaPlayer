@@ -3,6 +3,27 @@
 #include <QJsonArray>
 #include <random>
 
+QStringList getFileListUnderDir(const QString &dirPath)
+{
+    QStringList fileList;
+    QDir dir(dirPath);
+    QFileInfoList fileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot | QDir::Dirs);
+    foreach (auto fileInfo, fileInfoList) {
+        if(fileInfo.isDir())
+        {
+
+            getFileListUnderDir(fileInfo.absoluteFilePath());
+        }
+
+        if(fileInfo.isFile())
+        {
+            fileList.append(fileInfo.absoluteFilePath());
+            //qDebug() << __FUNCTION__ << __LINE__ << "  : " << fileInfo.absoluteFilePath();
+        }
+    }
+    return fileList;
+}
+
 DataManager::DataManager(QObject *parent)
     : QObject{parent}
 {
@@ -164,14 +185,22 @@ void DataManager::writeData()
         dir.setPath("./Data");
     }
 
+
     //将音频列表写入json文件中
     QFile audioFile(dir.filePath("audio.json"));
     if(audioFile.open(QFile::WriteOnly))
     {
+        //获取缩略图文件list，用于删除已经不存在的缩略图
+        auto list = getFileListUnderDir(dir.filePath("thumpnail/audio"));
+
         QJsonArray array;
         for(auto &item : _audioList)
         {
             array.append(item.toJson());
+            list.removeAll(item.imgPath());
+        }
+        for(auto& path:list){
+            QFile::remove(path);
         }
         QJsonDocument doc(array);
         audioFile.write(doc.toJson());
@@ -182,10 +211,16 @@ void DataManager::writeData()
     QFile videoFile(dir.filePath("video.json"));
     if(videoFile.open(QFile::WriteOnly))
     {
+        auto list = getFileListUnderDir(dir.filePath("thumpnail/video"));
         QJsonArray array;
         for(auto &item : _videoList)
         {
             array.append(item.toJson());
+            list.removeAll(item.imgPath());
+        }
+        for(auto& path:list){
+            qDebug()<<path;
+            QFile::remove(path);
         }
         QJsonDocument doc(array);
         videoFile.write(doc.toJson());

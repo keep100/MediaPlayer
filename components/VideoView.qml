@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 
@@ -60,7 +60,10 @@ Rectangle {
 
                                 MouseArea{
                                     anchors.fill: parent
-                                    onClicked: delDialog.open()
+                                    onClicked: {
+                                        delDialog.delIdx=modelData.index;
+                                        delDialog.open();
+                                    }
                                 }
                             }
                             Rectangle{//更多信息框
