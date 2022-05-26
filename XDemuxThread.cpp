@@ -104,7 +104,7 @@ void XDemuxThread::run()
             usleep(1);
         }
     }
-    qDebug() << "XDemuxThread exit";
+    qDebug() << "videoTread exit";
 }
 //关闭线程清理资源
 void XDemuxThread::Close()

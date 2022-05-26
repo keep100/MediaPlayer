@@ -175,6 +175,7 @@ void XMediaManager::playMedia(QString url) {
 }
 
 bool XMediaManager::open(const char *url) {
+    end();
     if (_curState == INITIAL || _curState == END) {
         _curState = READY;
         if (!demuxThread)
