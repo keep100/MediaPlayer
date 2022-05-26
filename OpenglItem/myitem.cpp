@@ -5,19 +5,19 @@
 MyItem::MyItem()
 {
     setFlag(QQuickItem::ItemHasContents,true);
-    startTimer(1000 / 24);
+    //startTimer(1000 / 24);
 }
 
 QQuickFramebufferObject::Renderer* MyItem::createRenderer()const{
     return new MyRender;
 }
 
-void MyItem::timerEvent(QTimerEvent* event)
-{
-    Q_UNUSED(event);
-    if(_isPlay)
-        update();
-}
+//void MyItem::timerEvent(QTimerEvent* event)
+//{
+//    Q_UNUSED(event);
+//    if(_isPlay)
+//        update();
+//}
 
 void MyItem::bind(Controller* obj){
     if(obj==nullptr){
@@ -28,6 +28,8 @@ void MyItem::bind(Controller* obj){
 
 
 void MyItem::onUpdate(std::shared_ptr<YUVData> data){
+    if(!_isPlay)
+        return;
     this->data = data;
     update();
 }
