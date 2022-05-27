@@ -16,6 +16,9 @@ Popup{
         pathInput.text=mainWindow.bgPath==="qrc:/images/bg.jpg"?"":mainWindow.bgPath;
         mainWindow.blur=tempBlur;
     }
+    function setImgPath(path){
+        pathInput.text=path;
+    }
 
     //窗口弹出记录模糊度
     onVisibleChanged: {

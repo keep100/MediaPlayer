@@ -103,6 +103,9 @@ Window {
     Component.onCompleted: {
         bgPath=dataMgr.userInfo.bckPath?dataMgr.userInfo.bckPath:"qrc:/images/bg.jpg";
         blur=dataMgr.userInfo.blurRatio;
+        if(bgPath!=="qrc:/images/bg.jpg"){
+            configDialog.setImgPath(bgPath);
+        }
     }
 
     //监听是否有音频在播放
