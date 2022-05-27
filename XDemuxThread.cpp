@@ -1,4 +1,4 @@
-﻿#include "XDemuxThread.h"
+#include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XVideoThread.h"
 #include "XAudioThread.h"
