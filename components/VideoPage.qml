@@ -14,9 +14,9 @@ Window {
     property bool isShowQueue: false  //是否展示了视频播放列表
     property int playTime: controller?.time  //当前播放进度
 
-                                       function setIdx(idx){
-                                           videoQueue.setIdx(idx);
-                                       }
+    function setIdx(idx){
+        videoQueue.setIdx(idx);
+    }
     onPlayTimeChanged: {
         if(visible&&!videoSlider.pressed){
             videoSlider.value=playTime;
@@ -32,15 +32,12 @@ Window {
         }
         function onPlayMedia(){              //准备播放视频
             console.log('begin play');
-//            loadingImg.visible=false;
             isPlaying=true;
         }
         function onFileFinish(){             //文件播放结束
             console.log('fileFinish',playMode);
             if(playMode===3){
                 controller.stop();
-            }else{
-                loadingImg.visible=true;
             }
         }
     }

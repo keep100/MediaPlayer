@@ -91,14 +91,14 @@ Rectangle{
 
                     Rectangle{
                         anchors.fill: parent
-                        color: musicItem.isEnter||musicList.currentIndex===index?
+                        color: musicItem.isEnter||musicList.currentIndex===modelData.index?
                                    setColor(66, 105, 137,0.8):setColor(75, 75, 80,0.6)
 
                         Image {
                             x:parent.width*0.04
                             width: 18
                             height: 18
-                            source: musicList.currentIndex===index?"qrc:/images/音量.png":""
+                            source: musicList.currentIndex===modelData.index?"qrc:/images/音量.png":""
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
