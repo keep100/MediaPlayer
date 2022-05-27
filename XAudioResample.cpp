@@ -25,6 +25,8 @@ void XAudioResample::init_out_frame(AVFrame *&out_frame, int64_t dst_nb_samples)
 }
 
 bool XAudioResample::Open(QAudioFormat fmt){
+    swrContext = nullptr;
+
     format = fmt;
     target_sample_rate = format.sampleRate();
     switch(format.sampleFormat()){
@@ -57,12 +59,16 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
         qDebug()<<"swrContext==nullptr";
         qDebug()<<"in_frame->sample_rate"<<in_frame->sample_rate;
         qDebug()<<"in_frame->format"<<in_frame->format;
+        qDebug()<<"in_frame->channels"<<in_frame->channels;
         qDebug()<<"in_frame->channel_layout"<<in_frame->channel_layout;
+
         qDebug()<<"target_sample_rate"<<target_sample_rate;
         qDebug()<<"target_sample_format"<<target_sample_format;
         qDebug()<<"target_channel_layout"<<target_channel_layout;
+        uint64_t in_channel_layout = in_frame->channel_layout;
+        if(in_frame->channel_layout==0) in_channel_layout = av_get_default_channel_layout(in_frame->channels);
         swrContext = swr_alloc_set_opts(nullptr, target_channel_layout, static_cast<AVSampleFormat>(target_sample_format), target_sample_rate,
-                                        in_frame->channel_layout, static_cast<AVSampleFormat>(in_frame->format),
+                                        in_channel_layout, static_cast<AVSampleFormat>(in_frame->format),
                                         in_frame->sample_rate, 0, nullptr);
         qDebug()<<"ggggggggg";
         int re = swr_init(swrContext);

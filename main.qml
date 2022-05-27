@@ -261,7 +261,7 @@ Window {
         fileMode:FileDialog.OpenFiles  //支持文件多选
         title:curIdx===0?"选择视频":"选择音频"
         nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
-                               :["audio files (*.mp3 *.flac *.wav *rm)"]
+                               :["audio files (*.mp3 *.flac *.wav *rm *m4a)"]
         onAccepted:{
             const urlList=[];
             for(let url of files){

@@ -68,11 +68,8 @@ bool XDemux::Seek(double pos)
     //清理读取缓冲
     avformat_flush(ic);
 
-    long long seekPos = 0;
-    AVRational a_time_base = ic->streams[audioStream]->time_base;
-    seekPos = ic->duration * pos / AV_TIME_BASE / av_q2d(a_time_base);
-//    qDebug()<<"ic->duration * pos / AV_TIME_BASE"<<ic->duration / AV_TIME_BASE;
-    int re = av_seek_frame(ic, audioStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    long long seekPos = ic->duration * pos;
+    int re = av_seek_frame(ic, -1, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;
     return true;
@@ -141,13 +138,13 @@ bool XDemux::Open(const char *url)
     }
     //获取总时长 毫秒
     totalMs = ic->duration / (AV_TIME_BASE / 1000);
-    qDebug() << "total " << totalMs;
+    qDebug() << "XDemux::Open total=" << totalMs;
 
     //获取音视频流信息
     //方法二
     videoStream = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-
+    qDebug()<<"videoStream"<<videoStream<<"audioStream"<<audioStream;
     //获取视频宽高
     if (videoStream >= 0)
     {
@@ -161,7 +158,6 @@ bool XDemux::Open(const char *url)
         channels = ic->streams[audioStream]->codecpar->channels;
         sampleFormat = ic->streams[audioStream]->codecpar->format;
     }
-//    qDebug() << "duration" << (ic->streams[audioStream]->duration);
     //获取音频采样率和通道数
     mtx.unlock();
     return true;
@@ -195,7 +191,6 @@ AVPacket *XDemux::ReadVideo()
 AVPacket *XDemux::Read()
 {
     mtx.lock();
-
     if (!ic)
     {
         mtx.unlock();

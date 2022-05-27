@@ -1,4 +1,4 @@
-﻿#include "XDemuxThread.h"
+#include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XVideoThread.h"
 #include "XAudioThread.h"
@@ -33,20 +33,19 @@ void XDemuxThread::SetVolume(double volume)
 }
 void XDemuxThread::Seek(double pos)
 {
-
-    Clear();
     mux.lock();
     bool status = this->isPause;
     mux.unlock();
 
     SetPause(true);
+    Clear();
     mux.lock();
     int re = 0;
     if (demux)
         re = demux->Seek(pos);
     if (re == 0)
         qDebug() << "demux->Seek failed!";
-    AVRational time_base =  demux->getATimebase();
+    AVRational time_base =  demux->getVTimebase();
     long long seekPts = pos * demux->totalMs / 1000.0 / av_q2d(time_base);
     while(!isExit)
     {
@@ -95,13 +94,14 @@ void XDemuxThread::run()
             if(at)
                 state = at->Push(pkt);
             mux.unlock();
+            msleep(1);
         }
         else //视频
         {
             if (vt)
                 state = vt->Push(pkt);
             mux.unlock();
-            usleep(1);
+            msleep(1);
         }
     }
     qDebug() << "videoTread exit";
@@ -145,7 +145,6 @@ void XDemuxThread::Clear()
 
 bool XDemuxThread::Open(const char *url, IVideoCall *call)
 {
-    qDebug()<<"XDemuxThread::Open"<<QString(url);
     if (url == 0 || url[0] == '\0')
         return false;
 
@@ -167,22 +166,24 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     bool re = demux->Open(url);
     if (!re)
     {
-        std::cout << "demux->Open(url) failed!" << std::endl;
+        qDebug() << "demux->Open(url) failed!" ;
         return false;
     }
-    syn->hasAudio =  demux->hasAudio();
+    qDebug()<<"demux->Open(url)"<<re;
+    if (syn)
+        syn->hasAudio =  demux->hasAudio();
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {
-        re = false;
-        std::cout << "vt->Open failed!" << std::endl;
+        QString suffix = QString(url).split(".").last();
+        if (QString("mp4, flv, avi, mkv").contains(suffix)) re = false;
+        qDebug() << "vt->Open failed!" ;
     }
     //打开音频解码器和处理线程
-    std::cout << "demux->sampleFormat : " << demux->sampleFormat << std::endl;
     if (!at->Open(demux->CopyAPara(), demux->sampleRate, demux->channels, syn))
     {
         re = false;
-        std::cout << "at->Open failed!" << std::endl;
+        qDebug() << "at->Open failed!" ;
     }
     if (isFirst)
     {
@@ -193,13 +194,15 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         isFirst = 1;
     }
     totalMs = demux->totalMs;
-
     AVRational time_base;
     time_base = demux->getATimebase();
+    qDebug() << "hhh21"<<av_q2d(time_base);
     syn->setATimeBase(time_base);
+    at->a_time_base_d = av_q2d(time_base);
     time_base = demux->getVTimebase();
+    qDebug() << "hhh24"<<av_q2d(time_base);
     syn->setVTimeBase(time_base);
-
+    qDebug() << "hhh3";
     mux.unlock();
     return re;
 }

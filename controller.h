@@ -83,7 +83,8 @@ public:
     void setVoice(float v);
 
     //需要与其他部分进行连接
-    void onUpdate(std::shared_ptr<YUVData> data,int time);       //连接后端传来的信号
+    void updateYUV(std::shared_ptr<YUVData> data);       //连接后端传来的信号
+    void updateTime(int time);
 
 private:
     explicit Controller(QObject *parent = nullptr){}

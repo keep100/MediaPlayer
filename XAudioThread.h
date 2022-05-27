@@ -8,6 +8,7 @@ struct AVCodecParameters;
 #include "XAudioResample.h"
 class XAudioThread:public XDecodeThread
 {
+    Q_OBJECT
 public:
     //当前音频播放的pts
     long long pts = 0;
@@ -23,12 +24,18 @@ public:
     void SetVolume(double volume);
     bool isPause = false;
     bool interupt = false;
+    // 是否有视频流，若没有则在当前线程发送播放时间
+    bool hasVideo;
+    // 音频流的timebase
+    double a_time_base_d;
+
 
 protected:
     std::mutex amux;
-//    XAudioPlay *ap = 0;
-//    XResample *res = 0;
     audioPlay2 *ap2 = 0;
     XAudioResample *rsmp = 0;
     SynModule *syn = 0;
+
+signals:
+    void transmitTime(int64_t time);
 };

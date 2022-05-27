@@ -32,21 +32,22 @@ public:
     virtual AVPacket *ReadVideo();
 
     AVRational getVTimebase() {
-        AVRational temp;
-        if (ic != nullptr && videoStream != -1)
+        AVRational temp{0, 1};
+        if (ic != nullptr && videoStream >= 0){
             temp =  ic->streams[videoStream]->time_base;
+        }
         return temp;
     }
 
     AVRational getATimebase() {
-        AVRational temp;
-        if (ic != nullptr && audioStream != -1)
+        AVRational temp{0,1};
+        if (ic != nullptr && audioStream >= 0)
             temp = ic->streams[audioStream]->time_base;
         return temp;
     }
 
     bool hasAudio() {
-        return (audioStream != -1);
+        return (audioStream >= 0);
     }
 
 //总时长 毫秒

@@ -102,8 +102,11 @@ void Controller::deleteData(int index,bool isAudio){
     manager.deleteData(index,isAudio);
 }
 
-void Controller::onUpdate(std::shared_ptr<YUVData> data,int time){
+void Controller::updateYUV(std::shared_ptr<YUVData> data){
     emit update(data);
+}
+
+void Controller::updateTime(int time) {
     _time = time;
     emit timeChanged();
 }
