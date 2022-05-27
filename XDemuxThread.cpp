@@ -16,7 +16,7 @@ void XDemuxThread::SetPause(bool isPause)
     this->isPause = isPause;
     if (at) at->SetPause(isPause);
     if (vt) vt->SetPause(isPause);
-   qDebug() << "XDemuxThread Pause\n";
+   qDebug() << "XDemuxThread Pause"<<isPause;
     mux.unlock();
 }
 void XDemuxThread::SetVolume(double volume)
@@ -40,7 +40,7 @@ void XDemuxThread::Seek(double pos)
     SetPause(true);
     Clear();
     mux.lock();
-    int re;
+    int re = 0;
     if (demux)
         re = demux->Seek(pos);
     if (re == 0)
@@ -104,19 +104,28 @@ void XDemuxThread::run()
             msleep(1);
         }
     }
+    qDebug() << "videoTread exit";
 }
 //关闭线程清理资源
 void XDemuxThread::Close()
 {
+    qDebug()<<"XDemuxThread::Close()";
     isExit = true;
     wait();
     if (vt) vt->Close();
-    if (at) at->Close();
+    if (at) {
+        qDebug()<<"at->Close()";
+        at->Close();
+    }
     if (syn) syn->clear();
     mux.lock();
-    delete vt;
-    delete at;
-    delete syn;
+    if(vt) {
+        qDebug()<<"delete vt";
+        delete vt;
+    }
+//    qDebug()<<"XDemuxThread::fff2";
+    if(at) delete at;
+//    if(syn) delete syn;
     vt = NULL;
     at = NULL;
     syn = NULL;
@@ -125,6 +134,7 @@ void XDemuxThread::Close()
 
 void XDemuxThread::Clear()
 {
+    qDebug()<<"XDemuxThread::Clear()";
     mux.lock();
     if (demux) demux->Clear();
     if (vt) vt->Clear();
@@ -135,14 +145,24 @@ void XDemuxThread::Clear()
 
 bool XDemuxThread::Open(const char *url, IVideoCall *call)
 {
+    qDebug()<<"XDemuxThread::Open"<<QString(url);
     if (url == 0 || url[0] == '\0')
         return false;
 
     mux.lock();
     if (!demux) demux = new XDemux();
-    if (!vt) vt = new XVideoThread();
-    if (!at) at = new XAudioThread();
-    if (!syn) syn = new SynModule();
+    if (!vt){
+        qDebug()<<"vt = new XVideoThread()";
+        vt = new XVideoThread();
+    }
+    if (!at){
+        qDebug()<<"at = new XAudioThread()";
+        at = new XAudioThread();
+    }
+    if (!syn){
+        qDebug()<<"syn = new SynModule()";
+        syn = new SynModule();
+    }
     //打开解封装
     bool re = demux->Open(url);
     if (!re)
@@ -150,7 +170,12 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         std::cout << "demux->Open(url) failed!" << std::endl;
         return false;
     }
-    syn->hasAudio =  demux->hasAudio();
+
+    if (syn)
+        syn->hasAudio =  demux->hasAudio();
+    if (at)
+        at->hasVideo = demux->hasVideo();
+
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {
@@ -187,6 +212,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
 //启动所有线程
 void XDemuxThread::Start()
 {
+    qDebug()<<"XDemuxThread::Start()";
     mux.lock();
     //启动当前线程
     if (!demux) demux = new XDemux();
@@ -198,6 +224,7 @@ void XDemuxThread::Start()
     if (at)at->start();
     if (syn) syn->start();
     mux.unlock();
+    qDebug()<<"XDemuxThread::Start() finished";
 }
 
 XDemuxThread::XDemuxThread()
@@ -206,7 +233,7 @@ XDemuxThread::XDemuxThread()
 
 XDemuxThread::~XDemuxThread()
 {
-    std::cout << "XDemuxThread::~XDemuxThread()\n";
+    qDebug() << "XDemuxThread::~XDemuxThread()";
     isExit = true;
     wait();
 }

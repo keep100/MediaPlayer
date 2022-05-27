@@ -1,11 +1,13 @@
 ﻿#include "XAudioThread.h"
 #include "XDecode.h"
 #include "util/pcmdata.h"
+#include "controller.h"
 #include <iostream>
 using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()
 {
+    qDebug()<<"XAudioThread::Close()";
     XDecodeThread::Close();
 
     if(rsmp){
@@ -61,8 +63,6 @@ void XAudioThread::SetPause(bool isPause)
 {
 
     this->isPause = isPause;
-    //    if (ap)
-    //        ap->SetPause(isPause);
     if(ap2) ap2->SetPause(isPause);
 
 }
@@ -116,20 +116,22 @@ void XAudioThread::run()
             if ((pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 pts = 0;
             while (ap2->GetFree() < size)
-                msleep(5);
-            hh
-            syn->setAClock(pts, ap2->GetNoPlayMs());
+                msleep(1);
+            // 若有视频流，则在同步模块发送当前播放时间；否则在这里发送当前播放时间
+            if (hasVideo)
+                 syn->setAClock(pts, ap2->GetNoPlayMs());
+            else
+                emit transmitTime(nullptr, int64_t(pts * a_time_base_d * 1000));
             ap2->Write(resample_data, size);
         }
         amux.unlock();
     }
-    qDebug() << "audioTread exit \n";
+    qDebug() << "audioTread exit";
 }
 
 XAudioThread::XAudioThread()
 {
-    //    if (!res) res = new XResample();
-    //    if (!ap) ap = XAudioPlay::Get();
+    QObject::connect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::onUpdate);
     if(!ap2) ap2 = new audioPlay2();
     if(!rsmp) rsmp = new XAudioResample();
 
@@ -142,4 +144,5 @@ XAudioThread::~XAudioThread()
     qDebug() << "XAudioThread::~XAudioThread()\n";
     isExit = true;
     wait();
+    QObject::disconnect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::onUpdate);
 }

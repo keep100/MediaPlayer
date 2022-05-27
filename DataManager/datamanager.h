@@ -51,8 +51,9 @@ public:
     void reset();                                   //重置，当退出播放时调用
     void setUserInfo(QString, float);               //设置用户数据
 
-private:
     bool _isAudio = false;
+private:
+
     QList<Data> _videoList, _audioList;
     RandomList _videoOrder, _audioOrder;            //播放顺序（随机播放）
     PlayMode::mode mode = PlayMode::Order;

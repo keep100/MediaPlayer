@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QQmlApplicationEngine engine;
-    Controller controller(engine);
+    Controller::init(engine);
     CursorPosProvider mousePosProvider;
     engine.rootContext()->setContextProperty("mousePosition", &mousePosProvider);
 
@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
 
     XMediaManager mm;
-    mm.bind(&controller);
     qmlRegisterType<MyItem>("MyItem", 1, 0, "MyItem");
     engine.load(url);
     return app.exec();

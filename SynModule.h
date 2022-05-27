@@ -29,10 +29,8 @@ public:
     bool hasAudio;
 
 public:
-    SynModule(): yuvQueue(yuvBuffSize){}
-    ~SynModule() {
-        clear();
-    }
+    SynModule();
+    ~SynModule();
     void setVTimeBase(AVRational vtb) {
         v_time_base_d = av_q2d(vtb);
     }

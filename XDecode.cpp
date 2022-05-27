@@ -23,26 +23,27 @@ void XFreeFrame(AVFrame **frame)
 }
 void XDecode::Close()
 {
-    mtx.lock();
+    qDebug()<<"XDecode::Close()";
+    decode_mtx.lock();
+
     if (codec)
     {
-        avcodec_close(codec);
         avcodec_free_context(&codec);
     }
     pts = 0;
-    mtx.unlock();
+    decode_mtx.unlock();
 }
 
 void XDecode::Clear()
 {
-    mtx.lock();
+    decode_mtx.lock();
     //清理解码缓冲
     if (codec)
     {
         avcodec_flush_buffers(codec);
     }
 
-    mtx.unlock();
+    decode_mtx.unlock();
 }
 
 //打开解码器
@@ -65,7 +66,7 @@ bool XDecode::Open(AVCodecParameters *para)
     }
     //cout << "find the AVCodec " << para->codec_id << endl;
 
-    mtx.lock();
+    decode_mtx.lock();
     codec = avcodec_alloc_context3(vcodec);
 
     ///配置解码器上下文参数
@@ -80,13 +81,13 @@ bool XDecode::Open(AVCodecParameters *para)
     if (re != 0)
     {
         avcodec_free_context(&codec);
-        mtx.unlock();
+        decode_mtx.unlock();
         char buf[1024] = { 0 };
         av_strerror(re, buf, sizeof(buf) - 1);
         cout << "avcodec_open2  failed! :" << buf << endl;
         return false;
     }
-    mtx.unlock();
+    decode_mtx.unlock();
     //cout << " avcodec_open2 success!" << endl;
     return true;
 }
@@ -98,14 +99,14 @@ bool XDecode::Send(AVPacket *pkt)
     {
         return false;
     }
-    mtx.lock();
+    decode_mtx.lock();
     if (!codec)
     {
-        mtx.unlock();
+        decode_mtx.unlock();
         return false;
     }
     int re = avcodec_send_packet(codec, pkt);
-    mtx.unlock();
+    decode_mtx.unlock();
     av_packet_free(&pkt);
     if (re != 0)
     {
@@ -118,15 +119,15 @@ bool XDecode::Send(AVPacket *pkt)
 //每次复制一份，由调用者释放 av_frame_free
 AVFrame *XDecode::Recv()
 {
-    mtx.lock();
+    decode_mtx.lock();
     if (!codec)
     {
-        mtx.unlock();
+        decode_mtx.unlock();
         return NULL;
     }
     AVFrame *frame = av_frame_alloc();
     int re = avcodec_receive_frame(codec, frame);
-    mtx.unlock();
+    decode_mtx.unlock();
     if (re != 0)
     {
         av_frame_free(&frame);

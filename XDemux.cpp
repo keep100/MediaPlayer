@@ -54,6 +54,7 @@ void XDemux::Close()
 }
 bool XDemux::Seek(double pos)
 {
+    qDebug()<<"pos"<<pos;
     if (pos < 0.0 || pos > 1.0)
     {
         return false;
@@ -67,8 +68,7 @@ bool XDemux::Seek(double pos)
     //清理读取缓冲
     avformat_flush(ic);
 
-    long long seekPos = 0;
-    seekPos = ic->duration * pos;
+    long long seekPos = ic->duration * pos;
     int re = av_seek_frame(ic, -1, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;

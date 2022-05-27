@@ -45,6 +45,10 @@ public:
         return temp;
     }
 
+    bool hasVideo() {
+        return (videoStream != -1);
+    }
+
     bool hasAudio() {
         return (audioStream != -1);
     }

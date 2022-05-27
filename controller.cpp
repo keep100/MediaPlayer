@@ -1,11 +1,16 @@
 ﻿#include "controller.h"
 #include <QQmlContext>
 
-Controller::Controller(QQmlApplicationEngine& engine,QObject *parent)
-    : QObject{parent}
+Controller* Controller::controller = nullptr;
+DataManager Controller::manager;
+
+void Controller::init(QQmlApplicationEngine& engine)
 {
-    engine.rootContext()->setContextProperty("controller",this);
-    engine.rootContext()->setContextProperty("dataMgr",&manager);
+    if(controller!=nullptr)
+        return;
+    controller = new Controller;
+    engine.rootContext()->setContextProperty("controller",controller);
+    engine.rootContext()->setContextProperty("dataMgr",&Controller::manager);
 }
 
 void Controller::stop(){
@@ -34,13 +39,14 @@ void Controller::setPlaySpeed(float s){
 
 void Controller::setVoice(float v){
     _voice = v;
+    qDebug()<<"setvoice"<<"voice"<<_voice;
     emit voiceChanged(v);
 }
 
 void Controller::setTime(int t){
     _time = t;
-    double total = manager.curVideo().duration();
-    qDebug()<<"emit skipTime(t/total)";
+    double total = manager._isAudio?manager.curAudio().duration():manager.curVideo().duration();
+    qDebug()<<"emit skipTime(t/total)"<<t<<total;
     emit skipTime(t/total);
 }
 
@@ -54,7 +60,11 @@ void Controller::startPlay(int index,bool isAudio){
         manager.setCur(index,isAudio);
         //发送对应的信号
         emit playMedia(manager.getData(index,isAudio).filePath());
-        setTime(_time);
+        qDebug()<<"startplay"<<manager.getData(index,isAudio).fileName()<<manager.getData(index,isAudio).lastTime();
+        qDebug()<<"voice"<<_voice;
+       emit voiceChanged(_voice);
+        setTime(manager.getData(index,isAudio).lastTime());
+
     }
     else if(s==State::Error){
         emit fileError(manager.getData(index,isAudio));

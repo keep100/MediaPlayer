@@ -2,6 +2,7 @@
 #include "XDecode.h"
 void XDecodeThread::Close()
 {
+    qDebug()<<"XDecodeThread::Close()";
     Clear();
     //等待线程退出
     mux.lock();

@@ -60,6 +60,7 @@ signals:
 protected:
     States  _curState;      //现态
     XDemuxThread *demuxThread = 0;
+    QObject* ctrl = nullptr;
 
 };
 
