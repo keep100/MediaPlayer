@@ -45,7 +45,7 @@ public:
     XMediaManager();
     //~XMediaManager();
     void playMedia(QString url);
-    bool open(const char *url);
+    bool open(QString url);
     void play();
     void toggle();
     void setVolume(float v);

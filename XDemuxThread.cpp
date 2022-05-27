@@ -145,7 +145,6 @@ void XDemuxThread::Clear()
 
 bool XDemuxThread::Open(const char *url, IVideoCall *call)
 {
-    qDebug()<<"XDemuxThread::Open"<<QString(url);
     if (url == 0 || url[0] == '\0')
         return false;
 
