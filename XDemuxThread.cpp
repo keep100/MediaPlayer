@@ -169,11 +169,9 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         qDebug() << "demux->Open(url) failed!" ;
         return false;
     }
-
+    qDebug()<<"demux->Open(url)"<<re;
     if (syn)
         syn->hasAudio =  demux->hasAudio();
-    if (at)
-        at->hasVideo = demux->hasVideo();
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {

@@ -46,10 +46,6 @@ public:
         return temp;
     }
 
-    bool hasVideo() {
-        return (ic->streams[videoStream]->duration);
-    }
-
     bool hasAudio() {
         return (audioStream >= 0);
     }

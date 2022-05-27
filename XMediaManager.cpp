@@ -85,7 +85,7 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
         briefInfo.img = getQImageFromFrame(pFrame, demux->CopyVPara());
 
     }
-    else if (QString("mp3, flac, wav").contains(suffix)) { //是音频就提取音频的相关信息
+    else if (QString("mp3, flac, wav, m4a").contains(suffix)) { //是音频就提取音频的相关信息
         briefInfo.mediaType = "audio";
         briefInfo.codecId = avcodec_get_name(demux->CopyAPara()->codec_id);
         qDebug()<<"briefInfo"<<briefInfo.mediaType<<briefInfo.codecId;

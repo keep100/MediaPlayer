@@ -138,13 +138,13 @@ bool XDemux::Open(const char *url)
     }
     //获取总时长 毫秒
     totalMs = ic->duration / (AV_TIME_BASE / 1000);
-    qDebug() << "total " << totalMs;
+    qDebug() << "XDemux::Open total=" << totalMs;
 
     //获取音视频流信息
     //方法二
     videoStream = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-
+    qDebug()<<"videoStream"<<videoStream<<"audioStream"<<audioStream;
     //获取视频宽高
     if (videoStream >= 0)
     {
