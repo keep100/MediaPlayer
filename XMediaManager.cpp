@@ -168,9 +168,12 @@ XMediaManager::XMediaManager() {
 
 void XMediaManager::playMedia(QString url) {
     if (open(url)) {
-        qDebug() << "open succeed";
+        qDebug() << "XMediaManager::playMedia open succeed";
         play();
-    }else end();
+    }else{
+        qDebug() << "XMediaManager::playMedia open failed";
+        end();
+    }
 }
 
 bool XMediaManager::open(QString url) {
@@ -192,6 +195,7 @@ bool XMediaManager::open(QString url) {
 }
 
 void XMediaManager::play() {
+    qDebug()<<"XMediaManager::play";
     if (_curState == READY) {
         _curState = PLAYING;
         if (!demuxThread) {
