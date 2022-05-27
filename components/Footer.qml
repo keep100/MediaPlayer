@@ -185,14 +185,14 @@ Rectangle{
         }
 
         //视频的已播放时长与总时长
-//        Text {
-//            leftPadding: -200
-//            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
-//            font.pixelSize: 14
-//            color: "white"
-//            anchors.verticalCenter: parent.verticalCenter
-//            opacity: isVideoPlay? 1:0
-//        }
+        Text {
+            leftPadding: -200
+            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
+            font.pixelSize: 14
+            color: "white"
+            anchors.verticalCenter: parent.verticalCenter
+            opacity: isVideoPlay? 1:0
+        }
         
         //退出播放音视频的按钮
         Image {

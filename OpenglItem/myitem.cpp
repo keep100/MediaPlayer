@@ -28,8 +28,8 @@ void MyItem::bind(Controller* obj){
 
 
 void MyItem::onUpdate(std::shared_ptr<YUVData> data){
-    if(!_isPlay)
-        return;
+//    if(!_isPlay)
+//        return;
     this->data = data;
     update();
 }

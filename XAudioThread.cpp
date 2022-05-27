@@ -79,7 +79,6 @@ void XAudioThread::SetVolume(double volume)
 
 void XAudioThread::run()
 {
-    //    unsigned char *pcm = new unsigned char[1024 * 1024];
     char resample_data[1024*256];
     while (!isExit)
     {
@@ -114,10 +113,11 @@ void XAudioThread::run()
             if (!frame) break;
 
             int size = rsmp->Resample(frame, resample_data);
-            if ((pts = frame->pts) == AV_NOPTS_VALUE)
+            if ((pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 pts = 0;
             while (ap2->GetFree() < size)
                 msleep(5);
+            hh
             syn->setAClock(pts, ap2->GetNoPlayMs());
             ap2->Write(resample_data, size);
         }

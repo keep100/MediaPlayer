@@ -23,11 +23,10 @@ public:
     void SetVolume(double volume);
     bool isPause = false;
     bool interupt = false;
+    double a_time_base_d;
 
 protected:
     std::mutex amux;
-//    XAudioPlay *ap = 0;
-//    XResample *res = 0;
     audioPlay2 *ap2 = 0;
     XAudioResample *rsmp = 0;
     SynModule *syn = 0;

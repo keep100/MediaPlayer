@@ -2,14 +2,14 @@
 #include <QDebug>
 
 void SynModule::run() {
-    std::shared_ptr<YUVData> vtemp = yuvQueue.dequeue();
+    vtemp = yuvQueue.dequeue();
     double start_time = av_gettime() / 1000000.0;
     while (true) {
         // 若没有音频，则用系统时钟来同步视频时间
         if (!hasAudio)
             syn_clock_t = av_gettime() / 1000000.0 - start_time;
         v_clock_t = vtemp->pts * v_time_base_d;
-//        qDebug() <<"SynModule" <<  v_clock_t << syn_clock_t;
+        qDebug() <<"SynModule" <<  v_clock_t << syn_clock_t;
         // 播放视频
         // 视频不超过音频0.01s则播放
         if (v_clock_t <= (syn_clock_t + 0.1)) {

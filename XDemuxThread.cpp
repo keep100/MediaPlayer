@@ -33,20 +33,19 @@ void XDemuxThread::SetVolume(double volume)
 }
 void XDemuxThread::Seek(double pos)
 {
-
-    Clear();
     mux.lock();
     bool status = this->isPause;
     mux.unlock();
 
     SetPause(true);
+    Clear();
     mux.lock();
     int re;
     if (demux)
         re = demux->Seek(pos);
     if (re == 0)
         qDebug() << "demux->Seek failed!";
-    AVRational time_base =  demux->getATimebase();
+    AVRational time_base =  demux->getVTimebase();
     long long seekPts = pos * demux->totalMs / 1000.0 / av_q2d(time_base);
     while(!isExit)
     {
@@ -95,13 +94,14 @@ void XDemuxThread::run()
             if(at)
                 state = at->Push(pkt);
             mux.unlock();
+            msleep(1);
         }
         else //视频
         {
             if (vt)
                 state = vt->Push(pkt);
             mux.unlock();
-            usleep(1);
+            msleep(1);
         }
     }
 }
@@ -177,6 +177,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     AVRational time_base;
     time_base = demux->getATimebase();
     syn->setATimeBase(time_base);
+    at->a_time_base_d = av_q2d(time_base);
     time_base = demux->getVTimebase();
     syn->setVTimeBase(time_base);
 

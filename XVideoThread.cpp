@@ -56,7 +56,7 @@ void XVideoThread::run() {
                 break;
 
             std::shared_ptr<YUVData> t = convertToYUV420P(frame);
-            if ((t->pts = frame->pts) == AV_NOPTS_VALUE)
+            if ((t->pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 t->pts = 0;
             // 缓冲区满了则睡眠等待
             int i = 0;
@@ -142,10 +142,11 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {
         vmux.unlock();
         return 0;
     }
+
     //到达位置
     if (decode->pts >= seekPts) {
         std::shared_ptr<YUVData> t = convertToYUV420P(frame);
-        if ((t->pts = frame->pts) == AV_NOPTS_VALUE)
+        if ((t->pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
             t->pts = 0;
         // 缓冲区满了则睡眠等待
         while (!syn->pushYuv(t)) {
@@ -158,7 +159,7 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {
     }
     XFreeFrame(&frame);
     vmux.unlock();
-    return false;
+    return 0;
 }
 
 XVideoThread::XVideoThread() {

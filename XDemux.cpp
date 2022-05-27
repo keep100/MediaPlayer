@@ -68,9 +68,8 @@ bool XDemux::Seek(double pos)
     avformat_flush(ic);
 
     long long seekPos = 0;
-    AVRational a_time_base = ic->streams[audioStream]->time_base;
-    seekPos = ic->duration * pos / AV_TIME_BASE / av_q2d(a_time_base);
-    int re = av_seek_frame(ic, audioStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    seekPos = ic->duration * pos;
+    int re = av_seek_frame(ic, -1, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;
     return true;
@@ -193,7 +192,6 @@ AVPacket *XDemux::ReadVideo()
 AVPacket *XDemux::Read()
 {
     mtx.lock();
-
     if (!ic)
     {
         mtx.unlock();

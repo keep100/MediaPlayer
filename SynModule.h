@@ -17,9 +17,10 @@ class SynModule : public QThread {
 private:
     // 视频帧缓冲队列
     BufferQueue<std::shared_ptr<YUVData>> yuvQueue;
-
-    // 音视频时钟，用于同步和显示当前播放时间
+    std::shared_ptr<YUVData> vtemp;
+    // 视频时钟，
     double v_clock_t = 0;
+    // 同步时钟用于同步和显示当前播放时间
     double syn_clock_t = 0;
     // 音视频帧的pts对应的timebase
     double v_time_base_d;
@@ -49,9 +50,12 @@ public:
     // 重置同步模块
     void clear() {
         yuvQueue.init();
+        int64_t time = 0;
+        if (vtemp)
+            time = vtemp->pts * v_time_base_d * 1000;
+        emit transmitYUV(nullptr, time);
     }
     void run();
-
 
 signals:
     // 通知前端渲染下一帧，并发送当前播放时间
