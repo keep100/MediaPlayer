@@ -37,7 +37,8 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
     qDebug()<<url;
     XDemux *demux = new XDemux();
     XDecode *decode = new XDecode();
-    auto temp = url.toLocal8Bit();
+    auto temp = url.toUtf8();
+    qDebug()<<"temp"<<temp;
     demux->Open(temp.data());
 
     briefInfo.totalMs = demux->totalMs;
@@ -86,21 +87,20 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
 
     }
     else if (QString("mp3, flac, wav").contains(suffix)) { //是音频就提取音频的相关信息
-
         briefInfo.mediaType = "audio";
         briefInfo.codecId = avcodec_get_name(demux->CopyAPara()->codec_id);
-
+        qDebug()<<"briefInfo"<<briefInfo.mediaType<<briefInfo.codecId;
         AVFormatContext *m_AVFormatContext = NULL;
-        int result = avformat_open_input(&m_AVFormatContext, url.toLocal8Bit(), nullptr, nullptr);
+        int result = avformat_open_input(&m_AVFormatContext, url.toUtf8().data(), nullptr, nullptr);
         if (result != 0 || m_AVFormatContext == nullptr) {
-            //            qDebug() << "fffff";
+            qDebug() << "fffff1"<<(result != 0);
             return briefInfo;
         }
 
         // 查找流信息，把它存入AVFormatContext中
         result = avformat_find_stream_info(m_AVFormatContext, nullptr);
         if (result) {
-            //            qDebug() << "fffff1";
+            qDebug() << "fffff2";
             return briefInfo;
         }
 
@@ -118,7 +118,7 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
         briefInfo.album = mInfoMap["album"];
         briefInfo.artist = mInfoMap["artist"];
         briefInfo.title = mInfoMap["title"];
-
+        qDebug()<<mInfoMap;
         for (int i = 0; i < streamsCount; ++i) {
             if (m_AVFormatContext->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) {
                 qDebug() << "-----" << i;
@@ -129,7 +129,6 @@ BriefInfo XMediaManager::getBriefInfo(const QString& url) {
         briefInfo.img = mInfoImage;
     }
 
-    qDebug()<<888;
     return briefInfo;
 }
 
@@ -168,20 +167,21 @@ XMediaManager::XMediaManager() {
 }
 
 void XMediaManager::playMedia(QString url) {
-    if (open(url.toLocal8Bit())) {
+    if (open(url)) {
         qDebug() << "open succeed";
         play();
-    }
+    }else end();
 }
 
-bool XMediaManager::open(const char *url) {
+bool XMediaManager::open(QString url) {
     end();
+    qDebug()<<"XMediaManager::open"<<url.toUtf8();
     if (_curState == INITIAL || _curState == END) {
         _curState = READY;
         if (!demuxThread)
             demuxThread = new XDemuxThread();
         demuxThread->SetPause(false);
-        return demuxThread->Open(url, NULL);
+        return demuxThread->Open(url.toUtf8().data(), NULL);
 
     } else {
         _curState = INITIAL;

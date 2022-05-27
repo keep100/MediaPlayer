@@ -25,6 +25,8 @@ void XAudioResample::init_out_frame(AVFrame *&out_frame, int64_t dst_nb_samples)
 }
 
 bool XAudioResample::Open(QAudioFormat fmt){
+    swrContext = nullptr;
+
     format = fmt;
     target_sample_rate = format.sampleRate();
     switch(format.sampleFormat()){
