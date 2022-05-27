@@ -1,4 +1,4 @@
-﻿#ifndef XDEMUXTHREAD_H
+#ifndef XDEMUXTHREAD_H
 #define XDEMUXTHREAD_H
 
 
@@ -49,7 +49,6 @@ protected:
     XVideoThread *vt = 0;
     XAudioThread *at = 0;
     SynModule *syn=nullptr;
-    int i = 0;
 };
 
 #endif // XDEMUXTHREAD_H
