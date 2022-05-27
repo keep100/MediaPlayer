@@ -20,6 +20,7 @@ private:
     std::shared_ptr<YUVData> vtemp;
     // 视频时钟，
     double v_clock_t = 0;
+    double a_clock_t = 0;
     // 同步时钟用于同步和显示当前播放时间
     double syn_clock_t = 0;
     // 音视频帧的pts对应的timebase
@@ -43,7 +44,7 @@ public:
     }
     // 将音频时钟赋值给syn_clock_t
     void setAClock(int64_t pts, long long noPlayMs) {
-        syn_clock_t = pts * a_time_base_d - noPlayMs / 1000.0;
+        a_clock_t = pts * a_time_base_d - noPlayMs / 1000.0;
     }
     // 重置同步模块
     void clear() {

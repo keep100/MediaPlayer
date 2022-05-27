@@ -60,14 +60,13 @@ void XVideoThread::run() {
                 t->pts = 0;
             // 缓冲区满了则睡眠等待
             int i = 0;
-            while (!syn->pushYuv(t) && i++ < 50) {
+            while (!syn->pushYuv(t) && i++ < 20) {
                 vmux.unlock();
                 msleep(1);
                 vmux.lock();
             }
-            //            showImage->sendimage(frameToImage(frame));
             av_frame_free(&frame);
-            msleep(1);
+//            msleep(1);
         }
         vmux.unlock();
     }
