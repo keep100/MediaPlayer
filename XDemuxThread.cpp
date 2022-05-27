@@ -175,7 +175,6 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         syn->hasAudio =  demux->hasAudio();
     if (at)
         at->hasVideo = demux->hasVideo();
-
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {

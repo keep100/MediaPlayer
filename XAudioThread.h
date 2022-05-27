@@ -37,5 +37,5 @@ protected:
     SynModule *syn = 0;
 
 signals:
-    void transmitTime(std::shared_ptr<YUVData>, int64_t);
+    void transmitTime(int64_t time);
 };

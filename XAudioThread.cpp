@@ -80,6 +80,7 @@ void XAudioThread::SetVolume(double volume)
 void XAudioThread::run()
 {
     char resample_data[1024*256];
+    QTimer timer;
     while (!isExit)
     {
         amux.lock();
@@ -108,6 +109,7 @@ void XAudioThread::run()
             {
                 break;
             }
+
             int64_t pts;
             AVFrame * frame = decode->Recv();
             if (!frame) break;
@@ -117,12 +119,21 @@ void XAudioThread::run()
                 pts = 0;
             while (ap2->GetFree() < size)
                 msleep(1);
-            // 若有视频流，则在同步模块发送当前播放时间；否则在这里发送当前播放时间
-            if (hasVideo)
-                 syn->setAClock(pts, ap2->GetNoPlayMs());
-            else
-                emit transmitTime(nullptr, int64_t(pts * a_time_base_d * 1000));
+            // 发送当前播放时间
+            int64_t noPlayMs = ap2->GetNoPlayMs();
+            emit transmitTime(int64_t(pts * a_time_base_d * 1000 - noPlayMs));
+            syn->setAClock(pts, noPlayMs);
             ap2->Write(resample_data, size);
+
+            connect(&timer, &QTimer::timeout, [&]{
+                noPlayMs -= 100;
+                if (noPlayMs >= 0)
+                    emit transmitTime(int64_t(pts * a_time_base_d * 1000 - noPlayMs));
+                else
+                    timer.stop();
+            });
+            timer.start(100);
+
         }
         amux.unlock();
     }
@@ -131,10 +142,9 @@ void XAudioThread::run()
 
 XAudioThread::XAudioThread()
 {
-    QObject::connect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::onUpdate);
+    QObject::connect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::updateTime);
     if(!ap2) ap2 = new audioPlay2();
     if(!rsmp) rsmp = new XAudioResample();
-
 }
 
 
@@ -144,5 +154,5 @@ XAudioThread::~XAudioThread()
     qDebug() << "XAudioThread::~XAudioThread()\n";
     isExit = true;
     wait();
-    QObject::disconnect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::onUpdate);
+    QObject::disconnect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::updateTime);
 }

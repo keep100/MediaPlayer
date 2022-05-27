@@ -158,7 +158,6 @@ bool XDemux::Open(const char *url)
         channels = ic->streams[audioStream]->codecpar->channels;
         sampleFormat = ic->streams[audioStream]->codecpar->format;
     }
-//    qDebug() << "duration" << (ic->streams[audioStream]->duration);
     //获取音频采样率和通道数
     mtx.unlock();
     return true;

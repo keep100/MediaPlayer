@@ -18,10 +18,11 @@ private:
     // 视频帧缓冲队列
     BufferQueue<std::shared_ptr<YUVData>> yuvQueue;
     std::shared_ptr<YUVData> vtemp;
-    // 视频时钟，
+    // 视频时钟，同步到音频时钟
     double v_clock_t = 0;
+    // 音频时钟
     double a_clock_t = 0;
-    // 同步时钟用于同步和显示当前播放时间
+    // 无音频时用的同步时间
     double syn_clock_t = 0;
     // 音视频帧的pts对应的timebase
     double v_time_base_d;
@@ -47,18 +48,14 @@ public:
         a_clock_t = pts * a_time_base_d - noPlayMs / 1000.0;
     }
     // 重置同步模块
-    void clear() {
-        yuvQueue.init();
-        int64_t time = 0;
-        if (vtemp)
-            time = vtemp->pts * v_time_base_d * 1000;
-        emit transmitYUV(nullptr, time);
-    }
+    void clear();
     void run();
 
 signals:
-    // 通知前端渲染下一帧，并发送当前播放时间
-    void transmitYUV(std::shared_ptr<YUVData> data, int64_t time);
+    // 通知前端渲染下一帧
+    void transmitYUV(std::shared_ptr<YUVData> data);
+    // 发送当前播放时间
+    void transmitTime(int64_t time);
 
 };
 

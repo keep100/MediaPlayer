@@ -46,11 +46,11 @@ public:
     }
 
     bool hasVideo() {
-        return (videoStream != -1);
+        return (ic->streams[videoStream]->duration);
     }
 
     bool hasAudio() {
-        return (audioStream != -1);
+        return (audioStream >= 0);
     }
 
 //总时长 毫秒
