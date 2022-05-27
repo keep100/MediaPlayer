@@ -9,9 +9,7 @@ Rectangle{
     width: parent.width
     height: 40
     color: videoPage.visible?setColor(0,0,0,0.6):setColor(43, 45, 47,0.95)
-    focus: true  //得获取焦点，才能监听键盘事件
-    
-    property variant pressedKeys: new Set()  //存储按下还未释放的按键
+
     required property string mediaType       //判断是否是视频底部栏
 
     //获取音频略缩图
@@ -19,102 +17,7 @@ Rectangle{
         return path? "file:///"+path : "qrc:/images/音乐封面.png"
     }
     
-    Keys.onPressed:function(e) {
-        //将键值加入set
-        if(!e.isAutoRepeat){
-            pressedKeys.add(e.key);
-        }
-        //启动定时器
-        if(!timer.running){
-            timer.start();
-        }
-    }
-    Keys.onReleased: function(e){
-        //将按键值弹出
-        if(!e.isAutoRepeat){
-            pressedKeys.delete(e.key);
-        }
-        //停止定时器
-        if(pressedKeys.size<=0){
-            timer.stop();
-        }
-    }
-    
-    //用于控制遍历按键set的时机
-    Timer{
-        id:timer
-        repeat: true
-        interval: 50
-        onTriggered: {
-            //如果没有按键按下，停止定时器
-            if(pressedKeys.size<=0){
-                timer.stop();
-                return;
-            }
-            
-            //遍历已经按下的按键，处理多个按键
-            for(let key of pressedKeys){
-                switch(key){
-                case Qt.Key_Space:     //处理空格键，暂停或播放音视频
-                    console.log('sapce');
-                    if(isAudioPlay||isVideoPlay){
-                        isPlaying=!isPlaying;
-                        controller.stop();
-                    }
-                    break;
-                case Qt.Key_Escape:     //处理esc键，退出全屏
-                    console.log('esc');
-                    if(isFullSreen){
-                        isFullSreen=false;
-                        showInitial();
-                    }
-                    break;
-                case Qt.Key_F:         //处理Ctrl+F，全屏
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl F');
-                        isFullSreen=true;
-                        showFull();
-                    }
-                    break;
-                case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl I');
-                        if(!fileDialog.visible){
-                            fileDialog.open();
-                        }
-                    }
-                    break;
-                case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl left');
-                        controller.playPre(mediaType==='audio');
-                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
-                    }
-                    break;
-                case Qt.Key_Right:      //处理Ctrl+ → ，下一首
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl right');
-                        controller.playNext(mediaType==='audio');
-                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
-                    }
-                    break;
-                case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl up');
-                        mainWindow.voice++;
-                    }
-                    break;
-                case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
-                    if(pressedKeys.has(Qt.Key_Control)){
-                        console.log('ctrl down');
-                        mainWindow.voice--;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-    
+    //内容区域
     Row{
         width: parent.width
         height: parent.height
@@ -185,14 +88,14 @@ Rectangle{
         }
 
         //视频的已播放时长与总时长
-//        Text {
-//            leftPadding: -200
-//            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
-//            font.pixelSize: 14
-//            color: "white"
-//            anchors.verticalCenter: parent.verticalCenter
-//            opacity: isVideoPlay? 1:0
-//        }
+        Text {
+            leftPadding: -200
+            text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
+            font.pixelSize: 14
+            color: "white"
+            anchors.verticalCenter: parent.verticalCenter
+            opacity: isVideoPlay? 1:0
+        }
         
         //退出播放音视频的按钮
         Image {
@@ -244,6 +147,7 @@ Rectangle{
                 onClicked: {
                     controller.playPre(mediaType==='audio');
                     curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+
                 }
             }
         }

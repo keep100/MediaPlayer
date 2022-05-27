@@ -12,9 +12,15 @@ Window {
 
     property bool isEnabled: false    //是否启用底部栏动画
     property bool isShowQueue: false  //是否展示了视频播放列表
+    property int playTime: controller?.time  //当前播放进度
 
-    function setIdx(idx){
-        videoQueue.setIdx(idx);
+                                       function setIdx(idx){
+                                           videoQueue.setIdx(idx);
+                                       }
+    onPlayTimeChanged: {
+        if(visible&&!videoSlider.pressed){
+            videoSlider.value=playTime;
+        }
     }
 
     //监听controller信号
@@ -26,10 +32,11 @@ Window {
         }
         function onPlayMedia(){              //准备播放视频
             console.log('begin play');
-            loadingImg.visible=false;
+//            loadingImg.visible=false;
+            isPlaying=true;
         }
         function onFileFinish(){             //文件播放结束
-            console.log('fileFinish');
+            console.log('fileFinish',playMode);
             if(playMode===3){
                 controller.stop();
             }else{
@@ -62,36 +69,36 @@ Window {
         anchors.fill: parent
         Component.onCompleted: bind(controller)
     }
-//    Image {
-//        id:img
-//        anchors.fill: parent
-//        cache: false
-//        mipmap: true
-//        smooth: true
-////        fillMode: Image.PreserveAspectFit
-//    }
+    //    Image {
+    //        id:img
+    //        anchors.fill: parent
+    //        cache: false
+    //        mipmap: true
+    //        smooth: true
+    ////        fillMode: Image.PreserveAspectFit
+    //    }
 
     //与ShowImage类实例建立连接，接收刷新界面的信号
-//    Connections{
-//        target: MyImage
-//        function onCallQmlRefeshImg(){
-//            img.source = "";
-//            img.source = "image://Imgs";
-//        }
-//    }
+    //    Connections{
+    //        target: MyImage
+    //        function onCallQmlRefeshImg(){
+    //            img.source = "";
+    //            img.source = "image://Imgs";
+    //        }
+    //    }
 
     //加载页面
-    Rectangle{
-        id:loadingImg
-        anchors.fill: parent
-        color: setColor(13, 18, 31)
-        Label{
-            anchors.centerIn: parent
-            text: '玩命加载中 . . .'
-            font.pixelSize: 16
-            color: "white"
-        }
-    }
+//    Rectangle{
+//        id:loadingImg
+//        anchors.fill: parent
+//        color: setColor(13, 18, 31)
+//        Label{
+//            anchors.centerIn: parent
+//            text: '玩命加载中 . . .'
+//            font.pixelSize: 16
+//            color: "white"
+//        }
+//    }
 
     //错误信息对话框
     Dialog {
@@ -231,8 +238,85 @@ Window {
     }
 
     MouseArea{
+        id:globalMouseArea
         anchors.fill: parent
         hoverEnabled: true
+        focus: true
+        property variant pressedKeys: new Set()  //存储按下还未释放的按键
+
+        Keys.onPressed:function(e) {
+            //将键值加入set
+            if(!e.isAutoRepeat){
+                globalMouseArea.pressedKeys.add(e.key);
+            }
+        }
+        Keys.onReleased: function(e){
+            //将按键值弹出
+            if(!e.isAutoRepeat&&globalMouseArea.pressedKeys.has(e.key)){
+                globalMouseArea.pressedKeys.delete(e.key);
+            }
+            switch(e.key){
+            case Qt.Key_Space:     //处理空格键，暂停或播放音视频
+                console.log('sapce');
+                if(isAudioPlay||isVideoPlay){
+                    isPlaying=!isPlaying;
+                    controller.stop();
+                }
+                break;
+            case Qt.Key_Escape:     //处理esc键，退出全屏
+                console.log('esc');
+                if(isFullSreen){
+                    isFullSreen=false;
+                    showInitial();
+                }
+                break;
+            case Qt.Key_F:         //处理Ctrl+F，全屏
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl F');
+                    isFullSreen=true;
+                    showFull();
+                }
+                break;
+            case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl I');
+                    if(!fileDialog.visible){
+                        fileDialog.open();
+                    }
+                }
+                break;
+            case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl left');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playPre(true):controller.playPre(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Right:      //处理Ctrl+ → ，下一首
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl right');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playNext(true):controller.playNext(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl up');
+                    mainWindow.voice++;
+                }
+                break;
+            case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl down');
+                    mainWindow.voice--;
+                }
+                break;
+            }
+        }
 
         //监听鼠标移动
         onPositionChanged: {
@@ -267,7 +351,7 @@ Window {
                 }
                 Text {
                     text: dataMgr?.curVideo.fileName ?? "这是视频名字"
-                    leftPadding: 10
+                                                        leftPadding: 10
                     color: "white"
                     font.pixelSize: 14
                     anchors.verticalCenter: parent.verticalCenter
@@ -310,9 +394,9 @@ Window {
         Slider {
             id: videoSlider
             from: 0
-            value: controller?.time ?? 0
+            value: 0
             to: dataMgr?.curVideo.duration ?? 100
-            stepSize: 1
+                                              stepSize: 1
             y:footer.y-videoSlider.availableHeight / 2
             z:1
             visible: footer.y!==windowHeight

@@ -13,6 +13,19 @@ Rectangle{
     function setIdx(idx){
         queue.currentIndex=idx;
     }
+    //关闭播放队列
+    function onClose(){
+        mainWindow.isShowQueue=false;
+        queueAnimation.from = windowWidth-playQueue.width;
+        queueAnimation.to = windowWidth;
+        queueAnimation.target=playQueue;
+        queueAnimation.running = true;
+    }
+    //打开播放界面
+    function openVideoPage(){
+        videoPage.visible=true;
+        mainWindow.visible=false;
+    }
 
     Column{
         anchors.fill: parent
@@ -73,7 +86,18 @@ Rectangle{
                     onClicked:{
                         if(curMediaIdx!==modelData.index){
                             curMediaIdx=modelData.index;
-                            controller.startPlay(modelData.index,true);
+                            if(curIdx===0){
+                                if(isAudioPlay){
+                                    isAudioPlay=false;
+                                    isPlaying=false;
+                                    controller.exit();
+                                }
+                                if(mainWindow.visible){
+                                    onClose();
+                                    openVideoPage();
+                                }
+                            }
+                            controller.startPlay(modelData.index,curIdx===1);
                             curIdx?isAudioPlay=true:isVideoPlay=true;
                             isPlaying=true;
                         }

@@ -22,11 +22,13 @@ Rectangle{
         leftPadding: uploadBtn.x
         visible: musicList.count>0
         Image {
+            id:listImg
             width: 100
             height: 100
             source: "qrc:/images/音乐封面.png"
         }
         Row{
+            id:titleRow
             topPadding: 10
             bottomPadding: 10
             Text {
@@ -37,7 +39,7 @@ Rectangle{
             }
             Text {
                 leftPadding: 14
-                text: qsTr("共100首")
+                text: qsTr("共"+dataMgr?.audioList.length+"首")
                 color: "white"
                 font.pixelSize: 14
                 anchors.verticalCenter: parent.verticalCenter
@@ -50,6 +52,7 @@ Rectangle{
 
             //列表表头
             Rectangle{
+                id:header
                 width: parent.width
                 height: 36
                 color: setColor(40, 41, 40,0.85)
@@ -186,7 +189,7 @@ Rectangle{
             ListView{
                 id:musicList
                 width: parent.width
-                height:titleBar.isMaximized||isFullSreen?windowHeight*0.48:windowHeight*0.35
+                height:musicView.height-listImg.height-titleRow.height-header.height
                 model: isSearched?searchList:dataMgr?.audioList
                 clip: true
                 delegate:musicDelegate

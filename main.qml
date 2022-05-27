@@ -20,7 +20,8 @@ Window {
     property bool isPlaying: false        //音视频是否正在播放
     property bool isCoverShow: false      //音频封面页是否已经展示
     property bool isShowQueue: false      //是否展示了播放列表
-    property int playMode: 2              //播放模式，默认循环播放
+    property int playTime: controller?.time  //当前播放进度
+                                       property int playMode: 2              //播放模式，默认循环播放
     property int voice: 15                //播放音量
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
@@ -133,6 +134,15 @@ Window {
         curIdx?musicView.setIdx(curMediaIdx):videoPage.setIdx(curMediaIdx);
     }
 
+    //监听播放进度变化
+    onPlayTimeChanged: {
+        onPlayTimeChanged: {
+            if(visible&&!audioSlider.pressed){
+                audioSlider.value=playTime;
+            }
+        }
+    }
+
     //监听controller信号
     Connections{
         target: controller
@@ -150,9 +160,6 @@ Window {
         }
         function onFileError(file){          //文件解析失败或者md5不一致
             console.log(file);
-        }
-        function onUpdate(yuv){              //渲染组件进行更新
-            console.log('update');
         }
     }
 
@@ -297,9 +304,9 @@ Window {
     Slider {
         id: audioSlider
         from: 0
-        value: controller?.time ?? 0
+        value: 0
         to: dataMgr?.curAudio.duration ?? 100
-        stepSize: 1
+                                          stepSize: 1
         y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay
@@ -357,5 +364,81 @@ Window {
     Footer{
         id:footer
         mediaType: 'audio'
+        focus: true
+        property variant pressedKeys: new Set()  //存储按下还未释放的按键
+
+        Keys.onPressed:function(e) {
+            //将键值加入set
+            if(!e.isAutoRepeat){
+                footer.pressedKeys.add(e.key);
+            }
+        }
+        Keys.onReleased: function(e){
+            //将按键值弹出
+            if(!e.isAutoRepeat&&footer.pressedKeys.has(e.key)){
+                footer.pressedKeys.delete(e.key);
+            }
+            switch(e.key){
+            case Qt.Key_Space:     //处理空格键，暂停或播放音视频
+                console.log('sapce');
+                if(isAudioPlay||isVideoPlay){
+                    isPlaying=!isPlaying;
+                    controller.stop();
+                }
+                break;
+            case Qt.Key_Escape:     //处理esc键，退出全屏
+                console.log('esc');
+                if(isFullSreen){
+                    isFullSreen=false;
+                    showInitial();
+                }
+                break;
+            case Qt.Key_F:         //处理Ctrl+F，全屏
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl F');
+                    isFullSreen=true;
+                    showFull();
+                }
+                break;
+            case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl I');
+                    if(!fileDialog.visible){
+                        fileDialog.open();
+                    }
+                }
+                break;
+            case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl left');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playPre(true):controller.playPre(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Right:      //处理Ctrl+ → ，下一首
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl right');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playNext(true):controller.playNext(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl up');
+                    mainWindow.voice++;
+                }
+                break;
+            case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl down');
+                    mainWindow.voice--;
+                }
+                break;
+            }
+        }
     }
 }
