@@ -26,7 +26,6 @@ void XMediaManager::bind(QObject *obj) {
         QObject::connect(ctrl, &Controller::exitPlay, this, &XMediaManager::end);
         QObject::connect(ctrl, &Controller::voiceChanged, this, &XMediaManager::setVolume);
         QObject::connect(ctrl, &Controller::skipTime, this,&XMediaManager::seek);
-        QObject::connect(demuxThread->getSyn(), &SynModule::transmitYUV, ctrl, &Controller::onUpdate);
     }
 }
 
