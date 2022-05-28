@@ -1,6 +1,6 @@
 ﻿import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls 2.5
+import QtQuick.Controls 2.15
 import Qt.labs.platform 1.1
 import Qt5Compat.GraphicalEffects
 import "./components/"
@@ -22,7 +22,7 @@ Window {
     property bool isShowQueue: false      //是否展示了播放列表
     property int playTime: controller?.time  //当前播放进度
     property int playMode: 2              //播放模式，默认循环播放
-    property int voice: 15                //播放音量
+    property int voice: 50                //播放音量
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度

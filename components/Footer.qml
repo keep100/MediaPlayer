@@ -18,15 +18,16 @@ Rectangle{
     }
     
     //内容区域
-    Row{
+    Rectangle{
         width: parent.width
         height: parent.height
+        color:"transparent"
         
         //音频略缩图、歌名和歌手信息
         Row{
             leftPadding: 20
             height: parent.height
-            opacity: isAudioPlay?1:0
+            visible: isAudioPlay
             
             //音频略缩图
             Image {
@@ -89,12 +90,12 @@ Rectangle{
 
         //视频的已播放时长与总时长
         Text {
-            leftPadding: -200
+            leftPadding: 20
             text: formatTime(controller?.time)+"/"+formatTime(dataMgr?.curVideo.duration)
             font.pixelSize: 14
             color: "white"
             anchors.verticalCenter: parent.verticalCenter
-            opacity: isVideoPlay? 1:0
+            visible: isVideoPlay
         }
         
         //退出播放音视频的按钮
@@ -256,7 +257,7 @@ Rectangle{
             font.pixelSize: 14
             color: "white"
             anchors.verticalCenter: parent.verticalCenter
-            opacity: isAudioPlay?1:0
+            visible: isAudioPlay
         }
 
         //倍速，当且仅当视频播放时展示
