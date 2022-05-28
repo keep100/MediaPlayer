@@ -22,6 +22,7 @@ void Controller::exit(){
     //退出播放前先记录播放历史
     manager.recordVideo(_time);
     manager.reset();
+    manager.writeData();
     _time = 0;
     emit exitPlay();
 }
@@ -62,7 +63,7 @@ void Controller::startPlay(int index,bool isAudio){
         emit playMedia(manager.getData(index,isAudio).filePath());
         qDebug()<<"startplay"<<manager.getData(index,isAudio).fileName()<<manager.getData(index,isAudio).lastTime();
         qDebug()<<"voice"<<_voice;
-       emit voiceChanged(_voice);
+        emit voiceChanged(_voice);
         setTime(manager.getData(index,isAudio).lastTime());
 
     }
@@ -113,6 +114,11 @@ void Controller::updateTime(int time) {
 
 void Controller::setUserInfo(QString path,float ratio){
     manager.setUserInfo(path,ratio);
+}
+
+void Controller::finish(){
+    manager.recordVideo(0);     //如果当前播放结束就把记录置为0
+    emit fileFinish();
 }
 
 

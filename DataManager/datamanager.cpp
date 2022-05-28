@@ -109,7 +109,6 @@ void DataManager::readData()
                     info.setFile(_audioList.back().filePath());
                     if(!info.isFile())
                     {
-                        QFile::remove(_audioList.back().imgPath());
                         _audioList.removeLast();
                     }
                 }
@@ -141,7 +140,6 @@ void DataManager::readData()
                     info.setFile(_videoList.back().filePath());
                     if(!info.isFile())
                     {
-                        QFile::remove(_videoList.back().imgPath());
                         _videoList.removeLast();
                     }
                 }
@@ -255,7 +253,6 @@ void DataManager::deleteData(int index, bool isAudio)
     if(index < list.size() && index >= 0)
     {
         //删除缩略图
-        QFile::remove(list[index].imgPath());
         list.removeAt(index);
         order.moveOrder(index);     //同步修改顺序列表
         //如果修改的是当前正在播放的列表则修改对应的索引
