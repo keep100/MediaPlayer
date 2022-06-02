@@ -3,10 +3,9 @@
 #include "XVideoThread.h"
 #include "XAudioThread.h"
 #include "XSubtitleThread.h"
-#include <iostream>
-#include <QDebug>
 #include <QMediaDevices>
 #include "XDecode.h"
+
 void XDemuxThread::SetPause(bool isPause)
 {
     mux.lock();
@@ -101,8 +100,8 @@ void XDemuxThread::run()
         }
         else //视频
         {
-            if (vt)
-                state = vt->Push(pkt);
+//            if (vt)
+//                state = vt->Push(pkt);
             mux.unlock();
             msleep(1);
         }
@@ -141,7 +140,7 @@ void XDemuxThread::Clear()
     mux.unlock();
 }
 
-bool XDemuxThread::Open(const char *url, IVideoCall *call)
+bool XDemuxThread::Open(const char *url)
 {
     if (url == 0 || url[0] == '\0')
         return false;
@@ -185,7 +184,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     syn->setVTimeBase(time_base);
 
     //打开视频解码器和处理线程
-    if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
+    if (!vt->Open(demux->CopyVPara(), demux->width, demux->height, syn))
     {
         QString suffix = QString(url).split(".").last();
         if (QString("mp4, flv, avi, mkv").contains(suffix)) re = false;
@@ -220,9 +219,9 @@ void XDemuxThread::Start()
     if (!at) at = new XAudioThread();
     if (!syn) syn = new SynModule();
     QThread::start();
-    if (vt)vt->start();
+//    if (vt)vt->start();
     if (at)at->start();
-    if (syn) syn->start();
+//    if (syn) syn->start();
     mux.unlock();
     qDebug()<<"XDemuxThread::Start() finished";
 }

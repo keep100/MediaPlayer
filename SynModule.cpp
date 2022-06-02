@@ -1,6 +1,6 @@
 ﻿#include "SynModule.h"
-#include <QDebug>
 #include "controller.h"
+
 SynModule::SynModule(): yuvQueue(yuvBuffSize){
     QObject::connect(this, &SynModule::transmitYUV, Controller::controller, &Controller::updateYUV);
     if (!hasAudio)
@@ -8,9 +8,6 @@ SynModule::SynModule(): yuvQueue(yuvBuffSize){
 }
 SynModule::~SynModule() {
     clear();
-    QObject::disconnect(this, &SynModule::transmitYUV, Controller::controller, &Controller::updateYUV);
-    if (!hasAudio)
-        QObject::disconnect(this, &SynModule::transmitTime, Controller::controller, &Controller::updateTime);
 }
 
 void SynModule::clear() {
@@ -36,17 +33,21 @@ void SynModule::run() {
                 vtemp = yuvQueue.dequeue();
             } else {
                 // 计算视频同步音频所需的延迟
-                int64_t delay = (v_clock_t - a_clock_t - 0.02) * 1000;
+                int64_t delay = (v_clock_t - a_clock_t) * 1000;
                 while (delay > 1000) {
                     vtemp = yuvQueue.dequeue();
                     emit transmitYUV(vtemp);
                     v_clock_t = vtemp->pts * v_time_base_d;
-                    delay = (v_clock_t - a_clock_t - 0.02) * 1000;
+                    delay = (v_clock_t - a_clock_t) * 1000;
                 }
                 // delay最多为5ms
-                if (delay > 5 || delay < 0)
-                    delay = 5;
+                if (delay > 38)
+                    delay = 38;
+                else if (delay < 0)
+                    delay = 0;
                 msleep(delay);
+                emit transmitYUV(vtemp);
+                vtemp = yuvQueue.dequeue();
             }
         }
     }

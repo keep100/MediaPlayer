@@ -6,8 +6,6 @@ class XDecode;
 class SynModule;
 #include <list>
 #include <mutex>
-#include <QThread>
-#include "IVideoCall.h"
 #include "XDecodeThread.h"
 #include "XSubtitleThread.h"
 #include "util/imageprovider.h"
@@ -19,7 +17,7 @@ class XVideoThread: public XDecodeThread
     friend class XSubtitleThread;
 public:
     //打开，不管成功与否都清理
-    virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height, SynModule *syn);
+    virtual bool Open(AVCodecParameters *para, int width, int height, SynModule *syn);
     void run();
 
     XVideoThread();
@@ -37,7 +35,6 @@ public:
 
 private:
     std::mutex vmux;
-    IVideoCall *call = 0;
     AVCodecParameters *codecParam;
     SynModule *syn = 0;
 

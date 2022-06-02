@@ -5,9 +5,6 @@
 #include "util/bufferqueue.h"
 #include "util/pcmdata.h"
 #include "util/yuvdata.h"
-#include <QTimer>
-#include <QThread>
-#include <QMutex>
 
 // 音视频缓存队列的容量
 const static size_t yuvBuffSize = 50;
@@ -49,7 +46,7 @@ public:
     }
     // 重置同步模块
     void clear();
-    void run();
+    void run() override;
 
 signals:
     // 通知前端渲染下一帧

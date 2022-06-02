@@ -2,11 +2,9 @@
 #ifndef XDEMUXTHREAD_H
 #define XDEMUXTHREAD_H
 
-
-#include <QThread>
-#include "IVideoCall.h"
 #include "SynModule.h"
 #include <mutex>
+
 struct YUVData;
 struct PCMData;
 class XDemux;
@@ -18,7 +16,7 @@ class XDemuxThread:public QThread
 {
 public:
     //创建对象并打开
-    virtual bool Open(const char *url, IVideoCall *call);
+    virtual bool Open(const char *url);
 
     //启动所有线程
     virtual void Start();

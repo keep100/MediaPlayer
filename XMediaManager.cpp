@@ -3,18 +3,7 @@
 #include "XDemux.h"
 #include "XDemuxThread.h"
 #include "XVideoThread.h"
-extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavdevice/avdevice.h"
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-#include "libavutil/imgutils.h"
-#include "libswscale/swscale.h"
-}
 #include "controller.h"
-#include <QDebug>
-#include <QThread>
-#include <iostream>
 
 using namespace std;
 
@@ -183,7 +172,7 @@ bool XMediaManager::open(QString url) {
         if (!demuxThread)
             demuxThread = new XDemuxThread();
         demuxThread->SetPause(false);
-        return demuxThread->Open(url.toUtf8().data(), NULL);
+        return demuxThread->Open(url.toUtf8().data());
 
     } else {
         _curState = INITIAL;

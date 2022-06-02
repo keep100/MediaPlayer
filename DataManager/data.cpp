@@ -1,7 +1,6 @@
 ﻿#include "data.h"
-#include<QFile>
 #include<QCryptographicHash>
-#include<QFileInfo>
+
 
 QDir Data::dir = QDir("./Data/thumpnail");
 

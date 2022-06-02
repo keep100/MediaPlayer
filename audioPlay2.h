@@ -1,19 +1,8 @@
-#ifndef AUDIOPLAY2_H
+﻿#ifndef AUDIOPLAY2_H
 #define AUDIOPLAY2_H
 
 #include <math.h>
-#include <QFile>
-#include <QAudioSink>
 #include <QByteArray>
-#include <QComboBox>
-#include <QIODevice>
-#include <QLabel>
-#include <QMainWindow>
-#include <QObject>
-#include <QPushButton>
-#include <QSlider>
-#include <QTimer>
-#include <QScopedPointer>
 #include <QMediaDevices>
 #include <mutex>
 

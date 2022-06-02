@@ -1,8 +1,6 @@
 ﻿#ifndef XMEDIAMANAGER_H
 #define XMEDIAMANAGER_H
-#include <QThread>
 #include <QImage>
-#include <QDebug>
 #include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XDecode.h"

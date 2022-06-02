@@ -5,7 +5,6 @@ struct AVPacket;
 class XDecode;
 #include <list>
 #include <mutex>
-#include <QThread>
 class XDecodeThread:public QThread
 {
 public:

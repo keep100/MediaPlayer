@@ -3,19 +3,9 @@
 #include "audioPlay2.h"
 #include <QAudioDevice>
 #include <QAudioSink>
-#include <QDebug>
 #include <QVBoxLayout>
 #include <qmath.h>
 #include <qendian.h>
-#include <QFile>
-extern "C" {
-#include "libavformat/avformat.h"
-#include <libswresample/swresample.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/frame.h>
-#include <libavutil/opt.h>
-#include <libavutil/channel_layout.h>
-}
 
 class XAudioResample{
 

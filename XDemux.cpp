@@ -1,11 +1,5 @@
 ﻿#include "XDemux.h"
 #include "controller.h"
-#include <iostream>
-using namespace std;
-extern "C"
-{
-#include <libavformat/avformat.h>
-}
 
 static double r2d(AVRational r)
 {
@@ -62,11 +56,9 @@ void XDemux::Close()
 }
 bool XDemux::Seek(double pos)
 {
-    qDebug()<<"pos"<<pos;
     if (pos < 0.0 || pos > 1.0)
-    {
         return false;
-    }
+
     mtx.lock();
     if (!ic)
     {
@@ -145,17 +137,17 @@ bool XDemux::Open(const char *url)
         mtx.unlock();
         char buf[1024]{0};
         av_strerror(ret, buf, 1024 - 1);
-        cout << "open failed : " << buf << endl;
+        qDebug() << "open failed : " << buf;
         getchar();
         return 0;
     }
-    cout << "open succeeded ret = " << ret << endl;
+    qDebug() << "open succeeded ret = " << ret;
 
     //获取流信息
     ret = avformat_find_stream_info(ic, NULL);
     if (ret)
     {
-        cout << "get stream info failed\n";
+        qDebug() << "get stream info failed";
         return 0;
     }
     //获取总时长 毫秒

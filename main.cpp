@@ -1,13 +1,8 @@
-﻿#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QQuickWindow>
-#include "XVideoThread.h"
+﻿#include "XVideoThread.h"
 #include "XDemuxThread.h"
 #include "util/imageprovider.h"
 #include "util/cursorposprovider.h"
 #include "XMediaManager.h"
-#include <QDebug>
 #include "OpenglItem/myitem.h"
 #include "controller.h"
 

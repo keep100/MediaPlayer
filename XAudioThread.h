@@ -1,11 +1,11 @@
-﻿#include <QThread>
-#include <mutex>
+﻿#include <mutex>
 #include <list>
-struct AVCodecParameters;
 #include "XDecodeThread.h"
 #include "audioPlay2.h"
 #include "SynModule.h"
 #include "XAudioResample.h"
+struct AVCodecParameters;
+
 class XAudioThread:public XDecodeThread
 {
     Q_OBJECT

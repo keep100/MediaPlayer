@@ -52,7 +52,6 @@ bool XDecodeThread::Push(AVPacket *pkt)
 {
     if (!pkt)return true;
     // 阻塞
-
     mux.lock();
     if (packs.size() < maxList)
     {

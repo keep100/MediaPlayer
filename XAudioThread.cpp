@@ -2,8 +2,6 @@
 #include "XDecode.h"
 #include "util/pcmdata.h"
 #include "controller.h"
-#include <iostream>
-using namespace std;
 //停止线程，清理资源
 void XAudioThread::Close()
 {
@@ -23,7 +21,6 @@ void XAudioThread::Close()
 void XAudioThread::Clear()
 {
     XDecodeThread::Clear();
-
     if(ap2){
         ap2->Clear();
     }
@@ -49,7 +46,6 @@ bool XAudioThread::Open(AVCodecParameters *para,int sampleRate, int channels, Sy
         re = false;
         qDebug()<<"!rsmp->Open(ap2->GetFormat())";
     }
-
     if (!decode->Open(para))
     {
         re = false;
@@ -76,10 +72,10 @@ void XAudioThread::SetVolume(double volume)
     //amux.unlock();
 }
 
-
 void XAudioThread::run()
 {
     char resample_data[1024*256];
+    double startTime = av_gettime() / 1000000.0;
     while (!isExit)
     {
         amux.lock();
@@ -97,7 +93,7 @@ void XAudioThread::run()
                 emit isEnd();
                 break;
             }
-            usleep(500);
+            msleep(1);
         }
 
         bool re = decode->Send(pkt);
@@ -112,9 +108,7 @@ void XAudioThread::run()
         while (!isExit)
         {
             if (isPause)
-            {
                 break;
-            }
 
             int64_t pts;
             AVFrame * frame = decode->Recv();
@@ -123,10 +117,14 @@ void XAudioThread::run()
             int size = rsmp->Resample(frame, resample_data);
             if ((pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 pts = 0;
-            while (ap2->GetFree() < size)
+//            qDebug() << "clock" << av_gettime() / 1000000.0 - startTime;
+            qDebug() << "audioclock" << pts * a_time_base_d;
+            while (ap2->GetFree() < size) {
                 msleep(1);
+            }
             // 发送当前播放时间
             int64_t noPlayMs = ap2->GetNoPlayMs();
+
             emit transmitTime(int64_t(pts * a_time_base_d * 1000 - noPlayMs));
             syn->setAClock(pts, noPlayMs);
             ap2->Write(resample_data, size);

@@ -2,10 +2,8 @@
 #define CONTROLLER_H
 
 #include <QObject>
-#include <QDebug>
 #include "PlayMode.h"
 #include "DataManager/datamanager.h"
-#include <QQmlApplicationEngine>
 #include "util/yuvdata.h"
 
 

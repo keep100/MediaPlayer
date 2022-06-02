@@ -2,10 +2,8 @@
 #define DATA_H
 
 #include <QObject>
-#include<QDebug>
 #include<QJsonObject>
 #include"XMediaManager.h"
-#include<QDir>
 
 enum State{
     Normal,

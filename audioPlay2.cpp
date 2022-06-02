@@ -1,14 +1,9 @@
 ﻿
 #include "audioPlay2.h"
 #include <QAudioDevice>
-#include <QAudioSink>
-#include <QDebug>
 #include <QVBoxLayout>
 #include <qmath.h>
 #include <qendian.h>
-#include <QFile>
-
-
 
 audioPlay2::audioPlay2()
 {

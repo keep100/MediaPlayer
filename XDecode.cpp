@@ -1,10 +1,5 @@
 ﻿#include "XDecode.h"
-extern "C"
-{
-#include<libavcodec/avcodec.h>
-}
-#include <iostream>
-using namespace std;
+
 void XFreePacket(AVPacket **pkt)
 {
     if (!pkt || !(*pkt))
@@ -61,7 +56,7 @@ bool XDecode::Open(AVCodecParameters *para)
     if (!vcodec)
     {
         avcodec_parameters_free(&para);
-        cout << "can't find the codec id " << para->codec_id << endl;
+        qDebug() << "can't find the codec id " << para->codec_id;
         return false;
     }
 
@@ -75,6 +70,7 @@ bool XDecode::Open(AVCodecParameters *para)
     //八线程解码
     codec->thread_count = 8;
 
+
     ///打开解码器上下文
     int re = avcodec_open2(codec, 0, 0);
     if (re != 0)
@@ -83,7 +79,7 @@ bool XDecode::Open(AVCodecParameters *para)
         decode_mtx.unlock();
         char buf[1024] = { 0 };
         av_strerror(re, buf, sizeof(buf) - 1);
-        cout << "avcodec_open2  failed! :" << buf << endl;
+        qDebug() << "avcodec_open2  failed! :" << buf;
         return false;
     }
     decode_mtx.unlock();

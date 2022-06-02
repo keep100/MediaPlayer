@@ -1,17 +1,9 @@
-﻿extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavdevice/avdevice.h"
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-#include "libavutil/imgutils.h"
-#include "libswscale/swscale.h"
-}
-#include "SynModule.h"
+﻿#include "SynModule.h"
 #include "XDecode.h"
 #include "XVideoThread.h"
-#include <iostream>
+
 //打开，不管成功与否都清理
-bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width,
+bool XVideoThread::Open(AVCodecParameters *para, int width,
                         int height, SynModule *syn) {
     if (!para)
         return false;
@@ -54,7 +46,7 @@ void XVideoThread::run() {
             if (!frame)
                 break;
             std::shared_ptr<YUVData> t;
-            //如果字幕成功打开，且是文本字幕，需经过过滤器，则输出使用subtitle
+            // 如果字幕成功打开，且是文本字幕，需经过过滤器，则输出使用subtitle
             // filter过滤后的图像
             if (subtitleOpened) {
                 qDebug() << "subtitleOpened";

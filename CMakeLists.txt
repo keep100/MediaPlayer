@@ -33,10 +33,10 @@ set(PROJECT_SOURCES
         image.qrc
         XDemux.h XDemux.cpp
         XDecode.h XDecode.cpp
-        XVideoWidget.h XVideoWidget.cpp
+#        XVideoWidget.h XVideoWidget.cpp
         XAudioThread.h XAudioThread.cpp
         XVideoThread.h XVideoThread.cpp
-        IVideoCall.h
+#        IVideoCall.h
         XDemuxThread.h XDemuxThread.cpp
         util/cursorposprovider.h
         util/imageprovider.h util/imageprovider.cpp
@@ -45,7 +45,7 @@ set(PROJECT_SOURCES
         util/pcmdata.h
         XDecodeThread.h XDecodeThread.cpp
         OverloadSlider.h OverloadSlider.cpp
-        widget.h widget.cpp widget.ui
+#        widget.h widget.cpp widget.ui
         PlayMode.h
         controller.h controller.cpp
         XMediaManager.h XMediaManager.cpp
@@ -90,7 +90,6 @@ endif()
 target_precompile_headers(
     MediaPlayer
     PUBLIC stdafx.h
-
 )
 
 target_compile_definitions(MediaPlayer

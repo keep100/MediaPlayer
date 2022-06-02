@@ -45,7 +45,7 @@ public:
     }
 
     AVRational getATimebase() {
-        AVRational temp{0,1};
+        AVRational temp{0, 1};
         if (ic != nullptr && audioStream >= 0)
             temp = ic->streams[audioStream]->time_base;
         return temp;

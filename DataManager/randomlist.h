@@ -2,7 +2,6 @@
 #define RANDOMLIST_H
 #include<QList>
 #include<random>
-#include <QDebug>
 
 
 //用于实现随机列表的功能

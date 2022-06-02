@@ -1,11 +1,6 @@
 ﻿#include "XAudioResample.h"
-#include <QDebug>
 #include <QAudioDevice>
 #include <QMediaDevices>
-extern "C" {
-#include <libswresample/swresample.h>
-#include <libavcodec/avcodec.h>
-}
 
 XAudioResample::XAudioResample(){
 
@@ -31,46 +26,50 @@ bool XAudioResample::Open(QAudioFormat fmt){
     target_sample_rate = format.sampleRate();
     switch(format.sampleFormat()){
     case QAudioFormat::UInt8:{
-        target_sample_format = AV_SAMPLE_FMT_U8P;break;
+        target_sample_format = AV_SAMPLE_FMT_U8P;
+        break;
     }
     case QAudioFormat::Int16:{
-        target_sample_format = AV_SAMPLE_FMT_S16P;break;
+        target_sample_format = AV_SAMPLE_FMT_S16P;
+        break;
     }
     case QAudioFormat::Int32:{
-        target_sample_format = AV_SAMPLE_FMT_S16P;break;
+        target_sample_format = AV_SAMPLE_FMT_S16P;
+        break;
     }
     case QAudioFormat::Float:{
-        target_sample_format = AV_SAMPLE_FMT_FLTP;break;
+        target_sample_format = AV_SAMPLE_FMT_FLTP;
+        break;
     }
     default:{
         target_sample_format = AV_SAMPLE_FMT_NONE;
     }
     }
     target_channel_layout = av_get_default_channel_layout(format.channelCount());
-    qDebug()<<"target_sample_rate"<<target_sample_rate;
-    qDebug()<<"target_sample_format"<<target_sample_format;
-    qDebug()<<"target_channel_layout"<<target_channel_layout;
-    qDebug()<<"XAudioResample::Open()";
+    //    qDebug()<<"target_sample_rate"<<target_sample_rate;
+    //    qDebug()<<"target_sample_format"<<target_sample_format;
+    //    qDebug()<<"target_channel_layout"<<target_channel_layout;
+    //    qDebug()<<"XAudioResample::Open()";
     return true;
 }
 
 int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
     if(swrContext==nullptr){
-        qDebug()<<"swrContext==nullptr";
-        qDebug()<<"in_frame->sample_rate"<<in_frame->sample_rate;
-        qDebug()<<"in_frame->format"<<in_frame->format;
-        qDebug()<<"in_frame->channels"<<in_frame->channels;
-        qDebug()<<"in_frame->channel_layout"<<in_frame->channel_layout;
+        //        qDebug()<<"swrContext==nullptr";
+        //        qDebug()<<"in_frame->sample_rate"<<in_frame->sample_rate;
+        //        qDebug()<<"in_frame->format"<<in_frame->format;
+        //        qDebug()<<"in_frame->channels"<<in_frame->channels;
+        //        qDebug()<<"in_frame->channel_layout"<<in_frame->channel_layout;
 
-        qDebug()<<"target_sample_rate"<<target_sample_rate;
-        qDebug()<<"target_sample_format"<<target_sample_format;
-        qDebug()<<"target_channel_layout"<<target_channel_layout;
+        //        qDebug()<<"target_sample_rate"<<target_sample_rate;
+        //        qDebug()<<"target_sample_format"<<target_sample_format;
+        //        qDebug()<<"target_channel_layout"<<target_channel_layout;
         uint64_t in_channel_layout = in_frame->channel_layout;
         if(in_frame->channel_layout==0) in_channel_layout = av_get_default_channel_layout(in_frame->channels);
-        swrContext = swr_alloc_set_opts(nullptr, target_channel_layout, static_cast<AVSampleFormat>(target_sample_format), target_sample_rate,
-                                        in_channel_layout, static_cast<AVSampleFormat>(in_frame->format),
+        swrContext = swr_alloc_set_opts(nullptr, target_channel_layout, target_sample_format, target_sample_rate,
+                                        in_channel_layout, (AVSampleFormat)in_frame->format,
                                         in_frame->sample_rate, 0, nullptr);
-        qDebug()<<"ggggggggg";
+        //        qDebug()<<"ggggggggg";
         int re = swr_init(swrContext);
         if(re!=0){
             qDebug() << "swr_init  failed!";
@@ -91,14 +90,14 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
     }
     if (dst_nb_samples > max_dst_nb_samples) {
         // 需要重新分配buffer
-//        qDebug() << "需要重新分配buffer" ;
+        //        qDebug() << "需要重新分配buffer" ;
         init_out_frame(out_frame, dst_nb_samples);
         max_dst_nb_samples = dst_nb_samples;
     }
     // 重采样
     int ret = swr_convert(swrContext, out_frame->data, dst_nb_samples,
                           const_cast<const uint8_t **>(in_frame->data), in_frame->nb_samples);
-//    qDebug()<<"XAudioResample::Resample() ret:"<<ret;
+    //    qDebug()<<"XAudioResample::Resample() ret:"<<ret;
 
     if(ret <= 0){
         qDebug() << "resample failed" ;
@@ -107,7 +106,7 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
         // 每帧音频数据量的大小
         int data_size = av_get_bytes_per_sample(static_cast<AVSampleFormat>(out_frame->format));
         int out_size = ret*out_frame->channels*data_size;
-//        qDebug() << "resample succeed:" << ret << "----dst_nb_samples:" << dst_nb_samples  << "---data_size:" << data_size ;
+        //        qDebug() << "resample succeed:" << ret << "----dst_nb_samples:" << dst_nb_samples  << "---data_size:" << data_size ;
         // 交错模式保持写入
         // 注意不要用 i < out_frame->nb_samples，因为重采样出来的点数不一定就是out_frame->nb_samples
         for (int i = 0; i < ret; i++) {
@@ -118,13 +117,11 @@ int XAudioResample::Resample(AVFrame *in_frame, char *out_data){
         }
         return out_size;
     }
-
 }
 
 void XAudioResample::Close(){
-    if(swrContext){
+    if(swrContext)
         swr_free(&swrContext);
-    }
 }
 
 

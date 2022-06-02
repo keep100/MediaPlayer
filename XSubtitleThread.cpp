@@ -1,10 +1,10 @@
 ﻿#include "XDecode.h"
 #include "XSubtitleThread.h"
 #include "XVideoThread.h"
-#include <QFile>
 #include <QFileInfo>
 #include <QDir>
 #include <QStringList>
+
 bool XSubtitleThread::Open(AVCodecParameters *para) {
     // 重置过滤器以及将字幕判断标志置0
     if (vt->buffersrcContext != nullptr)
