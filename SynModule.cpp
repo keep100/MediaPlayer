@@ -40,9 +40,9 @@ void SynModule::run() {
                     v_clock_t = vtemp->pts * v_time_base_d;
                     delay = (v_clock_t - a_clock_t) * 1000;
                 }
-                // delay最多为5ms
-                if (delay > 38)
-                    delay = 38;
+                // delay最多为35ms
+                if (delay > 35)
+                    delay = 35;
                 else if (delay < 0)
                     delay = 0;
                 msleep(delay);

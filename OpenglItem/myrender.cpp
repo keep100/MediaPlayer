@@ -63,7 +63,7 @@ void MyRender::init(){
 void MyRender::render(){
     //清空缓冲区
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.067f, 0.066f, 0.067f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     mProgram.bind();
 
