@@ -41,7 +41,7 @@ void SynModule::run() {
                     vtemp = yuvQueue.dequeue();
                     emit transmitYUV(vtemp);
                     v_clock_t = vtemp->pts * v_time_base_d;
-                    delay = (v_clock_t - syn_clock_t - 0.02) * 1000;
+                    delay = (v_clock_t - a_clock_t - 0.02) * 1000;
                 }
                 // delay最多为5ms
                 if (delay > 5 || delay < 0)

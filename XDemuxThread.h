@@ -1,3 +1,4 @@
+﻿#pragma once
 #ifndef XDEMUXTHREAD_H
 #define XDEMUXTHREAD_H
 
@@ -11,6 +12,7 @@ struct PCMData;
 class XDemux;
 class XVideoThread;
 class XAudioThread;
+class XSubtitleThread;
 class SynModule;
 class XDemuxThread:public QThread
 {
@@ -48,6 +50,7 @@ protected:
     XDemux *demux = 0;
     XVideoThread *vt = 0;
     XAudioThread *at = 0;
+    XSubtitleThread *st = 0;
     SynModule *syn=nullptr;
 };
 

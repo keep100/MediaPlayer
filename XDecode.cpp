@@ -64,7 +64,6 @@ bool XDecode::Open(AVCodecParameters *para)
         cout << "can't find the codec id " << para->codec_id << endl;
         return false;
     }
-    //cout << "find the AVCodec " << para->codec_id << endl;
 
     decode_mtx.lock();
     codec = avcodec_alloc_context3(vcodec);
@@ -88,7 +87,6 @@ bool XDecode::Open(AVCodecParameters *para)
         return false;
     }
     decode_mtx.unlock();
-    //cout << " avcodec_open2 success!" << endl;
     return true;
 }
 
@@ -136,6 +134,25 @@ AVFrame *XDecode::Recv()
     pts = frame->pts;
     return frame;
 }
+
+AVSubtitle* XDecode::RecvSubtile(AVPacket *pkt) {
+    //容错处理
+    if (!pkt || pkt->size <= 0 || !pkt->data)
+        return nullptr;
+    int got_frame;
+    decode_mtx.lock();
+    if (!codec)
+        return nullptr;
+    AVSubtitle *subtitle = new AVSubtitle;
+    int re = avcodec_decode_subtitle2(codec, subtitle, &got_frame, pkt);
+    decode_mtx.unlock();
+    av_packet_free(&pkt);
+    if (re != 0 || got_frame <= 0)
+        return nullptr;
+    pts = subtitle->pts;
+    return subtitle;
+}
+
 XDecode::XDecode()
 {
 }

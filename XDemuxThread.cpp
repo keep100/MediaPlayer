@@ -1,14 +1,11 @@
-#include "XDemuxThread.h"
+﻿#include "XDemuxThread.h"
 #include "XDemux.h"
 #include "XVideoThread.h"
 #include "XAudioThread.h"
+#include "XSubtitleThread.h"
 #include <iostream>
 #include <QDebug>
 #include <QMediaDevices>
-extern "C"
-{
-#include <libavformat/avformat.h>
-}
 #include "XDecode.h"
 void XDemuxThread::SetPause(bool isPause)
 {
@@ -16,7 +13,6 @@ void XDemuxThread::SetPause(bool isPause)
     this->isPause = isPause;
     if (at) at->SetPause(isPause);
     if (vt) vt->SetPause(isPause);
-   qDebug() << "XDemuxThread Pause"<<isPause;
     mux.unlock();
 }
 void XDemuxThread::SetVolume(double volume)
@@ -89,10 +85,17 @@ void XDemuxThread::run()
             continue;
         }
         //判断数据是音频
-        if (demux->IsAudio(pkt))
+        if (demux->isAudio(pkt))
         {
             if(at)
                 state = at->Push(pkt);
+            mux.unlock();
+            msleep(1);
+        }
+        else if (demux->isSubtitle(pkt))
+        {
+            if (st)
+                state = st->Push(pkt);
             mux.unlock();
             msleep(1);
         }
@@ -109,36 +112,31 @@ void XDemuxThread::run()
 //关闭线程清理资源
 void XDemuxThread::Close()
 {
-    qDebug()<<"XDemuxThread::Close()";
     isExit = true;
     wait();
     if (vt) vt->Close();
-    if (at) {
-        qDebug()<<"at->Close()";
-        at->Close();
-    }
+    if (at) at->Close();
     if (syn) syn->clear();
+    if (st) st->Clear();
     mux.lock();
-    if(vt) {
-        qDebug()<<"delete vt";
-        delete vt;
-    }
-//    qDebug()<<"XDemuxThread::fff2";
+    if(vt) delete vt;
     if(at) delete at;
 //    if(syn) delete syn;
-    vt = NULL;
-    at = NULL;
-    syn = NULL;
+    if (st) delete st;
+    vt = nullptr;
+    at = nullptr;
+    syn = nullptr;
+    st = nullptr;
     mux.unlock();
 }
 
 void XDemuxThread::Clear()
 {
-    qDebug()<<"XDemuxThread::Clear()";
     mux.lock();
     if (demux) demux->Clear();
     if (vt) vt->Clear();
     if (at) at->Clear();
+    if (st) st->Clear();
     if (syn) syn->clear();
     mux.unlock();
 }
@@ -154,6 +152,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         qDebug()<<"vt = new XVideoThread()";
         vt = new XVideoThread();
     }
+    vt->fileName = QString(url);
     if (!at){
         qDebug()<<"at = new XAudioThread()";
         at = new XAudioThread();
@@ -162,6 +161,11 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         qDebug()<<"syn = new SynModule()";
         syn = new SynModule();
     }
+    if (!st) {
+        qDebug()<<"st = new XSubtitleThread()";
+        st = new XSubtitleThread();
+    }
+    st->setVideoThread(vt);
     //打开解封装
     bool re = demux->Open(url);
     if (!re)
@@ -169,9 +173,17 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         qDebug() << "demux->Open(url) failed!" ;
         return false;
     }
-    qDebug()<<"demux->Open(url)"<<re;
-    if (syn)
-        syn->hasAudio =  demux->hasAudio();
+    syn->hasAudio =  demux->hasAudio();
+
+    AVRational time_base;
+    time_base = demux->getATimebase();
+    syn->setATimeBase(time_base);
+    at->a_time_base_d = av_q2d(time_base);
+
+    time_base = demux->getVTimebase();
+    vt->timebase = time_base;
+    syn->setVTimeBase(time_base);
+
     //打开视频解码器和处理线程
     if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height, syn))
     {
@@ -185,24 +197,15 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         re = false;
         qDebug() << "at->Open failed!" ;
     }
+    if (!st->Open(demux->CopySPara()))
+        qDebug() << "subtitle open failed!";
+
     if (isFirst)
-    {
         at->interupt = 1;
-    }
     if (!isFirst)
-    {
         isFirst = 1;
-    }
     totalMs = demux->totalMs;
-    AVRational time_base;
-    time_base = demux->getATimebase();
-    qDebug() << "hhh21"<<av_q2d(time_base);
-    syn->setATimeBase(time_base);
-    at->a_time_base_d = av_q2d(time_base);
-    time_base = demux->getVTimebase();
-    qDebug() << "hhh24"<<av_q2d(time_base);
-    syn->setVTimeBase(time_base);
-    qDebug() << "hhh3";
+
     mux.unlock();
     return re;
 }
@@ -230,7 +233,6 @@ XDemuxThread::XDemuxThread()
 
 XDemuxThread::~XDemuxThread()
 {
-    qDebug() << "XDemuxThread::~XDemuxThread()";
     isExit = true;
     wait();
 }

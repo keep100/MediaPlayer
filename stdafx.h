@@ -18,6 +18,9 @@ extern "C" {
 #include <libavutil/frame.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
-#include "libavutil/time.h"
+#include <libavfilter/avfilter.h>
+#include <libavfilter/buffersink.h>
+#include <libavfilter/buffersrc.h>
+#include <libavutil/time.h>
 }
 #endif // STDAFX_H

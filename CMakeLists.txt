@@ -25,7 +25,7 @@ find_package(Qt6 REQUIRED COMPONENTS MultimediaWidgets)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/include)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/lib)
-link_libraries(avcodec avformat avutil swscale swresample)
+link_libraries(avcodec avdevice avfilter avformat avutil postproc swscale swresample)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -58,6 +58,7 @@ set(PROJECT_SOURCES
         XAudioResample.h XAudioResample.cpp
         audioPlay2.h audioPlay2.cpp
         SynModule.h SynModule.cpp
+        XSubtitleThread.h XSubtitleThread.cpp
 )
 
 

@@ -24,8 +24,7 @@ public:
     void SetVolume(double volume);
     bool isPause = false;
     bool interupt = false;
-    // 是否有视频流，若没有则在当前线程发送播放时间
-    bool hasVideo;
+
     // 音频流的timebase
     double a_time_base_d;
 
@@ -38,4 +37,5 @@ protected:
 
 signals:
     void transmitTime(int64_t time);
+    void isEnd();
 };

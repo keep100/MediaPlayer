@@ -72,9 +72,9 @@ XDecodeThread::XDecodeThread()
     if (!decode) decode = new XDecode();
 }
 
-
 XDecodeThread::~XDecodeThread()
-{	//等待线程退出
+{
+    //等待线程退出
     isExit = true;
     wait();
 }

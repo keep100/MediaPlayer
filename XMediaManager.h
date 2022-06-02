@@ -54,8 +54,6 @@ public:
     States getCurState();
 
     void bind(QObject*);
-signals:
-   void transmit_yuv(std::shared_ptr<YUVData> t, int64_t time);
 
 protected:
     States  _curState;      //现态

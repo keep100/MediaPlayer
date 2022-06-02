@@ -1,6 +1,6 @@
-﻿#ifndef XDECODE_H
+﻿#pragma once
+#ifndef XDECODE_H
 #define XDECODE_H
-
 
 struct AVCodecParameters;
 struct AVCodecContext;
@@ -14,7 +14,7 @@ class XDecode
 public:
     long long pts = 0;
     bool isAudio = false;
-
+    AVCodecContext *codec = 0;
     //打开解码器,不管成功与否都释放para空间
     virtual bool Open(AVCodecParameters *para);
 
@@ -24,6 +24,7 @@ public:
     //获取解码数据，一次send可能需要多次Recv，获取缓冲中的数据Send NULL在Recv多次
     //每次复制一份，由调用者释放 av_frame_free
     virtual AVFrame* Recv();
+    AVSubtitle* RecvSubtile(AVPacket *pkt);
 
     virtual void Close();
     virtual void Clear();
@@ -38,7 +39,7 @@ public:
     XDecode();
     virtual ~XDecode();
 protected:
-    AVCodecContext *codec = 0;
+
     std::mutex decode_mtx;
 };
 

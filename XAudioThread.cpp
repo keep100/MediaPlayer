@@ -80,19 +80,25 @@ void XAudioThread::SetVolume(double volume)
 void XAudioThread::run()
 {
     char resample_data[1024*256];
-    QTimer timer;
     while (!isExit)
     {
         amux.lock();
-
         if (isPause)
         {
             amux.unlock();
             msleep(5);
             continue;
         }
-
-        AVPacket *pkt = Pop();
+        int i = 0;
+        AVPacket *pkt;
+        while ((pkt = Pop()) == NULL) {
+            // 若队列为空则睡眠，当连续睡眠次数超过10次时判断当前播放媒体流结束
+            if (i++ >= 10) {
+                emit isEnd();
+                break;
+            }
+            usleep(500);
+        }
 
         bool re = decode->Send(pkt);
         if (!re)
@@ -124,16 +130,6 @@ void XAudioThread::run()
             emit transmitTime(int64_t(pts * a_time_base_d * 1000 - noPlayMs));
             syn->setAClock(pts, noPlayMs);
             ap2->Write(resample_data, size);
-
-            connect(&timer, &QTimer::timeout, [&]{
-                noPlayMs -= 100;
-                if (noPlayMs >= 0)
-                    emit transmitTime(int64_t(pts * a_time_base_d * 1000 - noPlayMs));
-                else
-                    timer.stop();
-            });
-            timer.start(100);
-
         }
         amux.unlock();
     }
@@ -143,10 +139,10 @@ void XAudioThread::run()
 XAudioThread::XAudioThread()
 {
     QObject::connect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::updateTime);
+    QObject::connect(this, &XAudioThread::isEnd, Controller::controller, &Controller::finish);
     if(!ap2) ap2 = new audioPlay2();
     if(!rsmp) rsmp = new XAudioResample();
 }
-
 
 XAudioThread::~XAudioThread()
 {
@@ -155,4 +151,5 @@ XAudioThread::~XAudioThread()
     isExit = true;
     wait();
     QObject::disconnect(this, &XAudioThread::transmitTime, Controller::controller, &Controller::updateTime);
+    QObject::disconnect(this, &XAudioThread::isEnd, Controller::controller, &Controller::finish);
 }

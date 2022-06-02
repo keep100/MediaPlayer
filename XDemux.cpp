@@ -1,4 +1,5 @@
 ﻿#include "XDemux.h"
+#include "controller.h"
 #include <iostream>
 using namespace std;
 extern "C"
@@ -13,18 +14,25 @@ static double r2d(AVRational r)
 }
 XDemux::XDemux()
 {
-
+    QObject::connect(this, &XDemux::transmitTime, Controller::controller, &Controller::updateTime);
 }
 XDemux::~XDemux()
 {
-
+    QObject::disconnect(this, &XDemux::transmitTime, Controller::controller, &Controller::updateTime);
 }
-bool XDemux::IsAudio(AVPacket *pkt)
+bool XDemux::isAudio(AVPacket *pkt)
 {
     if (!pkt) return false;
     if (pkt->stream_index == videoStream)
         return false;
     return true;
+}
+bool XDemux::isSubtitle(AVPacket *pkt) {
+    if (!pkt)  return false;
+    if (pkt->stream_index == subtitleStream)
+        return true;
+    else
+        return false;
 }
 //清空读取缓存
 void XDemux::Clear()
@@ -69,6 +77,7 @@ bool XDemux::Seek(double pos)
     avformat_flush(ic);
 
     long long seekPos = ic->duration * pos;
+    emit transmitTime(pos * totalMs);
     int re = av_seek_frame(ic, -1, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mtx.unlock();
     if (re < 0) return false;
@@ -100,6 +109,19 @@ AVCodecParameters *XDemux::CopyAPara()
     }
     AVCodecParameters *pa = avcodec_parameters_alloc();
     avcodec_parameters_copy(pa, ic->streams[audioStream]->codecpar);
+    mtx.unlock();
+    return pa;
+}
+
+AVCodecParameters *XDemux::CopySPara() {
+    mtx.lock();
+    if (!ic || subtitleStream < 0)
+    {
+        mtx.unlock();
+        return NULL;
+    }
+    AVCodecParameters *pa = avcodec_parameters_alloc();
+    avcodec_parameters_copy(pa, ic->streams[subtitleStream]->codecpar);
     mtx.unlock();
     return pa;
 }
@@ -138,13 +160,12 @@ bool XDemux::Open(const char *url)
     }
     //获取总时长 毫秒
     totalMs = ic->duration / (AV_TIME_BASE / 1000);
-    qDebug() << "XDemux::Open total=" << totalMs;
 
     //获取音视频流信息
     //方法二
     videoStream = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-    qDebug()<<"videoStream"<<videoStream<<"audioStream"<<audioStream;
+    subtitleStream = av_find_best_stream(ic, AVMEDIA_TYPE_SUBTITLE, -1, -1, NULL, 0);
     //获取视频宽高
     if (videoStream >= 0)
     {

@@ -13,18 +13,17 @@
 //打开，不管成功与否都清理
 bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width,
                         int height, SynModule *syn) {
-    if (!para) {
+    if (!para)
         return false;
-    }
     Clear();
     vmux.lock();
     synpts = 0;
     codecParam = para;
     vmux.unlock();
     int re = true;
-    if (!decode->Open(para)) {
+    if (!decode->Open(para))
         re = false;
-    }
+
     this->syn = syn;
     return re;
 }
@@ -54,11 +53,28 @@ void XVideoThread::run() {
             AVFrame *frame = decode->Recv();
             if (!frame)
                 break;
-
-            std::shared_ptr<YUVData> t = convertToYUV420P(frame);
+            std::shared_ptr<YUVData> t;
+            //如果字幕成功打开，且是文本字幕，需经过过滤器，则输出使用subtitle
+            // filter过滤后的图像
+            if (subtitleOpened) {
+                qDebug() << "subtitleOpened";
+                AVFrame *filter_frame = av_frame_alloc();
+                if (av_buffersrc_add_frame_flags(buffersrcContext, frame,
+                                                 AV_BUFFERSRC_FLAG_KEEP_REF) < 0)
+                    break;
+                int ret = av_buffersink_get_frame(buffersinkContext, filter_frame);
+                if (ret < 0)
+                    break;
+                t = convertToYUV420P(filter_frame);
+                av_frame_unref(filter_frame);
+            }
+            // 字幕打开失败或者没有文本字幕
+            else {
+                t = convertToYUV420P(frame);
+            }
             if ((t->pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 t->pts = 0;
-            // 缓冲区满了则睡眠等待
+            // 缓冲区满了则睡眠等待，但判断不超过10次
             int i = 0;
             while (!syn->pushYuv(t) && i++ < 10) {
                 vmux.unlock();
@@ -160,12 +176,16 @@ bool XVideoThread::RepaintPts(long long seekPts, AVPacket *pkt) {
     return 0;
 }
 
-XVideoThread::XVideoThread() {
+XVideoThread::XVideoThread(){
     showImage = new ShowImage();
 }
 
 XVideoThread::~XVideoThread() {
     qDebug() << "XVideoThread::~XVideoThread()";
+    if (buffersrcContext != nullptr)
+        avfilter_free(buffersrcContext);
+    if (buffersinkContext != nullptr)
+        avfilter_free(buffersinkContext);
     isExit = true;
     wait();
 }
