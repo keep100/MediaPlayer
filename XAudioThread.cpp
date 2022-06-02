@@ -75,7 +75,6 @@ void XAudioThread::SetVolume(double volume)
 void XAudioThread::run()
 {
     char resample_data[1024*256];
-    double startTime = av_gettime() / 1000000.0;
     while (!isExit)
     {
         amux.lock();
@@ -117,8 +116,6 @@ void XAudioThread::run()
             int size = rsmp->Resample(frame, resample_data);
             if ((pts = frame->best_effort_timestamp) == AV_NOPTS_VALUE)
                 pts = 0;
-//            qDebug() << "clock" << av_gettime() / 1000000.0 - startTime;
-            qDebug() << "audioclock" << pts * a_time_base_d;
             while (ap2->GetFree() < size) {
                 msleep(1);
             }

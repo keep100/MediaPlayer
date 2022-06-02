@@ -100,8 +100,8 @@ void XDemuxThread::run()
         }
         else //视频
         {
-//            if (vt)
-//                state = vt->Push(pkt);
+            if (vt)
+                state = vt->Push(pkt);
             mux.unlock();
             msleep(1);
         }
@@ -219,9 +219,9 @@ void XDemuxThread::Start()
     if (!at) at = new XAudioThread();
     if (!syn) syn = new SynModule();
     QThread::start();
-//    if (vt)vt->start();
+    if (vt)vt->start();
     if (at)at->start();
-//    if (syn) syn->start();
+    if (syn) syn->start();
     mux.unlock();
     qDebug()<<"XDemuxThread::Start() finished";
 }
