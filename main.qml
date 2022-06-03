@@ -21,7 +21,7 @@ Window {
     property bool isCoverShow: false      //音频封面页是否已经展示
     property bool isShowQueue: false      //是否展示了播放列表
     property int playTime: controller?.time  //当前播放进度
-    property int playMode: 2              //播放模式，默认循环播放
+    property int playMode: 2              //播放模式，0代表随机播放，1顺序播放，2循环播放，3单曲播放，默认循环播放
     property int voice: 50                //播放音量
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
     property int curMediaIdx: -1          //当前正在播放文件的索引标记
@@ -99,6 +99,28 @@ Window {
                     })).join(':')
     }
 
+    //结束播放
+    function exitPlay(){
+        controller.exit();
+        if(isAudioPlay){
+            isAudioPlay=false;
+            isPlaying=false;
+        }
+        if(videoPage.visible){
+            mainWindow.visible=true;
+            videoPage.isShowQueue=false;
+            isVideoPlay=false;
+            isPlaying=false;
+            videoPage.close();
+        }
+        if(isCoverShow){
+            isCoverShow=false;
+            coverAnimation.from=0;
+            coverAnimation.to=windowHeight;
+            coverAnimation.running=true;
+        }
+    }
+
     //组件加载完毕
     Component.onCompleted: {
         bgPath=dataMgr.userInfo.bckPath?dataMgr.userInfo.bckPath:"qrc:/images/bg.jpg";
@@ -163,6 +185,39 @@ Window {
         }
         function onFileError(file){          //文件解析失败或者md5不一致
             console.log(file);
+        }
+        function onPlayMedia(){              //准备播放视频
+            if(curIdx){
+                isAudioPlay=true;
+            }else{
+                videoPage.visible=true;
+                mainWindow.visible=false;
+                isVideoPlay=true;
+            }
+            isPlaying=true;
+        }
+        function onFileFinish(){             //文件播放结束
+            if((curIdx===0&&Math.abs(controller.time-dataMgr.curVideo.duration)>5000)||(curIdx&&Math.abs(controller.time-dataMgr.curAudio.duration)>5000)){
+                return;
+            }
+            controller.stop();
+            isPlaying=false;
+
+            switch(playMode){
+            case 0:
+            case 1:
+                controller.playNext(curIdx===1);
+                curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                break;
+            case 2:
+                controller.setTime(0);
+                controller.stop();
+                isPlaying=true;
+                break;
+            case 3:
+                exitPlay();
+                break;
+            }
         }
     }
 

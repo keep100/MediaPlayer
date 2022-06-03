@@ -27,18 +27,7 @@ Window {
     Connections{
         target: controller
         function onFileError(file){          //文件解析失败或者md5不一致
-            console.log(file);
             messageDialog.open();
-        }
-        function onPlayMedia(){              //准备播放视频
-            console.log('begin play');
-            isPlaying=true;
-        }
-        function onFileFinish(){             //文件播放结束
-            console.log('fileFinish',playMode);
-            if(playMode===3){
-                controller.stop();
-            }
         }
     }
 
@@ -66,36 +55,6 @@ Window {
         anchors.fill: parent
         Component.onCompleted: bind(controller)
     }
-    //    Image {
-    //        id:img
-    //        anchors.fill: parent
-    //        cache: false
-    //        mipmap: true
-    //        smooth: true
-    ////        fillMode: Image.PreserveAspectFit
-    //    }
-
-    //与ShowImage类实例建立连接，接收刷新界面的信号
-    //    Connections{
-    //        target: MyImage
-    //        function onCallQmlRefeshImg(){
-    //            img.source = "";
-    //            img.source = "image://Imgs";
-    //        }
-    //    }
-
-    //加载页面
-//    Rectangle{
-//        id:loadingImg
-//        anchors.fill: parent
-//        color: setColor(13, 18, 31)
-//        Label{
-//            anchors.centerIn: parent
-//            text: '玩命加载中 . . .'
-//            font.pixelSize: 16
-//            color: "white"
-//        }
-//    }
 
     //错误信息对话框
     Dialog {

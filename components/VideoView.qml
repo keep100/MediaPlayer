@@ -100,12 +100,12 @@ Rectangle {
                                 isPlaying=false;
                                 controller.exit();
                             }
-                            videoPage.visible=true;
-                            mainWindow.visible=false;
+//                            videoPage.visible=true;
+//                            mainWindow.visible=false;
                             curMediaIdx=modelData.index;
                             controller.startPlay(modelData.index,false);
-                            isVideoPlay=true;
-                            isPlaying=true;
+//                            isVideoPlay=true;
+//                            isPlaying=true;
                         }
                     }
                 }

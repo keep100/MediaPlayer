@@ -14,7 +14,7 @@ Popup {
     background: Rectangle{
         anchors.fill: parent
         color:setColor(29, 34, 36)
-        radius: 10
+        radius: 18
     }
     contentItem: Text {
         text: qsTr(errorInfo)

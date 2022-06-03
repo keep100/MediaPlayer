@@ -121,8 +121,8 @@ Rectangle{
                                     if(curMediaIdx!==modelData.index){
                                         curMediaIdx=modelData.index;
                                         controller.startPlay(modelData.index,true);
-                                        isAudioPlay=true;
-                                        isPlaying=true;
+//                                        isAudioPlay=true;
+//                                        isPlaying=true;
                                     }
                                 }
                             }
@@ -152,8 +152,13 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    delDialog.open();
-                                    delDialog.delIdx=modelData.index;
+                                    if(curMediaIdx===modelData.index){
+                                        errorPopup.errorInfo="音频正在播放，无法删除";
+                                        errorPopup.open();
+                                    }else{
+                                        delDialog.open();
+                                        delDialog.delIdx=modelData.index;
+                                    }
                                 }
                             }
                         }
@@ -199,6 +204,9 @@ Rectangle{
             }
         }
     }
+
+    //警告弹窗
+    ErrorPopup{id:errorPopup}
 
     //删除对话框
     DelDialog{id:delDialog;mediaType: '音频'}

@@ -111,24 +111,7 @@ Rectangle{
                 anchors.fill: parent
                 enabled: isAudioPlay||isVideoPlay
                 onClicked: {
-                    controller.exit();
-                    if(isAudioPlay){
-                        isAudioPlay=false;
-                        isPlaying=false;
-                    }
-                    if(videoPage.visible){
-                        mainWindow.visible=true;
-                        videoPage.isShowQueue=false;
-                        isVideoPlay=false;
-                        isPlaying=false;
-                        videoPage.close();
-                    }
-                    if(isCoverShow){
-                        isCoverShow=false;
-                        coverAnimation.from=0;
-                        coverAnimation.to=windowHeight;
-                        coverAnimation.running=true;
-                    }
+                    exitPlay();
                 }
             }
         }
@@ -148,7 +131,6 @@ Rectangle{
                 onClicked: {
                     controller.playPre(mediaType==='audio');
                     curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
-
                 }
             }
         }
