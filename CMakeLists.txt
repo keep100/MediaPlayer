@@ -28,37 +28,37 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/lib)
 link_libraries(avcodec avdevice avfilter avformat avutil postproc swscale swresample)
 
 set(PROJECT_SOURCES
-        main.cpp
-        qml.qrc
-        image.qrc
-        XDemux.h XDemux.cpp
-        XDecode.h XDecode.cpp
-#        XVideoWidget.h XVideoWidget.cpp
-        XAudioThread.h XAudioThread.cpp
-        XVideoThread.h XVideoThread.cpp
-#        IVideoCall.h
-        XDemuxThread.h XDemuxThread.cpp
-        util/cursorposprovider.h
-        util/imageprovider.h util/imageprovider.cpp
-        util/bufferqueue.h
-        util/yuvdata.h
-        util/pcmdata.h
-        XDecodeThread.h XDecodeThread.cpp
-        OverloadSlider.h OverloadSlider.cpp
-#        widget.h widget.cpp widget.ui
-        PlayMode.h
-        controller.h controller.cpp
-        XMediaManager.h XMediaManager.cpp
-        OpenglItem/myitem.h OpenglItem/myitem.cpp
-        OpenglItem/myrender.h OpenglItem/myrender.cpp
-        DataManager/data.h DataManager/data.cpp
-        DataManager/datamanager.h DataManager/datamanager.cpp
-        DataManager/randomlist.h DataManager/randomlist.cpp
-        stdafx.h
-        XAudioResample.h XAudioResample.cpp
-        audioPlay2.h audioPlay2.cpp
-        SynModule.h SynModule.cpp
-        XSubtitleThread.h XSubtitleThread.cpp
+    src/main.cpp
+    qml.qrc
+    image.qrc
+    src/Demux/XDemux.h src/Demux/XDemux.cpp
+    src/Demux/XDemuxThread.h src/Demux/XDemuxThread.cpp
+    src/Decode/XDecode.h src/Decode/XDecode.cpp
+    src/Decode/XDecodeThread.h src/Decode/XDecodeThread.cpp
+    src/Audio/XAudioThread.h src/Audio/XAudioThread.cpp
+    src/Audio/XAudioResample.h src/Audio/XAudioResample.cpp
+    src/Audio/audioPlay2.h src/Audio/audioPlay2.cpp
+    src/Video/XVideoThread.h src/Video/XVideoThread.cpp
+    src/Video/SynModule.h src/Video/SynModule.cpp
+    src/Subtitle/XSubtitleThread.h src/Subtitle/XSubtitleThread.cpp
+
+    src/Controller/PlayMode.h
+    src/Controller/controller.h  src/Controller/controller.cpp
+    src/XMediaManager.h src/XMediaManager.cpp
+    src/OpenglItem/myitem.h src/OpenglItem/myitem.cpp
+    src/OpenglItem/myrender.h src/OpenglItem/myrender.cpp
+    src/DataManager/data.h src/DataManager/data.cpp
+    src/DataManager/datamanager.h src/DataManager/datamanager.cpp
+    src/DataManager/randomlist.h src/DataManager/randomlist.cpp
+    src/stdafx.h
+
+    utility/cursorposprovider.h
+    utility/bufferqueue.h
+    utility/yuvdata.h
+    utility/pcmdata.h
+
+    OverloadSlider.h OverloadSlider.cpp
+
 )
 
 
@@ -77,13 +77,13 @@ else()
         add_library(MediaPlayer SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(MediaPlayer
-          ${PROJECT_SOURCES}
-        )
-    endif()
+    # Define properties for Android with Qt 5 after find_package() calls as:
+    #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+else()
+    add_executable(MediaPlayer
+        ${PROJECT_SOURCES}
+    )
+endif()
 endif()
 
 
@@ -93,9 +93,9 @@ target_precompile_headers(
 )
 
 target_compile_definitions(MediaPlayer
-  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+    PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(MediaPlayer
-  PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick)
+    PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick)
 
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGLWidgets)
 target_link_libraries(MediaPlayer PRIVATE Qt6::OpenGL)
