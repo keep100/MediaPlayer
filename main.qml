@@ -183,8 +183,10 @@ Window {
             delDialog.mediaType=file.isAudio?'音频':'视频';
             delDialog.open();
         }
-        function onFileError(file){          //文件解析失败或者md5不一致
-            console.log(file);
+        function onFileError(file){          //md5不一致,文件内容不一致
+            controller.deleteData(file.index,curIdx===1);
+            errorPopup.errorInfo="文件内容不一致，已移除该文件";
+            errorPopup.open();
         }
         function onPlayMedia(){              //准备播放视频
             if(curIdx){

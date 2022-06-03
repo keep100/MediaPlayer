@@ -75,6 +75,7 @@ void XAudioThread::SetVolume(double volume)
 void XAudioThread::run()
 {
     char resample_data[1024*256];
+    bool endFlag = false;
     while (!isExit)
     {
         amux.lock();
@@ -86,14 +87,17 @@ void XAudioThread::run()
         }
         int i = 0;
         AVPacket *pkt;
-        while ((pkt = Pop()) == NULL) {
+        while ((pkt = Pop()) == nullptr && !endFlag) {
             // 若队列为空则睡眠，当连续睡眠次数超过10次时判断当前播放媒体流结束
             if (i++ >= 10) {
+                qDebug()<<isPause<<' '<<"clp";
+                endFlag = true;
                 emit isEnd();
                 break;
             }
             msleep(1);
         }
+
 
         bool re = decode->Send(pkt);
         if (!re)
@@ -102,7 +106,7 @@ void XAudioThread::run()
             msleep(1);
             continue;
         }
-
+        endFlag = false;
         //一次send 多次recv
         while (!isExit)
         {
