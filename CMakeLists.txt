@@ -88,7 +88,7 @@ endif()
 
 target_precompile_headers(
     MediaPlayer
-    PUBLIC stdafx.h
+    PUBLIC src/stdafx.h
 )
 
 target_compile_definitions(MediaPlayer
