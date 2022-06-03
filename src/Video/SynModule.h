@@ -2,9 +2,9 @@
 #ifndef SYNMODULE_H
 #define SYNMODULE_H
 #include "src/Audio/audioPlay2.h"
-#include "utility/bufferqueue.h"
-#include "utility/pcmdata.h"
-#include "utility/yuvdata.h"
+#include "utils/bufferqueue.h"
+#include "utils/pcmdata.h"
+#include "utils/yuvdata.h"
 
 // 音视频缓存队列的容量
 const static size_t yuvBuffSize = 50;

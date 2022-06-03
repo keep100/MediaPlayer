@@ -31,10 +31,12 @@ set(PROJECT_SOURCES
     src/main.cpp
     qml.qrc
     image.qrc
+
     src/Demux/XDemux.h src/Demux/XDemux.cpp
     src/Demux/XDemuxThread.h src/Demux/XDemuxThread.cpp
     src/Decode/XDecode.h src/Decode/XDecode.cpp
     src/Decode/XDecodeThread.h src/Decode/XDecodeThread.cpp
+
     src/Audio/XAudioThread.h src/Audio/XAudioThread.cpp
     src/Audio/XAudioResample.h src/Audio/XAudioResample.cpp
     src/Audio/audioPlay2.h src/Audio/audioPlay2.cpp
@@ -52,13 +54,10 @@ set(PROJECT_SOURCES
     src/DataManager/randomlist.h src/DataManager/randomlist.cpp
     src/stdafx.h
 
-    utility/cursorposprovider.h
-    utility/bufferqueue.h
-    utility/yuvdata.h
-    utility/pcmdata.h
-
-    OverloadSlider.h OverloadSlider.cpp
-
+    utils/cursorposprovider.h
+    utils/bufferqueue.h
+    utils/yuvdata.h
+    utils/pcmdata.h
 )
 
 

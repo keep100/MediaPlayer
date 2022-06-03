@@ -8,8 +8,8 @@ class SynModule;
 #include <mutex>
 #include "src/Decode/XDecodeThread.h"
 #include "src/Subtitle/XSubtitleThread.h"
-#include "utility/bufferqueue.h"
-#include "utility/yuvdata.h"
+#include "utils/bufferqueue.h"
+#include "utils/yuvdata.h"
 
 class XVideoThread: public XDecodeThread
 {

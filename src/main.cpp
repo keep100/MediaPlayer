@@ -1,6 +1,6 @@
 ﻿#include "Video/XVideoThread.h"
 #include "Demux/XDemuxThread.h"
-#include "utility/cursorposprovider.h"
+#include "utils/cursorposprovider.h"
 #include "XMediaManager.h"
 #include "OpenglItem/myitem.h"
 #include "Controller/controller.h"

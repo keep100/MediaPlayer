@@ -4,7 +4,7 @@
 #include <QObject>
 #include "PlayMode.h"
 #include "src/DataManager/datamanager.h"
-#include "utility/yuvdata.h"
+#include "utils/yuvdata.h"
 
 
 //提供方法给qml调用，并根据情况发出对应的信号

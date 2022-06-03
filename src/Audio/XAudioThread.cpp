@@ -1,6 +1,6 @@
 ﻿#include "XAudioThread.h"
 #include "src/Decode/XDecode.h"
-#include "utility/pcmdata.h"
+#include "utils/pcmdata.h"
 #include "src/Controller/controller.h"
 //停止线程，清理资源
 void XAudioThread::Close()

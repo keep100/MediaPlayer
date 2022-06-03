@@ -5,7 +5,7 @@
 #include "Demux/XDemux.h"
 #include "Decode/XDecode.h"
 #include <mutex>
-#include "utility/yuvdata.h"
+#include "utils/yuvdata.h"
 
 class XDemux;
 struct AVPacket;

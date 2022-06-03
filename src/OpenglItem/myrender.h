@@ -6,7 +6,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
-#include "utility/yuvdata.h"
+#include "utils/yuvdata.h"
 
 class MyRender :public QQuickFramebufferObject::Renderer,protected QOpenGLFunctions
 {
