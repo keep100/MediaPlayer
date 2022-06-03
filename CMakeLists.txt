@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
     src/main.cpp
     qml.qrc
     image.qrc
+    logo.rc
 
     src/Demux/XDemux.h src/Demux/XDemux.cpp
     src/Demux/XDemuxThread.h src/Demux/XDemuxThread.cpp
