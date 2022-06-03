@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 
@@ -10,6 +10,8 @@ Rectangle {
     height: parent.height-y
     color: "transparent"
     visible: curIdx===0
+    property bool isSearched: false                //是否在搜索状态
+    property variant searchList: []                //搜索结果列表
 
     Component {//视频列表子项
         id: videoDelegate
@@ -58,7 +60,10 @@ Rectangle {
 
                                 MouseArea{
                                     anchors.fill: parent
-                                    onClicked: delDialog.open()
+                                    onClicked: {
+                                        delDialog.delIdx=modelData.index;
+                                        delDialog.open();
+                                    }
                                 }
                             }
                             Rectangle{//更多信息框
@@ -79,7 +84,10 @@ Rectangle {
                                 }
                                 MouseArea{
                                     anchors.fill: parent
-                                    onClicked: morePopup.open()
+                                    onClicked: {
+                                        morePopup.file=modelData;
+                                        morePopup.open();
+                                    }
                                 }
                             }
                         }
@@ -87,10 +95,17 @@ Rectangle {
                         onEntered: videoCell.isEnter=true
                         onExited: videoCell.isEnter=false
                         onClicked: {
-                            videoPage.visible=true;
-                            mainWindow.visible=false;
-                            isVideoPlay=true;
-                            isPlaying=true;
+                            if(isAudioPlay){
+                                isAudioPlay=false;
+                                isPlaying=false;
+                                controller.exit();
+                            }
+//                            videoPage.visible=true;
+//                            mainWindow.visible=false;
+                            curMediaIdx=modelData.index;
+                            controller.startPlay(modelData.index,false);
+//                            isVideoPlay=true;
+//                            isPlaying=true;
                         }
                     }
                 }
@@ -122,15 +137,15 @@ Rectangle {
         cellWidth:  titleBar.isMaximized||isFullSreen?240:180
         cellHeight: cellWidth*0.7
         clip: true
-        visible: dataMgr?.videoList.length>0
+        visible: model?.length>0
 
-        model:dataMgr?.videoList
+        model: isSearched?searchList:dataMgr?.videoList
         delegate: videoDelegate
     }
 
     Column{
         anchors.centerIn: parent
-        visible: dataMgr?.videoList.length===0
+        visible: grid.model?.length===0
 
         Image {
             width: 110

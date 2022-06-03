@@ -1,7 +1,8 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls 2.5
+import QtQuick.Controls 2.15
 import Qt.labs.platform 1.1
+import Qt5Compat.GraphicalEffects
 import "./components/"
 
 Window {
@@ -12,17 +13,21 @@ Window {
     flags: Qt.Window | Qt.FramelessWindowHint  //除去窗口原生标题栏
 
     property int windowWidth: Screen.desktopAvailableWidth*0.65    //窗口宽度，跟随电脑屏幕变化
-    property int windowHeight: Screen.desktopAvailableHeight*0.85  //窗口高度，跟随电脑屏幕变化
+    property int windowHeight: Screen.desktopAvailableHeight*0.75  //窗口高度，跟随电脑屏幕变化
     property bool isFullSreen: false      //是否已经全屏
     property bool isAudioPlay: false      //是否有音频播放
     property bool isVideoPlay: false      //是否有视频播放
     property bool isPlaying: false        //音视频是否正在播放
     property bool isCoverShow: false      //音频封面页是否已经展示
     property bool isShowQueue: false      //是否展示了播放列表
-    property int playMode: 2              //播放模式，默认循环播放
-    property int voice: 15                //播放音量
+    property int playTime: controller?.time  //当前播放进度
+    property int playMode: 2              //播放模式，0代表随机播放，1顺序播放，2循环播放，3单曲播放，默认循环播放
+    property int voice: 50                //播放音量
     property int curIdx: 0                //当前页面，0代表视频页面，1代表音频页面
+    property int curMediaIdx: -1          //当前正在播放文件的索引标记
     property string playSpeed: '1.0x'     //当前视频播放速度
+    property int blur: 0                  //播放器背景模糊度
+    property string bgPath: "qrc:/images/bg.jpg"            //背景图片路径
 
     //设置color
     function setColor(r,g,b,a=1){
@@ -33,12 +38,21 @@ Window {
         showMaximized();
         windowWidth=Screen.desktopAvailableWidth;
         windowHeight=Screen.desktopAvailableHeight;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
     }
     //实现窗口正常化
     function showInitial(){
         showNormal();
+        if(isCoverShow){
+            coverPage.y=0;
+        }
         windowWidth=Screen.desktopAvailableWidth*0.65;
         windowHeight=Screen.desktopAvailableHeight*0.8;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
         if(videoPage.visible){
             mainWindow.visible=false;
             videoPage.x=Screen.width*0.5-videoPage.width*0.5;
@@ -49,8 +63,14 @@ Window {
     //实现窗口全屏
     function showFull(){
         showFullScreen();
+        if(isCoverShow){
+            coverPage.y=0;
+        }
         windowWidth=Screen.width;
         windowHeight=Screen.height;
+        if(!isCoverShow){
+            coverPage.y=windowHeight;
+        }
         if(videoPage.visible){
             mainWindow.visible=false;
             videoPage.x=0;
@@ -60,7 +80,7 @@ Window {
     //格式化时间戳
     function formatTime(time){
         if(typeof time !=='number' ||time<0){
-            return;
+            return "";
         }
         let hour=Math.floor(time/3600000);
         time=time%3600000;
@@ -79,11 +99,42 @@ Window {
                     })).join(':')
     }
 
+    //结束播放
+    function exitPlay(){
+        controller.exit();
+        if(isAudioPlay){
+            isAudioPlay=false;
+            isPlaying=false;
+        }
+        if(videoPage.visible){
+            mainWindow.visible=true;
+            videoPage.isShowQueue=false;
+            isVideoPlay=false;
+            isPlaying=false;
+            videoPage.close();
+        }
+        if(isCoverShow){
+            isCoverShow=false;
+            coverAnimation.from=0;
+            coverAnimation.to=windowHeight;
+            coverAnimation.running=true;
+        }
+    }
+
+    //组件加载完毕
+    Component.onCompleted: {
+        bgPath=dataMgr.userInfo.bckPath?dataMgr.userInfo.bckPath:"qrc:/images/bg.jpg";
+        blur=dataMgr.userInfo.blurRatio;
+        if(bgPath!=="qrc:/images/bg.jpg"){
+            configDialog.setImgPath(bgPath);
+        }
+    }
+
     //监听是否有音频在播放
     onIsAudioPlayChanged: {
         if(!isAudioPlay){
-            musicView.reset();
-            playQueue.reset();
+            musicView.setIdx(-1);
+            playQueue.setIdx(-1);
             controller.exit();
         }
     }
@@ -91,19 +142,31 @@ Window {
     //监听是否有视频在播放
     onIsVideoPlayChanged: {
         if(!isVideoPlay){
-            playQueue.reset();
+            playQueue.setIdx(-1);
             controller.exit();
         }
     }
-
-    //监听是否正在播放音视频
-    onIsPlayingChanged: controller.stop()
 
     //监听播放模式改变
     onPlayModeChanged: controller.mode=playMode
 
     //监听音量改变
     onVoiceChanged: controller.voice=voice
+
+    //监听当前播放文件变化
+    onCurMediaIdxChanged: {
+        playQueue.setIdx(curMediaIdx);
+        curIdx?musicView.setIdx(curMediaIdx):videoPage.setIdx(curMediaIdx);
+    }
+
+    //监听播放进度变化
+    onPlayTimeChanged: {
+        onPlayTimeChanged: {
+            if(visible&&!audioSlider.pressed){
+                audioSlider.value=playTime;
+            }
+        }
+    }
 
     //监听controller信号
     Connections{
@@ -115,7 +178,6 @@ Window {
             errorPopup.open();
         }
         function onFileMiss(file){           //文件缺失
-            console.log(file);
             delDialog.fileMiss=true;
             delDialog.delIdx=file.index;
             delDialog.mediaType=file.isAudio?'音频':'视频';
@@ -123,18 +185,44 @@ Window {
         }
         function onFileError(file){          //文件解析失败或者md5不一致
             console.log(file);
-
-        }
-        function onFileFinish(){             //文件播放结束
-            console.log('fileFinish');
         }
         function onPlayMedia(){              //准备播放视频
-            console.log('begin play');
+            if(curIdx){
+                isAudioPlay=true;
+            }else{
+                videoPage.visible=true;
+                mainWindow.visible=false;
+                isVideoPlay=true;
+            }
+            isPlaying=true;
         }
-        function onUpdate(yuv){
-            console.log('update');
+        function onFileFinish(){             //文件播放结束
+            if((curIdx===0&&Math.abs(controller.time-dataMgr.curVideo.duration)>5000)||(curIdx&&Math.abs(controller.time-dataMgr.curAudio.duration)>5000)){
+                return;
+            }
+            controller.stop();
+            isPlaying=false;
+
+            switch(playMode){
+            case 0:
+            case 1:
+                controller.playNext(curIdx===1);
+                curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                break;
+            case 2:
+                controller.setTime(0);
+                controller.stop();
+                isPlaying=true;
+                break;
+            case 3:
+                exitPlay();
+                break;
+            }
         }
     }
+
+    //背景设置对话框
+    ConfigDialog{id:configDialog}
 
     //文件缺失提示框
     DelDialog{id:delDialog}
@@ -148,10 +236,17 @@ Window {
     //窗口背景
     Image {
         id: bg
-        source: "qrc:/images/bg.jpg"
+        source: bgPath
         width: windowWidth
         height: windowHeight
         smooth: true
+    }
+
+    //毛玻璃效果
+    FastBlur {
+        anchors.fill: bg
+        source: bg
+        radius: blur
     }
 
     //左侧导航栏
@@ -223,8 +318,8 @@ Window {
         id: fileDialog
         fileMode:FileDialog.OpenFiles  //支持文件多选
         title:curIdx===0?"选择视频":"选择音频"
-        nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.dat *.mkv)"]  //筛选能够选择的文件类型
-                               :["audio files (*.mp3 *.flac *.wav *rm)"]
+        nameFilters: curIdx===0?["video files (*.mp4 *.flv *.avi *.mkv)"]  //筛选能够选择的文件类型
+                               :["audio files (*.mp3 *.flac)"]
         onAccepted:{
             const urlList=[];
             for(let url of files){
@@ -266,7 +361,10 @@ Window {
     //音频播放进度条
     Slider {
         id: audioSlider
-        value: 0.2
+        from: 0
+        value: 0
+        to: dataMgr?.curAudio.duration ?? 100
+                                          stepSize: 1
         y:footer.y-audioSlider.availableHeight / 2
         z:1
         visible: isAudioPlay
@@ -313,11 +411,92 @@ Window {
             border.color: "#bdbebf"
             visible: false
         }
+        onPressedChanged: {//监听最后释放位置
+            if(!pressed){
+                controller.setTime(value);
+            }
+        }
     }
 
     //音频底部控制栏
     Footer{
         id:footer
         mediaType: 'audio'
+        focus: true
+        property variant pressedKeys: new Set()  //存储按下还未释放的按键
+
+        Keys.onPressed:function(e) {
+            //将键值加入set
+            if(!e.isAutoRepeat){
+                footer.pressedKeys.add(e.key);
+            }
+        }
+        Keys.onReleased: function(e){
+            //将按键值弹出
+            if(!e.isAutoRepeat&&footer.pressedKeys.has(e.key)){
+                footer.pressedKeys.delete(e.key);
+            }
+            switch(e.key){
+            case Qt.Key_Space:     //处理空格键，暂停或播放音视频
+                console.log('sapce');
+                if(isAudioPlay||isVideoPlay){
+                    isPlaying=!isPlaying;
+                    controller.stop();
+                }
+                break;
+            case Qt.Key_Escape:     //处理esc键，退出全屏
+                console.log('esc');
+                if(isFullSreen){
+                    isFullSreen=false;
+                    showInitial();
+                }
+                break;
+            case Qt.Key_F:         //处理Ctrl+F，全屏
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl F');
+                    isFullSreen=true;
+                    showFull();
+                }
+                break;
+            case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl I');
+                    if(!fileDialog.visible){
+                        fileDialog.open();
+                    }
+                }
+                break;
+            case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl left');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playPre(true):controller.playPre(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Right:      //处理Ctrl+ → ，下一首
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl right');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playNext(true):controller.playNext(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl up');
+                    mainWindow.voice++;
+                }
+                break;
+            case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
+                if(footer.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl down');
+                    mainWindow.voice--;
+                }
+                break;
+            }
+        }
     }
 }

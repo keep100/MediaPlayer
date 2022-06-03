@@ -10,8 +10,21 @@ Rectangle{
     width: parent.width*0.22
     color: setColor(0,0,0,0.7)
 
-    function reset(){
-        queue.currentIndex=-1;
+    function setIdx(idx){
+        queue.currentIndex=idx;
+    }
+    //关闭播放队列
+    function onClose(){
+        mainWindow.isShowQueue=false;
+        queueAnimation.from = windowWidth-playQueue.width;
+        queueAnimation.to = windowWidth;
+        queueAnimation.target=playQueue;
+        queueAnimation.running = true;
+    }
+    //打开播放界面
+    function openVideoPage(){
+        videoPage.visible=true;
+        mainWindow.visible=false;
     }
 
     Column{
@@ -70,7 +83,25 @@ Rectangle{
                     hoverEnabled: true
                     onEntered: queueItem.isEnter=true
                     onExited: queueItem.isEnter=false
-                    onClicked: queue.currentIndex=index
+                    onClicked:{
+                        if(curMediaIdx!==modelData.index){
+                            curMediaIdx=modelData.index;
+                            if(curIdx===0){
+                                if(isAudioPlay){
+                                    isAudioPlay=false;
+                                    isPlaying=false;
+                                    controller.exit();
+                                }
+                                if(mainWindow.visible){
+                                    onClose();
+                                    openVideoPage();
+                                }
+                            }
+                            controller.startPlay(modelData.index,curIdx===1);
+                            curIdx?isAudioPlay=true:isVideoPlay=true;
+                            isPlaying=true;
+                        }
+                    }
                 }
             }
         }
@@ -87,8 +118,8 @@ Rectangle{
             //列表数据改变
             onModelChanged: isAudioPlay||isVideoPlay?
                                 (isAudioPlay?queue.currentIndex=dataMgr?.curAudio.index ?? 0
-                                            :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
-                              :reset()
+                                                                                         :queue.currentIndex=dataMgr?.curVideo.index ?? 0)
+                              :setIdx(-1)
         }
 
         //队列空状态

@@ -1,6 +1,7 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
+import MyItem 1.0
 
 Window {
     id:videoPage
@@ -11,6 +12,24 @@ Window {
 
     property bool isEnabled: false    //是否启用底部栏动画
     property bool isShowQueue: false  //是否展示了视频播放列表
+    property int playTime: controller?.time  //当前播放进度
+
+    function setIdx(idx){
+        videoQueue.setIdx(idx);
+    }
+    onPlayTimeChanged: {
+        if(visible&&!videoSlider.pressed){
+            videoSlider.value=playTime;
+        }
+    }
+
+    //监听controller信号
+    Connections{
+        target: controller
+        function onFileError(file){          //文件解析失败或者md5不一致
+            messageDialog.open();
+        }
+    }
 
     //定时器，时间到隐藏顶部和底部栏
     Timer {
@@ -32,34 +51,9 @@ Window {
     }
 
     //视频流展示区域
-//    Image {
-//        id:img
-//        anchors.fill: parent
-//        cache: false
-//        mipmap: true
-//        smooth: true
-////        fillMode: Image.PreserveAspectFit
-//    }
-
-    //与ShowImage类实例建立连接，接收刷新界面的信号
-//    Connections{
-//        target: MyImage
-//        function onCallQmlRefeshImg(){
-//            img.source = "";
-//            img.source = "image://Imgs";
-//        }
-//    }
-
-    //加载页面
-    Rectangle{
+    MyItem{
         anchors.fill: parent
-        color: setColor(13, 18, 31)
-        Label{
-            anchors.centerIn: parent
-            text: '玩命加载中 . . .'
-            font.pixelSize: 16
-            color: "white"
-        }
+        Component.onCompleted: bind(controller)
     }
 
     //错误信息对话框
@@ -118,6 +112,7 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
+                        controller.exit();
                         if(isVideoPlay){
                             isVideoPlay=false;
                             isPlaying=false;
@@ -155,7 +150,9 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        messageDialog.close();
                     }
                 }
             }
@@ -185,7 +182,11 @@ Window {
                     onEntered: parent.isHover=true
                     onExited: parent.isHover=false
                     onClicked: {
-                        messageDialog.close()
+                        let delIdx=dataMgr.curVideo.index;
+                        controller.playNext(false);
+                        curMediaIdx=dataMgr.curVideo.index;
+                        controller.deleteData(delIdx,false);
+                        messageDialog.close();
                     }
                 }
             }
@@ -193,8 +194,85 @@ Window {
     }
 
     MouseArea{
+        id:globalMouseArea
         anchors.fill: parent
         hoverEnabled: true
+        focus: true
+        property variant pressedKeys: new Set()  //存储按下还未释放的按键
+
+        Keys.onPressed:function(e) {
+            //将键值加入set
+            if(!e.isAutoRepeat){
+                globalMouseArea.pressedKeys.add(e.key);
+            }
+        }
+        Keys.onReleased: function(e){
+            //将按键值弹出
+            if(!e.isAutoRepeat&&globalMouseArea.pressedKeys.has(e.key)){
+                globalMouseArea.pressedKeys.delete(e.key);
+            }
+            switch(e.key){
+            case Qt.Key_Space:     //处理空格键，暂停或播放音视频
+                console.log('sapce');
+                if(isAudioPlay||isVideoPlay){
+                    isPlaying=!isPlaying;
+                    controller.stop();
+                }
+                break;
+            case Qt.Key_Escape:     //处理esc键，退出全屏
+                console.log('esc');
+                if(isFullSreen){
+                    isFullSreen=false;
+                    showInitial();
+                }
+                break;
+            case Qt.Key_F:         //处理Ctrl+F，全屏
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl F');
+                    isFullSreen=true;
+                    showFull();
+                }
+                break;
+            case Qt.Key_I:         //处理Ctrl+I，唤起资源导入弹窗
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl I');
+                    if(!fileDialog.visible){
+                        fileDialog.open();
+                    }
+                }
+                break;
+            case Qt.Key_Left:      //处理Ctrl+ ← ，上一首
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl left');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playPre(true):controller.playPre(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Right:      //处理Ctrl+ → ，下一首
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl right');
+                    if(isAudioPlay||isVideoPlay){
+                        isAudioPlay?controller.playNext(true):controller.playNext(false);
+                        curMediaIdx=isAudioPlay?dataMgr.curAudio.index:dataMgr.curVideo.index;
+                    }
+                }
+                break;
+            case Qt.Key_Up:      //处理Ctrl+ ↑ ，增加音量
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl up');
+                    mainWindow.voice++;
+                }
+                break;
+            case Qt.Key_Down:      //处理Ctrl+ ↓ ，降低音量
+                if(globalMouseArea.pressedKeys.has(Qt.Key_Control)){
+                    console.log('ctrl down');
+                    mainWindow.voice--;
+                }
+                break;
+            }
+        }
 
         //监听鼠标移动
         onPositionChanged: {
@@ -205,7 +283,6 @@ Window {
             timer.start();
         }
 
-        onClicked: messageDialog.open()
         //顶部栏
         Rectangle{
             id:topBar
@@ -222,15 +299,15 @@ Window {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: qsTr("播放器名字")
+                    text: qsTr("易影")
                     leftPadding: 8
                     color: "white"
                     font.pixelSize: 14
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: qsTr("这是视频名字")
-                    leftPadding: 10
+                    text: dataMgr?.curVideo.fileName ?? "这是视频名字"
+                                                        leftPadding: 10
                     color: "white"
                     font.pixelSize: 14
                     anchors.verticalCenter: parent.verticalCenter
@@ -273,8 +350,9 @@ Window {
         Slider {
             id: videoSlider
             from: 0
-            value: controller?.time ?? 0
-            to:100
+            value: 0
+            to: dataMgr?.curVideo.duration ?? 100
+                                              stepSize: 1
             y:footer.y-videoSlider.availableHeight / 2
             z:1
             visible: footer.y!==windowHeight
@@ -319,6 +397,11 @@ Window {
                 color: videoSlider.pressed ? "#f0f0f0" : "#f6f6f6"
                 border.color: "#bdbebf"
                 visible: false
+            }
+            onPressedChanged: {
+                if(!pressed){
+                    controller.setTime(value);
+                }
             }
         }
 

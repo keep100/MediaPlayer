@@ -57,6 +57,7 @@ Rectangle{
             id:listView
             width: parent.width
             height: 30*model.length
+            interactive: false
             model:[
                 {
                     text:'视频',

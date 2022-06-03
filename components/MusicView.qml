@@ -10,9 +10,11 @@ Rectangle{
     y:uploadBtn.y+uploadBtn.height+20
     color: "transparent"
     visible: curIdx===1
+    property bool isSearched: false                //是否在搜索状态
+    property variant searchList: []                //搜索结果列表
 
-    function reset(){
-        musicList.currentIndex=-1;
+    function setIdx(idx){
+        musicList.currentIndex=idx;
     }
 
     //有音频的状态展示区
@@ -20,11 +22,13 @@ Rectangle{
         leftPadding: uploadBtn.x
         visible: musicList.count>0
         Image {
+            id:listImg
             width: 100
             height: 100
             source: "qrc:/images/音乐封面.png"
         }
         Row{
+            id:titleRow
             topPadding: 10
             bottomPadding: 10
             Text {
@@ -35,7 +39,7 @@ Rectangle{
             }
             Text {
                 leftPadding: 14
-                text: qsTr("共100首")
+                text: qsTr("共"+dataMgr?.audioList.length+"首")
                 color: "white"
                 font.pixelSize: 14
                 anchors.verticalCenter: parent.verticalCenter
@@ -48,6 +52,7 @@ Rectangle{
 
             //列表表头
             Rectangle{
+                id:header
                 width: parent.width
                 height: 36
                 color: setColor(40, 41, 40,0.85)
@@ -86,14 +91,14 @@ Rectangle{
 
                     Rectangle{
                         anchors.fill: parent
-                        color: musicItem.isEnter||musicList.currentIndex===index?
+                        color: musicItem.isEnter||musicList.currentIndex===modelData.index?
                                    setColor(66, 105, 137,0.8):setColor(75, 75, 80,0.6)
 
                         Image {
                             x:parent.width*0.04
                             width: 18
                             height: 18
-                            source: musicList.currentIndex===index?"qrc:/images/音量.png":""
+                            source: musicList.currentIndex===modelData.index?"qrc:/images/音量.png":""
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
@@ -113,10 +118,12 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    musicList.currentIndex=modelData.index;
-                                    controller.startPlay(modelData.index,true);
-                                    isAudioPlay=true;
-                                    isPlaying=true;
+                                    if(curMediaIdx!==modelData.index){
+                                        curMediaIdx=modelData.index;
+                                        controller.startPlay(modelData.index,true);
+//                                        isAudioPlay=true;
+//                                        isPlaying=true;
+                                    }
                                 }
                             }
                         }
@@ -145,8 +152,13 @@ Rectangle{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    delDialog.open();
-                                    delDialog.delIdx=modelData.index;
+                                    if(curMediaIdx===modelData.index){
+                                        errorPopup.errorInfo="音频正在播放，无法删除";
+                                        errorPopup.open();
+                                    }else{
+                                        delDialog.open();
+                                        delDialog.delIdx=modelData.index;
+                                    }
                                 }
                             }
                         }
@@ -182,16 +194,19 @@ Rectangle{
             ListView{
                 id:musicList
                 width: parent.width
-                height:titleBar.isMaximized||isFullSreen?windowHeight*0.48:windowHeight*0.35
-                model:dataMgr?.audioList
+                height:musicView.height-listImg.height-titleRow.height-header.height
+                model: isSearched?searchList:dataMgr?.audioList
                 clip: true
                 delegate:musicDelegate
-                visible: dataMgr?.audioList.length>0
+                visible: model?.length>0
                 //音频数据列表改变
-                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr?.curAudio.index ?? 0 :reset()
+                onModelChanged: isAudioPlay?musicList.currentIndex=dataMgr?.curAudio.index ?? 0 :setIdx(-1)
             }
         }
     }
+
+    //警告弹窗
+    ErrorPopup{id:errorPopup}
 
     //删除对话框
     DelDialog{id:delDialog;mediaType: '音频'}
@@ -202,7 +217,7 @@ Rectangle{
     //无音频的空状态展示区
     Column{
         anchors.centerIn: parent
-        visible: dataMgr?.audioList.length===0
+        visible: musicList.model?.length===0
 
         Image {
             width: 100
@@ -218,4 +233,3 @@ Rectangle{
         }
     }
 }
-
