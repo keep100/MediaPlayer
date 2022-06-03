@@ -23,14 +23,6 @@ Window {
         }
     }
 
-    //监听controller信号
-    Connections{
-        target: controller
-        function onFileError(file){          //文件解析失败或者md5不一致
-            messageDialog.open();
-        }
-    }
-
     //定时器，时间到隐藏顶部和底部栏
     Timer {
         id:timer

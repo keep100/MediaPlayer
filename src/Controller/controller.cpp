@@ -56,13 +56,11 @@ void Controller::startPlay(int index,bool isAudio){
     State s = manager.check(index,isAudio);
     if(s == State::Normal){
         //记录历史
-        manager.recordVideo(_time);
+        manager.recordVideo(abs(_time-manager.curVideo().duration())<=5000?0:_time);
         //设置当前视频
         manager.setCur(index,isAudio);
         //发送对应的信号
         emit playMedia(manager.getData(index,isAudio).filePath());
-        qDebug()<<"startplay"<<manager.getData(index,isAudio).fileName()<<manager.getData(index,isAudio).lastTime();
-        qDebug()<<"voice"<<_voice;
         emit voiceChanged(_voice);
         setTime(manager.getData(index,isAudio).lastTime());
 
@@ -117,7 +115,7 @@ void Controller::setUserInfo(QString path,float ratio){
 }
 
 void Controller::finish(){
-    manager.recordVideo(0);     //如果当前播放结束就把记录置为0
+//    manager.recordVideo(0);     //如果当前播放结束就把记录置为0
     emit fileFinish();
 }
 
