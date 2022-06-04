@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #ifndef SYNMODULE_H
 #define SYNMODULE_H
 #include "src/Audio/audioPlay2.h"
@@ -40,7 +40,7 @@ public:
     bool pushYuv(std::shared_ptr<YUVData> data) {
         return yuvQueue.tryEnqueue(data);
     }
-    // 将音频时钟赋值给syn_clock_t
+     // 设置音频时钟
     void setAClock(int64_t pts, long long noPlayMs) {
         a_clock_t = pts * a_time_base_d - noPlayMs / 1000.0;
     }
