@@ -82,7 +82,8 @@
 ```
 
 ## 运行环境
-    Qt 6.3.0 + Qt5Compat + QMultiMedia（Qt5Compat与QMultiMedia在安装Qt时选择）
+    Qt 6.3.0
+    ![安装勾选](images/Snipaste_2022-06-05_23-26-49.png)
 
 ## 使用
     1. 将仓库拉至本地，使用Qt打开项目（在Qt中打开CMakeLists.txt）
