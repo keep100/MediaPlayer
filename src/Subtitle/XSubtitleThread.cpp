@@ -1,4 +1,4 @@
-﻿#include "src/Decode/XDecode.h"
+#include "src/Decode/XDecode.h"
 #include "XSubtitleThread.h"
 #include "src/Video/XVideoThread.h"
 #include <QFileInfo>
@@ -17,6 +17,10 @@ bool XSubtitleThread::Open(AVCodecParameters *para) {
     assert (vt != nullptr);
 
     AVCodecContext *videoCodecContext = vt->decode->codec;
+    // 若没有视频解码器上下文
+    if (videoCodecContext == nullptr)
+        return false;
+
     QString args = QString::asprintf(
                 "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d", videoCodecContext->width,
                 videoCodecContext->height, videoCodecContext->pix_fmt, vt->timebase.num, vt->timebase.den,
