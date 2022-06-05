@@ -85,5 +85,5 @@
     Qt 6.3.0 + Qt5Compat + QMultiMedia（Qt5Compat与QMultiMedia在安装Qt时选择）
 
 ## 使用
-    将仓库拉至本地，使用Qt打开项目（在Qt中打开CMakeLists.txt），
-然后先编译一次，在项目的同级目录下出现build文件夹，将项目中ffmpeg文件夹里的bin压缩包中的文件全部放入build文件夹下，然后运行
+    1. 将仓库拉至本地，使用Qt打开项目（在Qt中打开CMakeLists.txt）
+    2. 然后先编译一次，在项目的同级目录下出现build文件夹，将项目中ffmpeg文件夹里的bin压缩包中的文件全部放入build文件夹下，然后运行
